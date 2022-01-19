@@ -135,3 +135,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# key files
+public.key
