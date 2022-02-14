@@ -1,7 +1,11 @@
 import struct
-from typing import Any, Final, Union
+from typing import Final, Union
 from multipledispatch import dispatch
 from tfprotocol_client.misc.constants import ENDIANESS, STRING_ENCODING
+from tfprotocol_client.misc.parse_utils import (
+    separate_status_codenumber,
+    separate_status_name,
+)
 from tfprotocol_client.misc.status_server_code import StatusServerCode
 from tfprotocol_client.models.status_info import StatusInfo
 
@@ -33,31 +37,27 @@ class MessageBuilder:
         return header, body
 
     def build_receive_status(
-        self, header: int, message: bytes, parse_code: bool = False
+        self, header: int, message: bytes, parse_code: bool = True
     ) -> StatusInfo:
-        msg_str: str = str(message, encoding='utf8')
-        early_ocurrence: int = len(msg_str)
-        status: StatusServerCode = StatusServerCode.UNKNOWN
         code: int = header
-        for status_code in StatusServerCode:
-            index = msg_str.find(status_code.name)
-            if 0 <= index < early_ocurrence:
-                status = status_code
-                early_ocurrence = index
-                if index == 0:
-                    break
-        msg_str = msg_str.replace(status.name, '', 1).strip().replace(' : ', '', 1)
-        if (status != StatusServerCode.FAILED and len(msg_str) == 0) or not parse_code:
+        msg_str: str = str(message, encoding='utf8')
+        status_str, msg_str = separate_status_name(msg_str)
+        status: StatusServerCode = StatusServerCode.from_str(status_str.upper())
+        status: StatusServerCode = StatusServerCode.UNKNOWN if status is None else status
+
+        if (status != StatusServerCode.FAILED) or not parse_code:
+            # ? <status> [<msg_str>]
+            msg_str = msg_str.replace(status.name, '', 1).strip()
             code = status.value
         else:
-            strparts = msg_str.split('')
-            # TODO: UNKNOWN CODE CALCULATION FROM MESSAGE
+            # ? FAILED <str_code> : <msg_str>
+            str_code, msg_str = separate_status_codenumber(msg_str)
+            msg_str = msg_str.strip().replace(' : ', '', 1)
+            code = int(str_code)
         return StatusInfo(status, code=code, message=msg_str)
 
     def build_recvd_header(self, encoded_header: bytes):
         return int.from_bytes(encoded_header, byteorder='big')
-
-    # def _decode_int(self, encoded_value: bytes) -> int:
 
     @dispatch(str)
     def _encode_value(self, value: str) -> bytes:
