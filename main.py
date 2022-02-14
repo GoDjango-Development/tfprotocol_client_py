@@ -1,5 +1,6 @@
+from datetime import datetime
 import os
-from tfprotocol_client.handlers.super_proto_handler import SuperProtoHandler
+from tfprotocol_client.handlers.proto_handler import TfProtoHandler
 from tfprotocol_client.models.status_info import StatusInfo
 from tfprotocol_client.tfprotocol import TfProtocol
 
@@ -21,67 +22,14 @@ def get_random_bytes(lenght: int) -> bytes:
     return os.urandom(lenght)
 
 
-# def encrypt_session_key(session_key: bytes, public_key: str) -> bytes:
-#     pass
-# cipher = c
-
-
-# def test():
-#     ADDRESS = 'tfproto.expresscuba.com'
-#     PORT = 10345
-#     BUFFER_SIZE = 512 * 1024
-#     ENDIANESS = '>' if sys.byteorder == 'little' else '<'
-#     print('Start Test')
-
-#     # START CONNECTION
-#     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-#     ip = socket.gethostbyname(ADDRESS)
-#     result = sock.connect((ip, PORT))
-
-#     payload = b'0.0'
-
-#     header_buffer = ctypes.create_string_buffer(4)
-#     struct.pack_into(f'{ENDIANESS}i', header_buffer, 0, len(payload))
-#     sock.send(header_buffer)  # SEND HEADER
-#     sock.send(struct.pack(f'{ENDIANESS}{len(payload)}s', payload))  # SEND BODY
-
-#     a = sock.recv(4)  # RECIVE header
-#     print(a)
-#     (a,) = struct.unpack(f'{ENDIANESS}i', a)
-#     print(a)
-#     if a > 0:
-#         b = sock.recv(a)  # RECIVE body
-#         print(b)
-#         (b,) = struct.unpack(f'{ENDIANESS}{a}s', b)
-#         print(b)
-#     # ENCRYPT
-#     print('==Encrypt==')
-#     enc_session_key = pyCryptodomeExample()
-#     header_buffer = ctypes.create_string_buffer(4)
-#     struct.pack_into(f'{ENDIANESS}i', header_buffer, 0, len(enc_session_key))
-#     sock.send(header_buffer)  # SEND HEADER
-#     sock.send(
-#         struct.pack(f'{ENDIANESS}{len(enc_session_key)}s', enc_session_key)
-#     )  # SEND BODY
-#     a = sock.recv(4)  # RECIVE header
-#     print(a)
-#     (a,) = struct.unpack(f'{ENDIANESS}i', a)
-#     print(a)
-#     if a > 0:
-#         b = sock.recv(a)  # RECIVE body
-#         print(b)
-#         (b,) = struct.unpack(f'{ENDIANESS}{a}s', b)
-#         print(b)
-
-
-class MyHandler(SuperProtoHandler):
+class MyHandler(TfProtoHandler):
     """My handler
 
     Args:
         SuperProtoHandler ([type]): [description]
     """
 
-    def echoCallback(self, value: str):
+    def echo_callback(self, value: str):
         """ echo <value>
 
         Args:
@@ -89,13 +37,31 @@ class MyHandler(SuperProtoHandler):
         """
         print(f'Server: {value}')
 
-    def statusServer(self, status: StatusInfo):
+    def mkdir_callback(self, value: StatusInfo):
+        """ mkdir <value>
+
+        Args:
+            value (str): String value.
+        """
+        print(f'Server: {value}')
+
+    def date_callback(self, date: datetime, value: StatusInfo):
+        """ date <value>
+        """
+        print(f'Server: {value}; datetime:{date}')
+
+    def datef_callback(self, date: datetime, value: StatusInfo):
+        """ datef <value>
+        """
+        print(f'Server: {value}; datetime:{date}')
+
+    def status_server(self, status: StatusInfo):
         pass
 
-    def responseServerCallback(self, status: StatusInfo):
+    def response_server_callback(self, status: StatusInfo):
         pass
 
-    def instanceTfProtocol(self, instance: any):
+    def instance_tfprotocol(self, instance: any):
         pass
 
 
@@ -105,4 +71,5 @@ if __name__ == '__main__':
     proto = TfProtocol('0.0', get_publickey(), 'testhash', MyHandler(), ADDRESS, PORT)
 
     proto.connect()
-    proto.echo_command('Hello_World.')
+    # proto.echo_command('Hello_World.')
+    proto.datef_command()
