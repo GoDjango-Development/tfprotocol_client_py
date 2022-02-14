@@ -1,7 +1,7 @@
+from io import BytesIO
+from typing import Any
 import socket
 import socks
-from io import BytesIO
-from typing import Any, Optional
 from tfprotocol_client.misc.constants import DFLT_HEADER_SIZE, DFLT_MAX_BUFFER_SIZE
 from tfprotocol_client.misc.guard_exception import (
     on_except,
@@ -145,8 +145,10 @@ class SocketClient:
                 # header_size is not going to reach this line
                 # cause is an integer of up to 8 bytes only
                 raise TfException(
+                    exception=excpt,
                     code=ErrorCode.ON_WRITE_OR_RECEIVE_TO_SOCKET,
-                    message=f'Heap space not enough server answer with a very high header number\nheader:{size}',
+                    message=f'Heap space not enough server answer with a very \
+                        high header number\nheader:{size}',
                 )
         return raw_bytes.getvalue()
 

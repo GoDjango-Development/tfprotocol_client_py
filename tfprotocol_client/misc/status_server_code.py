@@ -2,6 +2,7 @@ from enum import Enum
 
 
 class StatusServerCode(Enum):
+    """Status Server Code Enum."""
     OK = 0
     FAILED = 1
     UNKNOWN = 2

@@ -2,11 +2,17 @@ from enum import Enum
 
 
 class KeepAliveMechanismType(Enum):
+    """Keep alive mechanism types
+    """
+
     UDP_HOSTCHECK = 0
     UDP_PROCHECK = 1
 
 
 class KeepAliveOptions:
+    """Keep Alive model to contain the options in case of keep alive.
+    """
+
     def __init__(
         self,
         keepalive_mechanism: KeepAliveMechanismType,

@@ -15,7 +15,7 @@ from tfprotocol_client.security.cryptography import Xor
 class ProtocolClient(SocketClient):
     """ Protocol Client to handle, connections and make the interface
     easy to use.
-    
+
     SocketClient: Super class
     """
 
@@ -83,7 +83,7 @@ class ProtocolClient(SocketClient):
         # RECEIVE AND DECRYPT BODY
         received_body = self._recv(decoded_header)
         decrypted_body = self._decrypt(received_body)
-
+        print(f'{decoded_header} {decrypted_body}')
         status = self.message_builder.build_receive_status(
             decoded_header, decrypted_body
         )

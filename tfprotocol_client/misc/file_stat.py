@@ -4,12 +4,25 @@ from typing import Final, Union
 
 
 class FileStatTypeEnum(Enum):
+    """Describes a type of File.
+    """
+
     DIR = 0
     FILE = 1
     UNKNOWN = 2
 
+    @staticmethod
+    def from_str(label: str, dflt=None):
+        try:
+            return FileStatTypeEnum[label]
+        except (KeyError, ValueError):
+            return dflt
+
 
 class FileStat:
+    """File Stat object, used to contain file info.
+    """
+
     def __init__(
         self,
         filestat_type: Union[str, FileStatTypeEnum],
@@ -21,10 +34,9 @@ class FileStat:
         if isinstance(filestat_type, FileStatTypeEnum):
             _type = filestat_type
         elif isinstance(filestat_type, str) and len(filestat_type) == 1:
-            if filestat_type.capitalize() == 'F':
-                _type = FileStatTypeEnum.FILE
-            elif filestat_type.capitalize() == 'D':
-                _type = FileStatTypeEnum.DIR
+            _type = FileStatTypeEnum.from_str(
+                filestat_type, dflt=FileStatTypeEnum.UNKNOWN,
+            )
         self.type: Final[FileStatTypeEnum] = _type
         self.size: Final[int] = size
         self.last_access: Final[int] = last_access
