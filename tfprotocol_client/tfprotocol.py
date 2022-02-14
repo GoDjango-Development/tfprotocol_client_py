@@ -13,6 +13,7 @@ class TfProtocol(TfProtocolSuper):
         `TfProtocolSuper`: The Abstract mother class of Tranference Protocol API.
     """
 
+    # pylint: disable=super-init-not-called
     @dispatch(SuperProtoHandler, protocol_handler=SuperProtoHandler)
     def __init__(
         self, tfprotocol: SuperProtoHandler, protocol_handler: TfProtoHandler = None,
@@ -45,7 +46,7 @@ class TfProtocol(TfProtocolSuper):
         protocol_version: str,
         public_key: str,
         client_hash: Union[str, bytes],
-        protocol_handler: SuperProtoHandler,
+        protocol_handler: TfProtoHandler,
         address: str,
         port: int,
         proxy: ProxyOptions = None,
@@ -56,7 +57,7 @@ class TfProtocol(TfProtocolSuper):
 
         Args:
             `protocol_handler` (SuperProtoHandler): The instance of
-                the callback handler which must extends from ISuperCallback.
+                the command handler which must extends from ISuperCallback.
             `protocol_version` (str, optional): The desired version of the protocol.
             `public_key` (str, optional): The previous shared rsa public key for
                 the initial encryptation of the communication.
@@ -82,6 +83,19 @@ class TfProtocol(TfProtocolSuper):
             keylen,
             channel_len,
         )
+
+    @property
+    def protocol_handler(self) -> TfProtoHandler:
+        """ Gets the protocol handler used.
+
+        Returns:
+            TfProtoHandler: `protocol_handler`.
+        """
+        return self._protocol_handler
+
+    @protocol_handler.setter
+    def set_protocol_handler(self, handler: TfProtoHandler):
+        self._protocol_handler = handler
 
     def freesp_command(self):
         """Retrieves the available space in the partition where the protocol folder is located.

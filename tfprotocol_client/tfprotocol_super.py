@@ -37,19 +37,19 @@ class TfProtocolSuper:
         Args:
             `protocol_version` (str): The desired version of the protocol.
             `public_key` (str): The previous shared rsa public key for
-            the initial encryptation of the communication.
+                the initial encryptation of the communication.
             `client_hash` (Union[str, bytes]): The hash to be used by
-            the server in order to test the integrity of the communication.
+                the server in order to test the integrity of the communication.
             `protocol_handler` (SuperProtoHandler): The instance of
-            the callback handler which must extends from ISuperCallback.
+                the callback handler which must extends from ISuperCallback.
             `address` (str): The ip/address where the protocol server is running.
             `port` (int): The TCP port where the protocol is listening.
             `proxy` (ProxyOptions, optional): The proxy address for
-            connect through a proxy, proxy auth. Defaults to None.
+                connect through a proxy, proxy auth. Defaults to None.
             `keylen` (int, optional): The desired length for the session key
-            used to encrypt communication whit the server. Defaults to KEY_LEN_INTERVAL[0].
+                used to encrypt communication whit the server. Defaults to KEY_LEN_INTERVAL[0].
             `channel_len` (int, optional): The length of the channel.
-            Defaults to DFLT_MAX_BUFFER_SIZE.
+                Defaults to DFLT_MAX_BUFFER_SIZE.
         """
         self._protocol_version = protocol_version
         self._public_key = public_key
