@@ -1,197 +1,151 @@
-from abc import abstractmethod
 from datetime import date as Date
 from tfprotocol_client.handlers.super_proto_handler import SuperProtoHandler
+from tfprotocol_client.misc.file_stat import FileStat
 from tfprotocol_client.models.status_info import StatusInfo
 
 
 class TfProtoHandler(SuperProtoHandler):
     '''The callback system where payload will be notified to be handled by the user.'''
 
-    @abstractmethod
-    def echoCallback(self, value: str):
+    def echo_callback(self, value: str):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    @abstractmethod
-    def mkdirCallback(self, status: StatusInfo):
+    def mkdir_callback(self, status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    @abstractmethod
-    def delCallback(self, status: StatusInfo):
+    def del_callback(self, status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    @abstractmethod
-    def rmdirCallback(self, status: StatusInfo):
+    def rmdir_callback(self, status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    @abstractmethod
-    def copyCallback(self, status: StatusInfo):
+    def copy_callback(self, status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    @abstractmethod
-    def touchCallback(self, status: StatusInfo):
+    def touch_callback(self, status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    @abstractmethod
-    def fupdCallback(self, status: StatusInfo):
+    def fupd_callback(self, status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    @abstractmethod
-    def dateCallback(self, timestamp: int, status: StatusInfo):
+    def date_callback(self, timestamp: int, status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    @abstractmethod
-    def datefCallback(self, date: Date, status: StatusInfo):
+    def datef_callback(self, date: Date, status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    @abstractmethod
-    def dtofCallback(self, date: Date, status: StatusInfo):
+    def dtof_callback(self, date: Date, status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    @abstractmethod
-    def ftodCallback(self, timestamp: int, status: StatusInfo):
+    def ftod_callback(self, timestamp: int, status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    @abstractmethod
-    def fstatCallback(self, timestamp: int, status: StatusInfo):
+    def fstat_callback(self, filestat: FileStat, status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    @abstractmethod
-    def cpdirCallback(self, status: StatusInfo):
+    def cpdir_callback(self, status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    @abstractmethod
-    def xcopyCallback(self, status: StatusInfo):
+    def xcopy_callback(self, status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    @abstractmethod
-    def xdelCallback(self, status: StatusInfo):
+    def xdel_callback(self, status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    @abstractmethod
-    def xrmdirCallback(self, status: StatusInfo):
+    def xrmdir_callback(self, status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    @abstractmethod
-    def xcpdirCallback(self, status: StatusInfo):
+    def xcpdir_callback(self, status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    @abstractmethod
-    def lockCallback(self, status: StatusInfo):
+    def lock_callback(self, status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    @abstractmethod
-    def sendFileCallback(
+    def sendfile_callback(
         self, is_overriten: bool, path: str, send_to_server: StatusInfo, payload: bytes
     ):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    @abstractmethod
-    def rcvFileCallback(
+    def rcvfile_callback(
         self, delete_after: bool, path: str, send_to_server: StatusInfo
     ):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    @abstractmethod
-    def lsCallback(self, status: StatusInfo):
+    def ls_callback(self, status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    @abstractmethod
-    def renamCallback(self, status: StatusInfo):
+    def renam_callback(self, status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    @abstractmethod
-    def keepAliveCallback(self, status: StatusInfo):
+    def keepclive_callback(self, status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    @abstractmethod
-    def loginCallback(self, login_status: StatusInfo):
+    def login_callback(self, login_status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    @abstractmethod
-    def chmodCallback(self, chmod_status: StatusInfo):
+    def chmod_callback(self, chmod_status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    @abstractmethod
-    def chownCallback(self, chown_status: StatusInfo):
+    def chown_callback(self, chown_status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    @abstractmethod
-    def getCanCallback(self, pcan_status: StatusInfo, other: any):
+    def getcan_callback(self, pcan_status: StatusInfo, other: any):
         # FIX: this other is temporal here goes easy_reum
         raise NotImplementedError("Callback is not implemented: exception")
 
-    @abstractmethod
-    def putCanCallback(self, status: StatusInfo, other: any):
+    def putcan_callback(self, status: StatusInfo, other: any):
         # FIX: this other is temporal here goes easy_reum
         raise NotImplementedError("Callback is not implemented: exception")
 
-    @abstractmethod
-    def sha256Callback(self, status: StatusInfo):
+    def sha256_callback(self, status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    @abstractmethod
-    def prockeyCallback(self, status: StatusInfo):
+    def prockey_callback(self, status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    @abstractmethod
-    def freespCallback(self, status: StatusInfo):
+    def freesp_callback(self, status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    @abstractmethod
-    def udateCallback(self, status: StatusInfo):
+    def udate_callback(self, status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    @abstractmethod
-    def ndateCallback(self, status: StatusInfo):
+    def ndate_callback(self, status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    @abstractmethod
-    def getWriteCallback(self, codes: any):
+    def getwrite_callback(self, codes: any):
         # FIX: CODES HAVE TO BE A SPECIFIC TYPE
         raise NotImplementedError("Callback is not implemented: exception")
 
-    @abstractmethod
-    def getReadCallback(self, status: StatusInfo):
+    def getread_callback(self, status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    @abstractmethod
-    def putCallback(self, codes: any):
+    def put_callback(self, codes: any):
         # FIX: CODES HAVE TO BE A SPECIFIC TYPE
         raise NotImplementedError("Callback is not implemented: exception")
 
-    @abstractmethod
-    def putStatusCallback(self, status: StatusInfo):
+    def putstatus_callback(self, status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    @abstractmethod
-    def nigmaCallback(self, bld_status: StatusInfo):
+    def nigma_callback(self, bld_status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    @abstractmethod
-    def rmSecureDirectoryCallback(self, bld_status: StatusInfo):
+    def rmsecuredirectory_callback(self, bld_status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    @abstractmethod
-    def injailCallback(self, injail_status: StatusInfo):
+    def injail_callback(self, injail_status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    @abstractmethod
-    def tlbCallback(self, tlb_status: StatusInfo):
+    def tlb_callback(self, tlb_status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    @abstractmethod
-    def sdownCallback(self, sdown_status: StatusInfo):
+    def sdown_callback(self, sdown_status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    @abstractmethod
-    def supCallback(self, sup_status: StatusInfo):
+    def sup_callback(self, sup_status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    @abstractmethod
-    def fsizeCallback(self, fsize_status: StatusInfo):
+    def fsize_callback(self, fsize_status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    @abstractmethod
-    def fsizelsCallback(self, fsizels_status: StatusInfo):
+    def fsizels_callback(self, fsizels_status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
-
