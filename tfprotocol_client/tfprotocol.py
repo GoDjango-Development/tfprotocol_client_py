@@ -412,19 +412,6 @@ class TfProtocol(TfProtocolSuper):
             self.client.translate(TfProtocolMessage('LOCK', lock_filename))
         )
 
-    @dispatch(bool, str, StatusInfo, (bytes, bytearray))
-    def sendfile_command(
-        self,
-        is_overriten: bool,
-        path: str,
-        _: StatusInfo,
-        payload: Union[bytes, bytearray],
-    ):
-        """DEPRECATED
-        """
-        # pylint: disable=no-value-for-parameter
-        self.sendfile_command(is_overriten, path, payload)
-
     @dispatch(bool, str, (bytes, bytearray))
     def sendfile_command(
         self, is_overriten: bool, path: str, payload: Union[bytes, bytearray],
@@ -438,15 +425,68 @@ class TfProtocol(TfProtocolSuper):
             `path` (str): The path in the server where the file be stored.
             `payload` (Union[bytes, bytearray]): The data of the file to be sent.
         """
+        # TODO: TEST
+        response = self.client.translate(
+            TfProtocolMessage('SNDFILE', '1' if (is_overriten) else '0', path),
+        )
+        self.protocol_handler.sendfile_callback(
+            is_overriten, path, response, payload,
+        )
 
-    def rcvfile_command(self):
-        pass
+        while True:  # TODO: HERE ALL
+            if (
+                payload is not None
+                and len(payload) - (len(StatusServerCode.CONT.value) - 1)
+                > self.len_channel
+            ):
+                self.protocol_handler.sendfile_callback(
+                    is_overriten, path, StatusInfo.parse('PAYLOAD_TOO_BIG'), payload,
+                )
+            elif payload is not None:
+                response = self.client.translate(TfProtocolMessage('CONT', payload),)
+                self.protocol_handler.sendfile_callback(
+                    is_overriten, path, response, payload,
+                )
+            else:
+                break
+            if response.status != StatusServerCode.CONT:
+                break
 
-    def ls_command(self):
-        pass
+    @dispatch(bool, str, StatusInfo, (bytes, bytearray))
+    def sendfile_command(
+        self,
+        is_overriten: bool,
+        path: str,
+        _: StatusInfo,
+        payload: Union[bytes, bytearray],
+    ):
+        """DEPRECATED"""
+        self.sendfile_command(is_overriten, path, payload)
 
-    def renam_command(self):
-        pass
+    @dispatch(bool, str)
+    def rcvfile_command(self, delete_after: bool, path: str):
+        """Receives a file from the server.
+
+        Args:
+            `delete_after` (bool): The first parameter could be either “0” for false or “1” for
+                true and tells the server whether the file must be deleted after successfully
+                received by the client.
+            `path` (str): The path to the file in the server to be retrieved.
+        """
+        response = self.client.translate(
+            TfProtocolMessage('RCVFILE', '1' if delete_after else '0', path)
+        )
+        self.protocol_handler.rcvfile_callback(delete_after, path, response)
+        while True:  # TODO: TEST THIS WITH A GOOD HANDLER IMPLEMENTATION
+            response = self.client.translate(TfProtocolMessage('CONT'))
+            self.protocol_handler.rcvfile_callback(delete_after, path, response)
+            if response.status != StatusServerCode.CONT:
+                break
+
+    @dispatch(bool, str, StatusInfo)
+    def rcvfile_command(self, delete_after: bool, path: str, _: StatusInfo):
+        """DEPRECATED"""
+        self.rcvfile_command(delete_after, path)
 
     def keepalive_command(self):
         pass
