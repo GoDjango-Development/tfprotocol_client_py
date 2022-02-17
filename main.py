@@ -43,17 +43,17 @@ class MyHandler(TfProtoHandler):
         Args:
             value (str): String value.
         """
-        print(f'Server: {value}')
+        print(f'Server: {status}')
 
-    def date_callback(self, date: datetime, value: StatusInfo):
+    def ftod_callback(self, timestamp, status):
         """ date <value>
         """
-        print(f'Server: {value}; datetime:{date}')
+        print(f'Server: {status}; datetime:{timestamp}')
 
-    def datef_callback(self, date: datetime, value: StatusInfo):
+    def datef_callback(self, date: datetime, status: StatusInfo):
         """ datef <value>
         """
-        print(f'Server: {value}; datetime:{date}')
+        print(f'Server: {status}; datetime:{date}')
 
     def status_server(self, status: StatusInfo):
         pass

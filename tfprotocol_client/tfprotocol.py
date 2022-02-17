@@ -223,15 +223,15 @@ class TfProtocol(TfProtocolSuper):
             raise TfException(exception=e)
         self.protocol_handler.datef_callback(date, response)
 
-    @dispatch(int)
+    @dispatch((int, float))
     def dtof_command(self, timestamp: int):
         """Converts date in Unix timestamp format -seconds since the epoch-
         in human-readable format “yyyy-mm-dd HH:MM:SS” UTC.
 
         Args:
-            `timestamp` (int): The timestamp to be converted to human-readable string.
+            `timestamp` (int,float): The timestamp to be converted to human-readable string.
         """
-        response = self.client.translate(TfProtocolMessage('DTOF', str(timestamp)))
+        response = self.client.translate(TfProtocolMessage('DTOF', str(int(timestamp))))
         try:
             date = dt.datetime.strptime(response.message, '%Y-%m-%d %H:%M:%S')
             self.protocol_handler.dtof_callback(date, response)
@@ -247,7 +247,7 @@ class TfProtocol(TfProtocolSuper):
             `timestamp` (str): The timestamp to be converted to human-readable string.
         """
         try:
-            self.dtof_command(int(timestamp))
+            self.dtof_command(int(float(timestamp)))
         except ValueError as e:
             raise TfException(exception=e)
 
