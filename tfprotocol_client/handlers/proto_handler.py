@@ -80,7 +80,7 @@ class TfProtoHandler(SuperProtoHandler):
     def renam_callback(self, status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    def keepclive_callback(self, status: StatusInfo):
+    def keepalive_callback(self, status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
     def login_callback(self, login_status: StatusInfo):

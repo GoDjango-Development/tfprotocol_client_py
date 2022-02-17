@@ -440,7 +440,7 @@ class TfProtocol(TfProtocolSuper):
     def renam_command(self):
         pass
 
-    def keepclive_command(self):
+    def keepalive_command(self):
         pass
 
     def login_command(self):
