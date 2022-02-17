@@ -258,6 +258,7 @@ class TfProtocol(TfProtocolSuper):
         Args:
             `formatter` (str): The date in human-readable format.
         """
+        # TODO: WHY THE TIMESTAMP RETURNED FROM THE SERVER IS NEGATIVE??
 
         get_time_value = dt.datetime.now() - dt.datetime(1970, 1, 1)
         timestamp = int(get_time_value.total_seconds() * 1000)
@@ -300,6 +301,7 @@ class TfProtocol(TfProtocolSuper):
         Args:
             `path` (str): The path to the target which timestamp is going to be updated.
         """
+        # TODO: TEST
         self.protocol_handler.fupd_callback(
             self.client.translate(TfProtocolMessage('FUPB', path))
         )
@@ -312,6 +314,7 @@ class TfProtocol(TfProtocolSuper):
             `path_from` (str): The source target directory.
             `path_to` (str): The destiny target directory.
         """
+        # TODO: TEST
         self.protocol_handler.cpdir_callback(
             self.client.translate(TfProtocolMessage('CPDIR', path_from, '|', path_to))
         )
@@ -329,6 +332,7 @@ class TfProtocol(TfProtocolSuper):
             `path` (str): The target source file.
             `pattern` (str): The pattern that specified where to copy the target source file.
         """
+        # TODO: TEST
         self.protocol_handler.xcopy_callback(
             self.client.translate(
                 TfProtocolMessage('XCOPY', new_name, path, "|", pattern)
@@ -346,6 +350,7 @@ class TfProtocol(TfProtocolSuper):
             `path` (str): The parent folder where the protocol is going to search for the files.
             `file_name` (str): The file name that you want to erase.
         """
+        # TODO: TEST
         self.protocol_handler.xdel_callback(
             self.client.translate(TfProtocolMessage('XDEL', path, file_name))
         )
@@ -362,6 +367,7 @@ class TfProtocol(TfProtocolSuper):
                 for directoryName.
             `directory_name` (str): The name of the directories to be deleted.
         """
+        # TODO: TEST
         self.protocol_handler.xrmdir_callback(
             self.client.translate(TfProtocolMessage('XRMDIR', path, directory_name))
         )
@@ -382,6 +388,7 @@ class TfProtocol(TfProtocolSuper):
             `destination_pattern` (str): The pattern that is going to be used for selecting
                 the folders.
         """
+        # TODO: TEST
         self.protocol_handler.xcpdir_callback(
             self.client.translate(
                 TfProtocolMessage(
@@ -400,6 +407,7 @@ class TfProtocol(TfProtocolSuper):
         Args:
             lock_filename (str): The name of the file who locks directories.
         """
+        # TODO: TEST
         self.protocol_handler.lock_callback(
             self.client.translate(TfProtocolMessage('LOCK', lock_filename))
         )
