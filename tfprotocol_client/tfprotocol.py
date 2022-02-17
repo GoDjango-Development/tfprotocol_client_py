@@ -488,7 +488,8 @@ class TfProtocol(TfProtocolSuper):
         """DEPRECATED"""
         self.rcvfile_command(delete_after, path)
 
-    def ls_command(self, path: str, status_client: StatusInfo):
+    @dispatch(str, StatusInfo)
+    def ls_command(self, path: str, _: StatusInfo):
         """Command list the directory entries for the indicated path, if the argument is missing,
         it lists the root directory of the protocol daemon. The return value of this command
         is a file with the listed content. In fact, it is like issuing the command RCVFILE to
@@ -559,24 +560,81 @@ class TfProtocol(TfProtocolSuper):
         )
 
     @dispatch(str, str)
-    def renam_command(self, path_oldname: str, operator: str, path_newname: str):
+    def renam_command(self, path_oldname: str, _: str, path_newname: str):
         """DEPRECATED"""
         self.renam_command(path_oldname, path_newname)
 
-    def keepalive_command(self):
-        pass
+    def keepalive_command(
+        self, is_on: bool, time_connection: int, interval: int, count: int,
+    ):
+        """Sets the configuration parameters for the TCP keepalive feature. This is especially
+        useful for clients behind NAT boxes. If there is some idle time in the established
+        connection -no data transmission- the NAT box could close or unset the connection
+        without the peers knowing it. In contexts where it is predictable that an established
+        connection could be ‘in silent’ for long periods of time, and it is possible that
+        clients are behind NAT boxes, it is necessary to set the TCP keepalive packets.
 
-    def login_command(self):
-        pass
+        Args:
+            `is_on` (bool): The first parameter of the command could be 0 or 1, meaning on or off.
+            `time_connection` (int): The second parameter is the time (in seconds) the connection
+                needs to remain idle before TCP starts sending keepalive probes.
+            `interval` (int): The third parameter is the time (in seconds) between individual
+                keepalive probes.
+            `count` (int): The fourth parameter is the maximum number of keepalive probes TCP
+                should send before dropping the connection.
+        """
+        # TODO: TEST
+        self.protocol_handler.keepalive_callback(
+            self.client.translate(
+                TfProtocolMessage(
+                    'KEEPALIVE',
+                    '1' if is_on else '0',
+                    time_connection,
+                    '|',
+                    interval,
+                    '|',
+                    count,
+                )
+            )
+        )
 
-    def chmod_command(self):
-        pass
+    def login_command(self, user: str, passw: str):
+        """Login into system this is required for many others commands.
 
-    def chown_command(self):
-        pass
+        Args:
+            `user` (str): The username for the login action.
+            `passw` (str): The password for the login action.
+        """
+        # TODO: TEST
+        self.protocol_handler.login_callback(
+            self.client.translate(TfProtocolMessage('LOGIN', user, passw))
+        )
 
-    def getcan_command(self):
-        pass
+    def chmod_command(self, path_file: str, octal_mode: str):
+        """Change the access modifier to a new one.
+
+        Args:
+            `path_file` (str): The location to the file to be modified.
+            `octal_mode` (str): The octal modes stands for 000 or 777 etc in octal representation
+                000 means not permission for owner not permission for user and nor for group
+        """
+        self.protocol_handler.chmod_callback(
+            self.client.translate(TfProtocolMessage('CHMOD', path_file, octal_mode))
+        )
+
+    def chown_command(self, path_file: str, user: str, group: str):
+        """Change the owner of a file to a new one .This commands is similar to chown command
+        at unix systems.
+
+        Args:
+            path_file (str): The location to the file.
+            user (str): The new username who is going to owns the file.
+            group (str): The new group for the file.
+        """
+        # TODO: TEST
+        self.protocol_handler.chown_callback(
+            self.client.translate(TfProtocolMessage('CHOWN', path_file, user, group))
+        )
 
     def putcan_command(self):
         pass
