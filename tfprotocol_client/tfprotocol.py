@@ -488,6 +488,81 @@ class TfProtocol(TfProtocolSuper):
         """DEPRECATED"""
         self.rcvfile_command(delete_after, path)
 
+    def ls_command(self, path: str, status_client: StatusInfo):
+        """Command list the directory entries for the indicated path, if the argument is missing,
+        it lists the root directory of the protocol daemon. The return value of this command
+        is a file with the listed content. In fact, it is like issuing the command RCVFILE to
+        a temporary file with the listed content of the directory.The file returned by LS has
+        the following syntax.F | D | U /path/to/file-or-directoryThe F stands for “file”; the
+        D for “directory” and the U for “unknown”.
+        
+        Args:
+            `path` (str): The path to the folder to be listed.
+        """
+        # TODO: TEST
+        response: StatusInfo = self.client.translate('LS', path)
+        self.protocol_handler.ls_callback(response)
+
+        while True:
+            response = self.client.translate(TfProtocolMessage('CONT'))
+            self.protocol_handler.ls_callback(response)
+            if response.status != StatusServerCode.CONT:
+                break
+
+    @dispatch(str)
+    def lsr_command(self, path: str):
+        """Command list the directory entries for the indicated path, if the argument is missing,
+        it lists the root directory of the protocol daemon. The return value of this command
+        is a file with the listed content. In fact, it is like issuing the command RCVFILE to
+        a temporary file with the listed content of the directory.The file returned by LS has
+        the following syntax.F | D | U /path/to/file-or-directoryThe F stands for “file”; the
+        D for “directory” and the U for “unknown”.
+
+        Args:
+            path (str): The path to the folder to be listed.
+        """
+        # TODO: TEST
+        response: StatusInfo = self.client.translate('LSR', path)
+        self.protocol_handler.lsr_callback(response)
+
+        while True:
+            response = self.client.translate(TfProtocolMessage('CONT'))
+            self.protocol_handler.lsr_callback(response)
+            if response.status != StatusServerCode.CONT:
+                break
+
+    @dispatch(str, StatusInfo)
+    def lsr_command(self, path: str, status_client: StatusInfo):
+        """DEPRECATED"""
+        self.lsr_command(path)
+
+    @dispatch(str, str)
+    def renam_command(self, path_oldname: str, path_newname: str):
+        """Renames the file or directory specified at first parameter into the name specified at
+        second parameter. RENAM operates atomically; there is no instant at which “newname” is
+        non-existent between the operation’s steps if “newname” already exists. If a system
+        crash occurs, it is possible for both names “oldname” and “newname” to still exist,
+        but “newname” will be intact.RENAM has some restrictions to operate.1) “oldname” it
+        must exist.2) If “newname” is a directory must be empty.3) If “oldname” is a directory
+        then “newname” must not exist or it has to be an empty directory.4) The “newname”
+        must not specify a subdirectory of the directory “oldname” which is being renamed.
+
+        Args:
+            path_oldname (str): The target to be renamed.
+            path_newname (str): The new name for this target.
+        """
+        # TODO: TEST
+        self.protocol_handler.renam_callback(
+            self.client.translate(
+                TfProtocolMessage('RENAM', path_oldname, '|', path_newname)
+            )
+        )
+
+    @dispatch(str, str)
+    def renam_command(self, path_oldname: str, operator: str, path_newname: str):
+        """DEPRECATED"""
+        self.renam_command(path_oldname, path_newname)
+
     def keepalive_command(self):
         pass
 
