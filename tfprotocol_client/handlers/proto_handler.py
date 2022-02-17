@@ -74,6 +74,9 @@ class TfProtoHandler(SuperProtoHandler):
     def ls_callback(self, status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
+    def lsr_callback(self, status: StatusInfo):
+        raise NotImplementedError("Callback is not implemented: exception")
+
     def renam_callback(self, status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
