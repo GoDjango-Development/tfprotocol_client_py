@@ -3,7 +3,12 @@ from io import BytesIO
 from typing import Optional, Union
 from multipledispatch import dispatch
 
-from tfprotocol_client.misc.constants import ENDIANESS, STRING_ENCODING
+from tfprotocol_client.misc.constants import (
+    DFLT_HEADER_SIZE,
+    ENDIANESS,
+    INT_SIZE,
+    STRING_ENCODING,
+)
 
 
 class TfProtocolMessage:

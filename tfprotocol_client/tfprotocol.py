@@ -4,7 +4,11 @@ from typing import Union
 from multipledispatch import dispatch
 from tfprotocol_client.handlers.super_proto_handler import SuperProtoHandler
 from tfprotocol_client.handlers.proto_handler import TfProtoHandler
-from tfprotocol_client.misc.constants import DFLT_MAX_BUFFER_SIZE, KEY_LEN_INTERVAL
+from tfprotocol_client.misc.constants import (
+    DFLT_MAX_BUFFER_SIZE,
+    KEY_LEN_INTERVAL,
+    LONG_SIZE,
+)
 from tfprotocol_client.misc.file_stat import FileStat, FileStatTypeEnum
 from tfprotocol_client.misc.status_server_code import StatusServerCode
 from tfprotocol_client.models.exceptions import TfException
