@@ -1,7 +1,9 @@
 from datetime import date as Date
+from tfprotocol_client.connection.protocol_client import ProtocolClient
 from tfprotocol_client.handlers.super_proto_handler import SuperProtoHandler
 from tfprotocol_client.misc.file_stat import FileStat
 from tfprotocol_client.models.status_info import StatusInfo
+from tfprotocol_client.models.transfer_state import TransferStatus
 
 
 class TfProtoHandler(SuperProtoHandler):
@@ -92,12 +94,20 @@ class TfProtoHandler(SuperProtoHandler):
     def chown_callback(self, chown_status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    def getcan_callback(self, pcan_status: StatusInfo, other: any):
-        # FIX: this other is temporal here goes easy_reum
+    def getcan_callback(
+        self,
+        status: StatusInfo,
+        client: ProtocolClient,
+        transfer_status: TransferStatus,
+    ):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    def putcan_callback(self, status: StatusInfo, other: any):
-        # FIX: this other is temporal here goes easy_reum
+    def putcan_callback(
+        self,
+        status: StatusInfo,
+        client: ProtocolClient,
+        transfer_status: TransferStatus,
+    ):
         raise NotImplementedError("Callback is not implemented: exception")
 
     def sha256_callback(self, status: StatusInfo):
