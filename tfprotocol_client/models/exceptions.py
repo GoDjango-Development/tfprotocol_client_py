@@ -48,7 +48,7 @@ class TfException(Exception):
         return (
             self.status_info.payload
             if self.status_info.payload is not None
-            else self.status_info.message.decode('utf-8')
+            else self.status_info.message.decode(STRING_ENCODING)
         )
 
     def __str__(self) -> str:

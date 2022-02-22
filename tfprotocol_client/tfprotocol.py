@@ -1,5 +1,6 @@
 """ Transfer Protocol API Base implementation. """
 import datetime as dt
+from io import BytesIO
 from typing import Union
 from multipledispatch import dispatch
 from tfprotocol_client.handlers.super_proto_handler import SuperProtoHandler
@@ -10,11 +11,14 @@ from tfprotocol_client.misc.constants import (
     LONG_SIZE,
 )
 from tfprotocol_client.misc.file_stat import FileStat, FileStatTypeEnum
+from tfprotocol_client.misc.parse_utils import tryparse_int
 from tfprotocol_client.misc.status_server_code import StatusServerCode
-from tfprotocol_client.models.exceptions import TfException
+from tfprotocol_client.models.exceptions import ErrorCode, TfException
 from tfprotocol_client.models.message import TfProtocolMessage
+from tfprotocol_client.models.putget_commands import PutGetCommandEnum
 from tfprotocol_client.models.proxy_options import ProxyOptions
 from tfprotocol_client.models.status_info import StatusInfo
+from tfprotocol_client.models.transfer_state import TransferStatus
 from tfprotocol_client.tfprotocol_super import TfProtocolSuper
 
 

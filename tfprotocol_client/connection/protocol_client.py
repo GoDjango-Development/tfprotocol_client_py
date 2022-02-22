@@ -83,37 +83,51 @@ class ProtocolClient(SocketClient):
         self._send(encrypted_header)
         self._send(encrypted_message)
 
+    @dispatch((str, bytes))
+    def send(
+        self,
+        message: Union[str, bytes],
+        custom_header: Union[str, bytes, int, bool, None] = None,
+        header_size: int = None,
+    ):
+        self.send(
+            TfProtocolMessage(
+                message, custom_header=custom_header, header_size=header_size,
+            )
+        )
+
     @dispatch()
-    def recv(self) -> StatusInfo:
+    def recv(self, header_size=None) -> StatusInfo:
         self.exception_guard()
+        header_size = header_size if header_size > 0 else self.header_size
         # RECEIVE, DECRYPT AND DECODE HEADER
-        received_header = self._recv(self.header_size)
+        received_header = self._recv(header_size)
         decrypted_header = self._decrypt(received_header)
-        decoded_header = self.message_builder.build_recvd_header(decrypted_header)
+        decoded_header = MessageUtils.decode_int(decrypted_header)
 
         # RECEIVE AND DECRYPT BODY
         received_body = self._recv(decoded_header)
         decrypted_body = self._decrypt(received_body)
-        print(f'{decoded_header} {decrypted_body}')
-        status = self.message_builder.build_receive_status(
-            decoded_header, decrypted_body
-        )
+        print(f'SERVER: {decoded_header} {decrypted_body}')
+        status = StatusInfo.build_status(decoded_header, decrypted_body)
         return status
 
-    @dispatch(str)
-    def translate(self, message: str) -> StatusInfo:
-        self.exception_guard()
-        self.send(message)
-        return self.recv()
+    @dispatch((str, bytes))
+    def translate(
+        self,
+        message: Union[str, bytes],
+        custom_header: Union[str, bytes, int, bool, None] = None,
+        header_size: int = None,
+        **_,
+    ) -> StatusInfo:
+        return self.translate(
+            TfProtocolMessage(
+                message, custom_header=custom_header, header_size=header_size
+            )
+        )
 
     @dispatch(TfProtocolMessage)
     def translate(self, message: TfProtocolMessage) -> StatusInfo:
         self.exception_guard()
-        self.send(message.payload, custom_header=message.custom_header)
-        return self.recv()
-
-    @dispatch(bytes)
-    def translate(self, message: bytes) -> StatusInfo:
-        self.exception_guard()
         self.send(message)
-        return self.recv()
+        return self.recv(header_size=message.header_size)
