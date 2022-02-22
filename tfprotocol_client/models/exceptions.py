@@ -1,11 +1,14 @@
 from enum import Enum
 from typing import Optional, Union
+from tfprotocol_client.misc.constants import STRING_ENCODING
 from tfprotocol_client.misc.status_server_code import StatusServerCode
 
 from tfprotocol_client.models.status_info import StatusInfo
 
 
 class ErrorCode(Enum):
+    """Error Code for `TfExceptions`"""
+
     ON_WRITE_OR_RECEIVE_TO_SOCKET = 0
     ILLEGAL_ARGUMENTS = 1
     UNHANDLED_EXCEPTION = 2
@@ -13,6 +16,8 @@ class ErrorCode(Enum):
 
 
 class TfException(Exception):
+    """Transfer Protocol Exception"""
+
     def __init__(
         self,
         *args: tuple,
