@@ -1,8 +1,9 @@
-from typing import Any, Optional, Union
+from typing import Optional, Union
 from multipledispatch import dispatch
 from tfprotocol_client.connection.client import SocketClient
-from tfprotocol_client.misc.constants import DFLT_MAX_BUFFER_SIZE
-from tfprotocol_client.misc.message_builder import MessageBuilder
+from tfprotocol_client.misc.constants import DFLT_MAX_BUFFER_SIZE, INT_SIZE
+from tfprotocol_client.misc.build_utils import MessageUtils
+from tfprotocol_client.models.exceptions import TfException
 from tfprotocol_client.models.message import TfProtocolMessage
 from tfprotocol_client.models.proxy_options import ProxyOptions
 from tfprotocol_client.models.status_info import StatusInfo
@@ -32,9 +33,7 @@ class ProtocolClient(SocketClient):
             proxy_options=proxy_options,
             max_buffer_size=max_buffer_size,
         )
-        self.message_builder: MessageBuilder = MessageBuilder(
-            max_buffer_size=max_buffer_size
-        )
+        self.builder_utils: MessageUtils = MessageUtils(max_buffer_size=max_buffer_size)
         self.xor_input = None
         self.xor_output = None
 
@@ -52,17 +51,29 @@ class ProtocolClient(SocketClient):
             payload = self.xor_output.encrypt(payload)
         return payload
 
-    @dispatch((str, bytes), custom_header=Any)
-    def send(
-        self,
-        message: Union[str, bytes],
-        custom_header: Union[str, bytes, int, bool, None] = None,
-    ):
+    def just_recv_int(self, size: int = INT_SIZE) -> int:
+        # RECEIVE, DECRYPT AND DECODE INTEGER
+        decrypted_data = self.just_recv(size)
+        return MessageUtils.decode_int(decrypted_data)
+
+    def just_recv_str(self, size: int) -> int:
+        # RECEIVE, DECRYPT AND DECODE TEXT-STRING
+        decrypted_data = self.just_recv(size)
+        return MessageUtils.decode_str(decrypted_data)
+
+    def just_recv(self, size: int = None) -> bytes:
+        if size:
+            raise TfException(message="Bytes to receive not specified ...")
+        # RECEIVE AND DECRYPT CHUNK
+        received_header = self._recv(size)
+        decrypted_header = self._decrypt(received_header)
+        return decrypted_header
+
+    @dispatch(TfProtocolMessage)
+    def send(self, message: TfProtocolMessage):
         self.exception_guard()
         # BUILD
-        header, encoded_message = self.message_builder.build_send_message(
-            message, custom_header=custom_header,
-        )
+        header, encoded_message = message
 
         # ENCRYPT
         encrypted_header: bytes = self._encrypt(header)

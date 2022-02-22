@@ -1,2 +1,4 @@
 class TfProtocolKeepAlive:
-    pass
+    """_summary_
+    """
+

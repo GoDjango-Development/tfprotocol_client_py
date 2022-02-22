@@ -1,13 +1,10 @@
-import struct
 from io import BytesIO
-from typing import Optional, Union
+from typing import Union
 from multipledispatch import dispatch
-
+from tfprotocol_client.misc.build_utils import MessageUtils
 from tfprotocol_client.misc.constants import (
     DFLT_HEADER_SIZE,
-    ENDIANESS,
     INT_SIZE,
-    STRING_ENCODING,
 )
 
 
@@ -19,23 +16,32 @@ class TfProtocolMessage:
         *payloads,
         custom_header: Union[int, bytes, None] = None,
         trim_body: bool = True,
+        separate_by_spaces: bool = True,
+        header_size: int = DFLT_HEADER_SIZE,
     ) -> None:
-        self.custom_header = self._encode_value(custom_header)
+        self.custom_header = MessageUtils.encode_value(custom_header, size=header_size)
         self.body_buffer = BytesIO()
+        self.header_size = header_size if header_size else DFLT_HEADER_SIZE
         for e in payloads:
-            self.add(b' ')
+            if separate_by_spaces:
+                self.add(b' ')
             self.add(e)
         self.trim_body = trim_body
 
-    def add(self, payload: Union[str, bytes, int, bool]):
-        self.body_buffer.write(self._encode_value(payload))
+    @dispatch((str, bytes, bool))
+    def add(self, payload: Union[str, bytes, int, bool], **_):
+        self.body_buffer.write(MessageUtils.encode_value(payload))
+
+    @dispatch(int)
+    def add(self, payload: int, size: int = INT_SIZE, **_):
+        self.body_buffer.write(MessageUtils.encode_value(payload, size=size))
 
     @property
     def header(self) -> bytes:
         if self.custom_header is not None:
-            header = self._encode_value(self.custom_header)
+            header = MessageUtils.encode_value(self.custom_header)
         else:
-            header = self._encode_value(len(self.body_buffer.getvalue()))
+            header = MessageUtils.encode_value(len(self.body_buffer.getvalue()))
         return header
 
     @property
@@ -47,27 +53,3 @@ class TfProtocolMessage:
     def __iter__(self):
         yield self.header
         yield self.payload
-
-    @dispatch(str)
-    def _encode_value(self, value: str) -> bytes:
-        encoded_str = value.encode(STRING_ENCODING)
-        return struct.pack(f'{ENDIANESS}{len(encoded_str)}s', encoded_str)
-
-    @dispatch(int)
-    def _encode_value(self, value: int) -> bytes:
-        if value.bit_length() < 32:  # 32 bit // 4 bytes
-            return struct.pack(f'{ENDIANESS}i', value)
-        else:  # 64 bit // 8 bytes
-            return struct.pack(f'{ENDIANESS}q', value)
-
-    @dispatch(bytes)
-    def _encode_value(self, value: bytes) -> bytes:
-        return struct.pack(f'{ENDIANESS}{len(value)}s', value)
-
-    @dispatch(object)
-    def _encode_value(self, _) -> Optional[bytes]:
-        return None
-
-    @dispatch(bool)
-    def _encode_value(self, value: bool) -> bytes:
-        return struct.pack(f'{ENDIANESS}?', value)

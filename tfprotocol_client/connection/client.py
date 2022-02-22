@@ -92,11 +92,11 @@ class SocketClient:
             self._socket.close()
         self._is_connect = False
 
-    def _send(self, message: bytes) -> int:
+    def _send(self, rawmessage: bytes) -> int:
         """Send a bunch of bytes through the socket to the server.
 
         Args:
-            `message` (bytes): Ready to send message bytes.
+            `rawmessage` (bytes): Ready to send message bytes.
 
         Raises:
             TfException: Socket write failed.
@@ -105,7 +105,9 @@ class SocketClient:
             int: how many bytes has been sended.
         """
         try:
-            return self.socket.send(message)
+            if rawmessage:
+                return self.socket.send(rawmessage)
+            return 0
         except Exception as e:
             raise TfException(
                 message='Cannot succesfully write to socket',

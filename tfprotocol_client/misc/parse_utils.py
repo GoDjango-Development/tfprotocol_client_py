@@ -18,3 +18,10 @@ def separate_status_codenumber(string: str) -> Tuple[str, str]:
         return res_f[0], ''.join(res_f[1:])
     else:
         return '', ''.join(res_f)
+
+
+def tryparse_int(str_value: str, base: int = 10, dflt_value: int = 0) -> int:
+    try:
+        return int(str_value, base=base)
+    except ValueError:
+        return dflt_value
