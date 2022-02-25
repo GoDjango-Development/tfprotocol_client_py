@@ -132,10 +132,14 @@ class TfProtoHandler(SuperProtoHandler):
     def getread_callback(self, status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    def put_callback(self, codes: any):
+    def get_callback(self, codes: any):
         # FIX: CODES HAVE TO BE A SPECIFIC TYPE
         raise NotImplementedError("Callback is not implemented: exception")
 
+    def put_callback(self, codes: any):
+        # FIX: CODES HAVE TO BE A SPECIFIC TYPE
+        raise NotImplementedError("Callback is not implemented: exception")
+    
     def putstatus_callback(self, status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
