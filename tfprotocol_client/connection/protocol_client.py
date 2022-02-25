@@ -1,4 +1,4 @@
-from typing import Optional, Union
+from typing import Any, Optional, Union
 from multipledispatch import dispatch
 from tfprotocol_client.connection.client import SocketClient
 from tfprotocol_client.misc.constants import DFLT_MAX_BUFFER_SIZE, INT_SIZE
@@ -94,6 +94,7 @@ class ProtocolClient(SocketClient):
 
         # SEND
         self._send(encrypted_message)
+
     @dispatch(TfProtocolMessage)
     def send(self, message: TfProtocolMessage):
         self.exception_guard()
