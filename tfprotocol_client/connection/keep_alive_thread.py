@@ -14,13 +14,14 @@ class KeepAliveHandler:
 
 
 class KeepAliveThread(Thread):
+    """Keep Alive mechanism threaded."""
     def __init__(
         self,
         proto_client: Any,
         ka_handler: KeepAliveHandler,
         options: KeepAliveOptions,
     ) -> None:
-        super().__init__()
+        super().__init__(name='keepalive_t')
         self._keepalive_mechanism: KeepAliveMechanismType = options.keepalive_mechanism
         self._proto_client: ProtocolClient = proto_client
         self._idle: int = options.idle

@@ -69,6 +69,31 @@ class ProtocolClient(SocketClient):
         decrypted_header = self._decrypt(received_header)
         return decrypted_header
 
+    @dispatch((int, str, bytes, bool))
+    def just_send(self, message: int, size=INT_SIZE):
+        self.exception_guard()
+
+        # BUILD
+        encoded_message = MessageUtils.encode_value(message, size=size)
+
+        # ENCRYPT
+        encrypted_message: bytes = self._encrypt(encoded_message)
+
+        # SEND
+        self._send(encrypted_message)
+
+    @dispatch(TfProtocolMessage)
+    def just_send(self, message: TfProtocolMessage, **_):
+        self.exception_guard()
+
+        # BUILD
+        _, encoded_message = message
+
+        # ENCRYPT
+        encrypted_message: bytes = self._encrypt(encoded_message)
+
+        # SEND
+        self._send(encrypted_message)
     @dispatch(TfProtocolMessage)
     def send(self, message: TfProtocolMessage):
         self.exception_guard()
