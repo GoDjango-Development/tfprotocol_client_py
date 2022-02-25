@@ -112,6 +112,12 @@ class ProtocolClient(SocketClient):
         status = StatusInfo.build_status(decoded_header, decrypted_body)
         return status
 
+    @dispatch(TfProtocolMessage)
+    def translate(self, message: TfProtocolMessage) -> StatusInfo:
+        self.exception_guard()
+        self.send(message)
+        return self.recv(header_size=message.header_size)
+
     @dispatch((str, bytes))
     def translate(
         self,
@@ -125,9 +131,3 @@ class ProtocolClient(SocketClient):
                 message, custom_header=custom_header, header_size=header_size
             )
         )
-
-    @dispatch(TfProtocolMessage)
-    def translate(self, message: TfProtocolMessage) -> StatusInfo:
-        self.exception_guard()
-        self.send(message)
-        return self.recv(header_size=message.header_size)

@@ -31,10 +31,12 @@ class TfProtocolMessage:
     @dispatch((str, bytes, bool))
     def add(self, payload: Union[str, bytes, int, bool], **_):
         self.body_buffer.write(MessageUtils.encode_value(payload))
+        return self
 
     @dispatch(int)
     def add(self, payload: int, size: int = INT_SIZE, **_):
         self.body_buffer.write(MessageUtils.encode_value(payload, size=size))
+        return self
 
     @property
     def header(self) -> bytes:
