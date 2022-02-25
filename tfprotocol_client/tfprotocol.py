@@ -11,7 +11,6 @@ from tfprotocol_client.misc.constants import (
     LONG_SIZE,
 )
 from tfprotocol_client.misc.file_stat import FileStat, FileStatTypeEnum
-from tfprotocol_client.misc.parse_utils import tryparse_int
 from tfprotocol_client.misc.status_server_code import StatusServerCode
 from tfprotocol_client.models.exceptions import ErrorCode, TfException
 from tfprotocol_client.models.message import TfProtocolMessage
@@ -657,8 +656,7 @@ class TfProtocol(TfProtocolSuper):
         Args:
             `data_stream` (BytesIO): Input stream where you can read the information to
                 be uploaded. Can be any object that inherits from BinaryIO in read mode.
-            `path_file` (str): Ruta al archivo del servidor para cargar, si no es así
-                existe lo crea.
+            `path_file` (str): Path to server file to upload, if not exists creates it.
             `offset` (int): The pointer position from where to start writing to the
                 server file.
             `buffer_size` (int): The size proposed by the client for the buffer, the buffer
@@ -667,18 +665,16 @@ class TfProtocol(TfProtocolSuper):
                 user, it will have to read from the server to know if it continues or not.
         """
         # TODO: TEST
-        offset = 0 if offset < 0 else offset
-        canpt = 0 if canpt < 0 else canpt
-
-        # BUILD MESSAGE TO SET INITIAL OPTIONS
-        message = TfProtocolMessage('PUTCAN ', path_file, separate_by_spaces=False)
-        message.add(' ')
-        message.add(offset)
-        message.add(buffer_size, size=LONG_SIZE)
-        message.add(canpt)
+        offset, canpt = max(0, offset), max(0, canpt)
 
         # SEND INITIAL OPTIONS
-        response = self.client.translate(message)
+        response = self.client.translate(
+            TfProtocolMessage('PUTCAN ', path_file, separate_by_spaces=False)
+            .add(' ')
+            .add(offset)
+            .add(buffer_size, size=LONG_SIZE)
+            .add(canpt)
+        )
         self.protocol_handler.putcan_callback(response, None, None)
 
         # INITIALIZE TRANSFER VARIABLES
@@ -686,87 +682,157 @@ class TfProtocol(TfProtocolSuper):
         header_size = LONG_SIZE
         server_buffer_size = buffer_size
         transfer_status.command = PutGetCommandEnum.HPFCONT
-        if response is not None and response.code == 0:
-            server_buffer_size = tryparse_int(response.message)
-            i = 0
-            while True:
-                i += 1
-                if canpt > 0 and i == canpt:
-                    i = 0
-                    cur_header = self.client.just_recv_int(header_size=header_size)
-                    transfer_status.dummy_state = True
-                    if cur_header == PutGetCommandEnum.HPFCANCEL.value:
-                        transfer_status.command = PutGetCommandEnum.HPFCANCEL.value
-                        self.protocol_handler.putcan_callback(
-                            None, self.client, transfer_status
-                        )
-                        break
-                    elif cur_header == PutGetCommandEnum.HPFCONT.value:
-                        transfer_status.command = PutGetCommandEnum.HPFCONT.value
-                        self.protocol_handler.putcan_callback(
-                            None, self.client, transfer_status
-                        )
-                    else:
-                        self.protocol_handler.putcan_callback(
-                            None, self.client, transfer_status
-                        )
-                        raise TfException(
-                            status_server_code=StatusServerCode.FAILED,
-                            code=ErrorCode.CAN_PUT,
-                            message="Some error ocurred while trying to handle canpt",
-                        )
-                    transfer_status.dummy_state = False
-                    continue
-                # LOAD DATA TO BE SENT
-                payl: bytearray = None
-                try:
-                    payl = data_stream.read(server_buffer_size)
-                except Exception as e:
-                    raise TfException(exception=e)
+        if response is None or response.code != 0:
+            return
+        server_buffer_size = int(response.message)
+        i = 0
+        while True:
+            i += 1
+            if canpt > 0 and i == canpt:
+                i = 0
+                cur_header = self.client.just_recv_int(header_size=header_size)
+                transfer_status.dummy_state = True
+                if cur_header == PutGetCommandEnum.HPFCANCEL.value:
+                    transfer_status.command = PutGetCommandEnum.HPFCANCEL.value
+                    self.protocol_handler.putcan_callback(
+                        None, self.client, transfer_status
+                    )
+                    break
+                elif cur_header == PutGetCommandEnum.HPFCONT.value:
+                    transfer_status.command = PutGetCommandEnum.HPFCONT.value
+                    self.protocol_handler.putcan_callback(
+                        None, self.client, transfer_status
+                    )
+                else:
+                    self.protocol_handler.putcan_callback(
+                        None, self.client, transfer_status
+                    )
+                    raise TfException(
+                        status_server_code=StatusServerCode.FAILED,
+                        code=ErrorCode.CAN_PUT,
+                        message="Some error ocurred while trying to handle canpt",
+                    )
+                transfer_status.dummy_state = False
+                continue
+            # LOAD DATA TO BE SENT
+            payl: bytearray = None
+            try:
+                payl = data_stream.read(server_buffer_size)
+            except Exception as e:
+                raise TfException(exception=e)
 
-                # SEND DATA CHUNK
-                # TODO: TEST WHEN  payl  IS EMPTY b''
-                self.client.send(payl)
-                transfer_status.dummy = len(payl)
-                self.protocol_handler.putcan_callback(
-                    None, self.client, transfer_status
+            # SEND DATA CHUNK
+            # TODO: TEST WHEN  payl  IS EMPTY b''
+            self.client.send(payl)
+            transfer_status.dummy = len(payl)
+            self.protocol_handler.putcan_callback(None, self.client, transfer_status)
+
+            # HANDLER SIGNAL (SEND HPFCANCEL or HPFSTOP)
+            if transfer_status.dummy in (
+                PutGetCommandEnum.HPFCANCEL.value,
+                PutGetCommandEnum.HPFSTOP.value,
+            ):
+                self.client.send(
+                    TfProtocolMessage(
+                        custom_header=transfer_status.dummy, header_size=header_size
+                    )
                 )
 
-                # HANDLER SIGNAL (SEND HPFCANCEL or HPFSTOP)
-                if transfer_status.dummy in (
-                    PutGetCommandEnum.HPFCANCEL.value,
-                    PutGetCommandEnum.HPFSTOP.value,
-                ):
+            # BREAK STOP THE CYCLE IF THERE IS NO DATA LEFT IN THE 'data_stream'
+            try:
+                if not payl or transfer_status.dummy == PutGetCommandEnum.HPFEND.value:
                     self.client.send(
                         TfProtocolMessage(
-                            custom_header=transfer_status.dummy, header_size=header_size
+                            custom_header=PutGetCommandEnum.HPFEND.value,
+                            header_size=header_size,
                         )
                     )
+                    transfer_status.dummy = PutGetCommandEnum.HPFEND.value
+                    self.protocol_handler.putcan_callback(
+                        None, self.client, transfer_status
+                    )
+                    break
+            except IOError as e:
+                raise TfException(exception=e)
 
-                # BREAK STOP THE CYCLE IF THERE IS NO DATA LEFT IN THE 'data_stream'
-                try:
-                    if (
-                        not payl
-                        or transfer_status.dummy == PutGetCommandEnum.HPFEND.value
-                    ):
-                        self.client.send(
-                            TfProtocolMessage(
-                                custom_header=PutGetCommandEnum.HPFEND.value,
-                                header_size=header_size,
-                            )
-                        )
-                        transfer_status.dummy = PutGetCommandEnum.HPFEND.value
-                        self.protocol_handler.putcan_callback(
-                            None, self.client, transfer_status
-                        )
-                        break
-                except IOError as e:
-                    raise TfException(exception=e)
+    def getcan_command(
+        self,
+        data_sink: BytesIO,
+        path_file: str,
+        offset: int,
+        buffer_size: int,
+        canpt: int,
+    ):
+        """Download a file from the server.
 
-        pass
+        Args:
+            `data_sink` (BytesIO): Output sink where you can write the downloaded information.
+                Can be any object that inherits from BinaryIO in write mode.
+            `path_file` (str): Path to server file to be download.
+            `offset` (int): The pointer position from where to start reading to the server file.
+            `buffer_size` (int): The size proposed by the client for the buffer, the buffer
+                definitive will be sent by the server in case of OK.
+            `canpt` (int): Cancellation Points, determines the cancellation points where the
+                user, it will have to read from the server to know if it continues or not.
+        """
+        # TODO: TEST
+        offset, canpt = max(offset, 0), max(canpt, 0)
+        # SEND INITIAL OPTIONS
+        response = self.client.translate(
+            TfProtocolMessage('GETCAN ', path_file, separate_by_spaces=False)
+            .add(' ')
+            .add(offset)
+            .add(buffer_size, size=LONG_SIZE)
+            .add(canpt)
+        )
+        self.protocol_handler.getcan_callback(response, None, None)
 
-    def sha256_command(self):
-        pass
+        # INITIALIZE TRANSFER VARIABLES
+        transfer_status = TransferStatus()
+        header_size = LONG_SIZE
+        server_buffer_size = buffer_size
+        transfer_status.command = PutGetCommandEnum.HPFCONT
+        if response is None or response.code != 0:
+            return
+        server_buffer_size = int(response.message)
+        i = 0
+        while True:
+            i += 1
+            if canpt > 0 and i == canpt:
+                i = 0
+                transfer_status.dummy_state = True
+                self.protocol_handler.getcan_callback(
+                    None, self.client, transfer_status
+                )
+                if transfer_status.dummy:
+                    transfer_status.dummy = PutGetCommandEnum.HPFCONT.value
+                self.client.send(
+                    TfProtocolMessage(
+                        custom_header=transfer_status.dummy, header_size=header_size,
+                    )
+                )
+                if transfer_status.dummy == PutGetCommandEnum.HPFCANCEL.value:
+                    break
+                transfer_status.dummy_state = False
+                continue
+            cur_header = self.client.just_recv_int(size=header_size)
+            if cur_header in (
+                PutGetCommandEnum.HPFCANCEL.value,
+                PutGetCommandEnum.HPFEND.value,
+            ):
+                # CANCELATION FROM SERVER OR END OF FILE REACHED
+                transfer_status.dummy = cur_header
+                self.protocol_handler.getcan_callback(
+                    None, self.client, transfer_status,
+                )
+                break
+            pyld = self.client.just_recv(size=server_buffer_size)
+            try:
+                data_sink.write(pyld)
+            except IOError as e:
+                raise TfException(exception=e)
+            transfer_status.dummy(len(pyld))
+            self.protocol_handler.getcan_callback(None, self.client, transfer_status)
 
     def prockey_command(self):
         pass
