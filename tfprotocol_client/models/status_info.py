@@ -67,4 +67,4 @@ class StatusInfo:
         return StatusInfo(status, code=code, message=msg_str)
 
     def __str__(self):
-        return f'StatusInfo[{self.status.name}]<{self.code}, "{self.message}">'
+        return f'StatusInfo[{self.status.name}]<{self.code}, "{self.message[:1000]}">'
