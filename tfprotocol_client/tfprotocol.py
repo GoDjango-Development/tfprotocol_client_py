@@ -1228,8 +1228,41 @@ class TfProtocol(TfProtocolSuper):
             pass
         return header == 0
 
-    def fsize_command(self):
-        pass
+    def fsize_command(self, path_file: str):
+        """gets the file size -in bytes- of the specified file in the parameter.
 
-    def fsizels_command(self):
-        pass
+        Args:
+            path_file (str): Path to server file.
+        """
+        # TODO: TEST
+        self.client.send(TfProtocolMessage('FSIZE', path_file))
+        size = self.client.just_recv_int(size=LONG_SIZE)
+        self.protocol_handler.fsize_callback(
+            StatusInfo(
+                status=StatusServerCode.OK if size >= 0 else StatusServerCode.FAILED,
+                code=size,
+                message=str(size),
+            )
+        )
+
+    def fsizels_command(self, path_file: str):
+        """Each line in the specified file as parameter represents a path to a file. Gets the
+        file size -in bytes- of each path.
+
+        Args:
+            path_file (str): Path to a server file with paths.
+        """
+        # TODO: TEST
+        self.client.send(TfProtocolMessage('FSIZE', path_file))
+        size: int = None
+        while size != -3:
+            size = self.client.just_recv_int(size=LONG_SIZE)
+            self.protocol_handler.fsizels_callback(
+                StatusInfo(
+                    status=StatusServerCode.OK
+                    if size >= 0
+                    else StatusServerCode.FAILED,
+                    code=size,
+                    message=str(size),
+                )
+            )
