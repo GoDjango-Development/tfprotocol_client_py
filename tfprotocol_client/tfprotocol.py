@@ -983,6 +983,114 @@ class TfProtocol(TfProtocolSuper):
                     data_sink.write(chunk)
             except IOError as e:
                 raise TfException(exception=e)
+
+    def put_command(
+        self, data_stream: BytesIO, path_file: str, offset: int, buffer_size: int,
+    ):
+        """Upload a stream of data allowing to cancel at any moment. Asynchronously
+
+        Args:
+            `data_stream` (BytesIO): It is the stream where data resides in disk or memory,
+                to be sent.
+            `path_file` (str): The path IN THE SERVER where the data is located at.
+            `offset` (int): The offset is used for when we are reading the data start reading
+                since the offset position for example if the data is 100 bytes long then if
+                offset is 20 I will read since 20 to 100 skiping first 20 bytes. This is useful
+                for when we stop an operation and wanted to restart it again later.
+            `buff_size` (int): Is the size of the buffer, while bigger faster will be the
+                communication, of course server wont give you always the amount you request,
+                because may be that server's bandwidth is getting filled.
+        """
+        # TODO: TEST
+        response = self.client.translate(
+            TfProtocolMessage('PUT', path_file)
+            .add(' ')
+            .add(offset)
+            .add(buffer_size, size=LONG_SIZE)
+        )
+        if response.status is not StatusServerCode.OK:
+            self.protocol_handler.getstatus_callback(response)
+            return
+        response.code = MessageUtils.decode_int(response.message)
+        self.protocol_handler.getstatus_callback(response)
+
+        # SEEK TO THE OFFSET POSX
+        try:
+            data_stream.seek(offset)
+        except IOError as e:
+            raise TfException(exception=e)
+
+        # SET UP SHARED VARIABLES
+        cond_lock = Condition()
+        code_sr = CodesSenderRecvr(self.client)
+        t_command: TfThread
+        try:
+            t_command = TfThread(
+                self.__put_command_t,
+                cond_lock=cond_lock,
+                args=(data_stream, response.code, code_sr),
+            )
+        except Exception as e:
+            raise TfException(
+                exception=e,
+                message='FATAL ERROR!!! incorrect callback found, reinstall module...',
+            )
+        # RUN THREAD
+        t_command.start()
+
+        # WHILE HEADERS NOT AN END-OF-FILE OR AN ERROR CONTINUES
+        while True:
+            code_sr.last_header = self.client.just_recv_int(size=LONG_SIZE)
+            if code_sr.last_header <= 0:
+                code_sr.recveing_signal = True
+                break
+
+        while t_command.is_alive():
+            try:
+                cond_lock.wait()
+            except InterruptedError as e:
+                raise TfException(exception=e)
+
+        # FINAL HANDSHAKE
+        if code_sr.last_header is not PutGetCommandEnum.HPFFIN.value:
+            self.client.just_recv_int(size=LONG_SIZE)
+        code_sr.send_put(PutGetCommandEnum.HPFFIN.value)
+        code_sr.block = True
+        self.protocol_handler.put_callback(code_sr)
+
+    def __put_command_t(
+        self, data_stream: BytesIO, buffer_size: int, code_sr: CodesSenderRecvr
+    ):
+        """This command is intended to be used ONLY by the put_command function not by
+        user DO NOT CALL THIS METHOD DIRECTLY.
+
+        Args:
+            `data_stream` (BytesIO): It is the stream where data will take to be upload.
+            `buffer_size` (int): Max buffer size of the payloads sended to the server.
+            `code_sr` (CodesSenderRecvr): Stateful codes sender and receiver helper.
+        """
+        # TODO: TEST
+        while True:
+            try:
+                if code_sr.recveing_signal:
+                    return
+                readed = data_stream.read(buffer_size)
+                if not readed:
+                    # TODO: TEST THIS "IF"
+                    self.client.just_send(
+                        PutGetCommandEnum.HPFEND.value, size=LONG_SIZE
+                    )
+                    return
+                self.protocol_handler.put_callback(code_sr)
+                self.protocol_handler.putstatus_callback(
+                    StatusInfo(StatusServerCode.OK, code=len(readed))
+                )
+            except IOError as e:
+                raise TfException(
+                    exception=e,
+                    message='Some error ocurred while trying to upload data... retry again later',
+                )
+
     def freesp_command(self):
         pass
 
@@ -996,9 +1104,6 @@ class TfProtocol(TfProtocolSuper):
         pass
 
     def getread_command(self):
-        pass
-
-    def put_command(self):
         pass
 
     def putstatus_command(self):
