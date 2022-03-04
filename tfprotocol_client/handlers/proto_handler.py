@@ -125,10 +125,6 @@ class TfProtoHandler(SuperProtoHandler):
     def ndate_callback(self, status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    def getwrite_callback(self, codes: any):
-        # FIX: CODES HAVE TO BE A SPECIFIC TYPE
-        raise NotImplementedError("Callback is not implemented: exception")
-
     def getstatus_callback(self, status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
