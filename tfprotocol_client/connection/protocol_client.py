@@ -82,6 +82,7 @@ class ProtocolClient(SocketClient):
         # SEND
         self._send(encrypted_message)
 
+    # pylint: disable=function-redefined
     @dispatch(TfProtocolMessage)
     def just_send(self, message: TfProtocolMessage, **_):
         self.exception_guard()
@@ -110,6 +111,7 @@ class ProtocolClient(SocketClient):
         self._send(encrypted_header)
         self._send(encrypted_message)
 
+    # pylint: disable=function-redefined
     @dispatch((str, bytes))
     def send(
         self,
@@ -145,6 +147,7 @@ class ProtocolClient(SocketClient):
         self.send(message)
         return self.recv(header_size=message.header_size)
 
+    # pylint: disable=function-redefined
     @dispatch((str, bytes))
     def translate(
         self,

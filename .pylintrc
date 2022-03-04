@@ -86,7 +86,7 @@ disable=raw-checker-failed,
         useless-suppression,
         deprecated-pragma,
         use-symbolic-message-instead,
-        function-redefined,
+      ;   function-redefined,
         raise-missing-from,
         missing-function-docstring
 

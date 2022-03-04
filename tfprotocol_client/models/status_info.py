@@ -15,13 +15,13 @@ class StatusInfo:
         status: StatusServerCode = None,
         opcode: int = None,
         sz: int = None,  # pylint: disable=invalid-name
-        payload: bytes = None,
+        payload: bytes = b'',
         code: int = 0,
         message: str = '',
     ):
         self.status: StatusServerCode = status
         self.opcode: int = opcode
-        self.payload: bytes = payload
+        self.payload: bytes = payload if payload else b''
         self.code: int = code
         self.sz: int = sz  # pylint: disable=invalid-name
         self.message: str = message
@@ -64,7 +64,7 @@ class StatusInfo:
             str_code, msg_str = separate_status_codenumber(msg_str)
             msg_str = msg_str.strip().replace(' : ', '', 1)
             code = int(str_code)
-        return StatusInfo(status, code=code, message=msg_str)
+        return StatusInfo(status, code=code, message=msg_str, payload=message)
 
     def __str__(self):
         return f'StatusInfo[{self.status.name}]<{self.code}, "{self.message[:1000]}">'

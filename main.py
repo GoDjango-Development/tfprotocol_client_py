@@ -37,7 +37,7 @@ class MyHandler(TfProtoHandler):
         """
         print(f'Server: {value}')
 
-    def mkdir_callback(self, value: StatusInfo):
+    def mkdir_callback(self, status: StatusInfo):
         """ mkdir <value>
 
         Args:

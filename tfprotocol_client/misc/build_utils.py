@@ -30,30 +30,33 @@ class MessageUtils:
 
     @staticmethod
     @dispatch(int)
+    # pylint: disable=function-redefined
     def encode_value(value: int, size: int = DFLT_HEADER_SIZE, **_,) -> bytes:
         value_size = value.bit_length() // 8 + (value.bit_length() % 8 != 0)
         if value_size <= SHORT_SIZE and size <= SHORT_SIZE:
             # 1-16 bit // 2 bytes
             return struct.pack(f'{ENDIANESS}h', value)
-        elif value_size <= INT_SIZE and size <= INT_SIZE:
+        if value_size <= INT_SIZE and size <= INT_SIZE:
             # 17-32 bit // 4 bytes
             return struct.pack(f'{ENDIANESS}i', value)
-        else:
-            # 33-64 bit // 8 bytes
-            return struct.pack(f'{ENDIANESS}q', value)
+        # 33-64 bit // 8 bytes
+        return struct.pack(f'{ENDIANESS}q', value)
 
     @staticmethod
     @dispatch(bytes)
+    # pylint: disable=function-redefined
     def encode_value(value: bytes, **_) -> bytes:
         return struct.pack(f'{ENDIANESS}{len(value)}s', value)
 
     @staticmethod
     @dispatch(object)
+    # pylint: disable=function-redefined
     def encode_value(_, **__) -> Optional[bytes]:
         return None
 
     @staticmethod
     @dispatch(bool)
+    # pylint: disable=function-redefined
     def encode_value(value: bool, **_) -> bytes:
         return struct.pack(f'{ENDIANESS}?', value)
 

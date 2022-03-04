@@ -49,6 +49,7 @@ class TfProtocol(TfProtocolSuper):
         )
         self._proto_client = tfprotocol._proto_client
 
+    # pylint: disable=function-redefined
     @dispatch(
         str,
         str,
@@ -250,6 +251,7 @@ class TfProtocol(TfProtocolSuper):
         except ValueError as e:
             raise TfException(exception=e)
 
+    # pylint: disable=function-redefined
     @dispatch(str)
     def dtof_command(self, timestamp: str):
         """Converts date in Unix timestamp format -seconds since the epoch-
@@ -464,6 +466,7 @@ class TfProtocol(TfProtocolSuper):
             if response.status != StatusServerCode.CONT:
                 break
 
+    # pylint: disable=function-redefined
     @dispatch(bool, str, StatusInfo, (bytes, bytearray))
     def sendfile_command(
         self,
@@ -495,6 +498,7 @@ class TfProtocol(TfProtocolSuper):
             if response.status != StatusServerCode.CONT:
                 break
 
+    # pylint: disable=function-redefined
     @dispatch(bool, str, StatusInfo)
     def rcvfile_command(self, delete_after: bool, path: str, _: StatusInfo):
         """DEPRECATED"""
@@ -544,6 +548,7 @@ class TfProtocol(TfProtocolSuper):
             if response.status != StatusServerCode.CONT:
                 break
 
+    # pylint: disable=function-redefined
     @dispatch(str, StatusInfo)
     def lsr_command(self, path: str, status_client: StatusInfo):
         """DEPRECATED"""
@@ -571,6 +576,7 @@ class TfProtocol(TfProtocolSuper):
             )
         )
 
+    # pylint: disable=function-redefined
     @dispatch(str, str)
     def renam_command(self, path_oldname: str, _: str, path_newname: str):
         """DEPRECATED"""

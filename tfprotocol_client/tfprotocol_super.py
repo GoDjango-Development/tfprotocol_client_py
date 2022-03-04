@@ -73,6 +73,7 @@ class TfProtocolSuper:
         """
         self._connect()
 
+    # pylint: disable=function-redefined
     @dispatch(KeepAliveOptions)
     def connect(self, keepalive_options: KeepAliveOptions):
         """Connect to the server with keep-alive mechanism enabled or disabled
