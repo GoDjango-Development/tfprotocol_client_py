@@ -89,7 +89,10 @@ class SocketClient:
     def stop_connection(self):
         """Close socket connection to the server"""
         if self._socket is not None:
-            self._socket.close()
+            try:
+                self._socket.close()
+            except Exception: #pylint: disable=broad-except
+                pass
         self._is_connect = False
 
     def _send(self, rawmessage: bytes) -> int:
