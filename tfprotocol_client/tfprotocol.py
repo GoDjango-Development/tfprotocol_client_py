@@ -2,7 +2,6 @@
 import datetime as dt
 from io import BytesIO
 from multiprocessing import Condition
-from threading import Event, Lock
 from typing import Union
 from multipledispatch import dispatch
 from tfprotocol_client.connection.codes_sender_recvr import CodesSenderRecvr
@@ -1097,41 +1096,137 @@ class TfProtocol(TfProtocolSuper):
                     message='Some error ocurred while trying to upload data... retry again later',
                 )
 
-    def freesp_command(self):
-        pass
+    def nigma_command(self, keylen: int):
+        """Change the current session key to another session key with any arbitrary size. This
+        length should be a number equal or greater than 8 and multiple of 4.
 
-    def udate_command(self):
-        pass
+        Args:
+            keylen (int): Is the new session key length
 
-    def ndate_command(self):
-        pass
+        Raises:
+            TfException: In case of invalid keylen.
+        """
+        # TODO: TEST
+        if keylen % 4 == 0 and keylen >= 8:
+            raise TfException(
+                code=-1,
+                message='Invalid key length,'
+                ' key length must be multiple of 4'
+                ' and greater or equals than 8...',
+            )
+        response = self.client.translate(TfProtocolMessage('NIGMA', str(keylen)))
+        if response.status is StatusServerCode.OK:
+            hdr = self.client.just_recv_int()
+            self.client.session_key = self.client.just_recv(size=hdr)
+            self.protocol_handler.nigma_callback(
+                StatusInfo(
+                    status=StatusServerCode.OK,
+                    message=MessageUtils.decode_str(self.client.session_key),
+                )
+            )
+        else:
+            self.protocol_handler.nigma_callback(response)
 
-    def getwrite_command(self):
-        pass
+    def rmsd_command(self, secure_token: str, path_dir: str):
+        """Removes a specified secure directory recursively. The first parameter is the secure
+        token that allows to remove the directory specified in the second parameter. The secure
+        token could be either a file or a directory named as the first parameter, inside the
+        directory specified as the second parameter.
 
-    def getread_command(self):
-        pass
-
-    def putstatus_command(self):
-        pass
-
-    def nigma_command(self):
-        pass
-
-    def rmsecuredirectory_command(self):
-        pass
-
-    def injail_command(self):
-        pass
+        Args:
+            secure_token (str): This token allows you to remove the secure folder
+            path_dir (str): The target folder to be deleted.
+        """
+        # TODO: TEST
+        self.protocol_handler.rmsecuredirectory_callback(
+            self.client.translate(
+                TfProtocolMessage('RMSD', secure_token, '|', path_dir)
+            )
+        )
 
     def tlb_command(self):
-        pass
+        """requests a tuple 2 ip/port from the Transfer Load Balancer pool. The clients can use
+        this command -in ‘advisory’ way- to retrieve other servers in order to balance the
+        overall traffic. By ‘advisory’ we mean that it’s up to the clients to agree in asking for
+        a server from the pool before start any further interaction.
+        """
+        # TODO: TEST
+        self.protocol_handler.tlb_callback(self.client.translate('TLB'))
 
-    def sdown_command(self):
-        pass
+    def sdown_command(self, path: str, data_sink: BytesIO, timeout: float):
+        """Downloads the specified file in the command argument.
 
-    def sup_command(self):
-        pass
+        Args:
+            path (str): File path to the server file to be download.
+            data_sink (BytesIO): Data sink open in write/append mode.
+            timeout (float): Time out (in seconds) used to shutdown pending connection.
+        """
+        # TODO: TEST
+        socket_timeout = self.client.socket.timeout
+        self.client.socket.settimeout(timeout if timeout > 0 else socket_timeout)
+
+        # SEND: SDOWN 'path/to/file'
+        self.client.send(TfProtocolMessage('SDOWN', path))
+        has_error = False
+        header = None
+        while True:
+            header = self.client.just_recv_int()
+            if header > 0:
+                try:
+                    data_sink.write(self.client.just_recv(size=header))
+                except IOError:
+                    has_error = True
+            else:
+                break
+
+        if socket_timeout > 0:
+            self.client.socket.settimeout(socket_timeout)
+
+        return header == 0 and not has_error
+
+    def sup_command(self, path: str, data_stream: BytesIO, timeout: float):
+        """uploads the specified file in the command argument.
+
+        Args:
+            path (str): Path to store uploaded file.
+            data_stream (BytesIO): Data stream open in read mode.
+            timeout (float): Time out (in seconds) used to shutdown pending connection.
+        """
+        # TODO: TEST
+        socket_timeout = self.client.socket.timeout
+        self.client.socket.settimeout(timeout if timeout > 0 else socket_timeout)
+
+        # SEND: SUP 'path/to/store/uploaded/file'
+        self.client.send(TfProtocolMessage('SUP', path))
+        read = None
+        buffer_size = self.client.max_buffer_size
+        readed = b''
+        header = 0
+        try:
+            while True:
+                readed = data_stream.read(buffer_size)
+                if readed:
+                    # TODO: TEST THIS IF
+                    self.client.send(readed)
+                else:
+                    break
+            self.client.just_send(0)
+            header = self.client.just_recv_int()
+        except TfException as e:
+            self.client.stop_connection()
+            raise TfException(
+                code=ErrorCode.ON_WRITE_OR_RECEIVE_TO_SOCKET,
+                exception=e.original_exception,
+                message='Socket exception',
+            )
+        except:  # pylint: disable=bare-except
+            self.client.just_send(-1)
+            return False
+        try:
+            self.client.socket.settimeout(socket_timeout)
+        except:  # pylint: disable=bare-except
+            pass
+        return header == 0
 
     def fsize_command(self):
         pass
