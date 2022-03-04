@@ -100,6 +100,7 @@ class ProtocolClient(SocketClient):
         self.exception_guard()
         # BUILD
         header, encoded_message = message
+        print(f'CLIENT: [{header}] {encoded_message}')
 
         # ENCRYPT
         encrypted_header: bytes = self._encrypt(header)
@@ -134,8 +135,8 @@ class ProtocolClient(SocketClient):
         # RECEIVE AND DECRYPT BODY
         received_body = self._recv(decoded_header)
         decrypted_body = self._decrypt(received_body)
-        print(f'SERVER: {decoded_header} {decrypted_body}')
         status = StatusInfo.build_status(decoded_header, decrypted_body)
+        print(f'SERVER: {decoded_header} {status}')
         return status
 
     @dispatch(TfProtocolMessage)

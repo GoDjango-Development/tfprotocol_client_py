@@ -15,10 +15,11 @@ class CodesSenderRecvr:
             client (ProtocolClient): Protocol client.
         """
         self._client: ProtocolClient = client
-        self._recveing_signal: bool = False
-        self._sending_signal: bool = False
+        self.recveing_signal: bool = False
+        self.sending_signal: bool = False
         self.block: bool = False
-        self._last_command = PutGetCommandEnum.HPFEND
+        self._last_command = PutGetCommandEnum.HPFEND.value
+        self.last_header: int = 0
 
     def send_put(self, command: int):
         """Send a code to the server codes can only be codes described at XSAceConsts
@@ -28,7 +29,7 @@ class CodesSenderRecvr:
             command (int[64-bit]): The code to be send to server.
         """
         if not self.block:
-            self._recveing_signal = True
+            self.recveing_signal = True
             self._last_command = command
             self._client.just_send(command, int_size=LONG_SIZE)
 
@@ -40,11 +41,11 @@ class CodesSenderRecvr:
             command (int[64-bit]): The code to be send to server.
         """
         if not self.block:
-            self._sending_signal = True
+            self.sending_signal = True
             self._last_command = command
             self._client.just_send(command, int_size=LONG_SIZE)
 
     @property
     def last_command(self):
-        """Return the last command send."""
+        """Return the last command sent."""
         return self._last_command
