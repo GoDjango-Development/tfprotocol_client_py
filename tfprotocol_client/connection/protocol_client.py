@@ -36,10 +36,17 @@ class ProtocolClient(SocketClient):
         self.builder_utils: MessageUtils = MessageUtils(max_buffer_size=max_buffer_size)
         self.xor_input = None
         self.xor_output = None
+        self._session_key = None
 
+    @property
+    def session_key(self):
+        return self._session_key
+
+    @session_key.setter
     def set_sessionkey(self, session_key: bytes):
         self.xor_input = Xor(session_key)
         self.xor_output = Xor(session_key)
+        self._session_key = session_key
 
     def _decrypt(self, payload: bytes) -> bytes:
         if self.xor_input is not None:
