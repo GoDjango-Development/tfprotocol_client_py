@@ -1,4 +1,4 @@
-from threading import Lock, Thread
+from threading import Condition, Thread
 from typing import Any, Callable, Iterable, Mapping
 from tfprotocol_client.models.exceptions import TfException
 
@@ -12,7 +12,7 @@ class TfThread(Thread):
         self,
         target: Callable[..., Any],
         quite_errors: bool = False,
-        lock: Lock = None,
+        cond_lock: Condition = None,
         name: str = ...,
         args: Iterable[Any] = ...,
         kwargs: Mapping[str, Any] = ...,
@@ -24,7 +24,7 @@ class TfThread(Thread):
         Args:
             `target` (Callable[..., Any]): The method who is going to be used asynchronous.
             `quite_errors` (bool, optional): Raise silently exceptions.
-            `lock` (Lock, optional): The mutex that is going to be informed when the method
+            `cond_lock` (Conditional, optional): The mutex that is going to be informed when the method
                 execution reach its end. Defaults to None.
             `name` (str, optional): Thread name. Defaults to ....
             `args` (Iterable[Any], optional): Postitional arguments to be passed to method
@@ -34,7 +34,7 @@ class TfThread(Thread):
             `daemon` (bool, optional): Demonize the thread.
         """
         super().__init__(name=name, args=args, kwargs=kwargs, daemon=daemon)
-        self.lock = lock if lock else Lock()
+        self.conditional_lock = cond_lock if cond_lock else Condition()
         self._quite_errors = quite_errors
         self._method = target
 
@@ -65,6 +65,7 @@ class TfThread(Thread):
                     message=f'{self.getName()}:\n {self._method.__name__}()',
                 )
         finally:
+            self.conditional_lock.notify_all()
             self._stop()
     
     def interrupt(self):
