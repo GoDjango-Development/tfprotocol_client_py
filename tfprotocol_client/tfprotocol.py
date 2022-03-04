@@ -1,10 +1,14 @@
 """ Transfer Protocol API Base implementation. """
 import datetime as dt
 from io import BytesIO
+from multiprocessing import Condition
+from threading import Event, Lock
 from typing import Union
 from multipledispatch import dispatch
+from tfprotocol_client.connection.codes_sender_recvr import CodesSenderRecvr
 from tfprotocol_client.handlers.super_proto_handler import SuperProtoHandler
 from tfprotocol_client.handlers.proto_handler import TfProtoHandler
+from tfprotocol_client.misc.build_utils import MessageUtils
 from tfprotocol_client.misc.constants import (
     DFLT_MAX_BUFFER_SIZE,
     KEY_LEN_INTERVAL,
@@ -12,6 +16,7 @@ from tfprotocol_client.misc.constants import (
 )
 from tfprotocol_client.misc.file_stat import FileStat, FileStatTypeEnum
 from tfprotocol_client.misc.status_server_code import StatusServerCode
+from tfprotocol_client.misc.thread import TfThread
 from tfprotocol_client.models.exceptions import ErrorCode, TfException
 from tfprotocol_client.models.message import TfProtocolMessage
 from tfprotocol_client.models.putget_commands import PutGetCommandEnum
@@ -845,7 +850,7 @@ class TfProtocol(TfProtocolSuper):
         that on very large files the time to resolve the digest function could be potentially long.
 
         Args:
-            path (str): The path to the target file.
+            `path` (str): The path to the target file.
         """
         # TODO: TEST
         self.protocol_handler.sha256_callback(self.client.translate('SHA256', path))
@@ -866,17 +871,118 @@ class TfProtocol(TfProtocolSuper):
         for that directory.
 
         Args:
-            secure_token (str): This token allows you to change the jail folder to isolate your
+            `secure_token` (str): This token allows you to change the jail folder to isolate your
                 tfprotocol instance
-            pathtojail_directory (str): The jail folder where tfprotocol will be executing
+            `pathtojail_directory` (str): The jail folder where tfprotocol will be executing
                 (Use only if your secure token has access to it).
         """
         # TODO: TEST
         self.protocol_handler.injail_callback(
             self.client.translate('INJAIL', secure_token, '|', pathtojail_directory)
         )
-        pass
 
+    def get_command(
+        self, data_sink: BytesIO, path_file: str, offset: int, buffer_size: int,
+    ):
+        """Get Command download data from server asynchronously to any OutputStream the
+        user wants...
+
+        Args:
+            `data_sink` (BytesIO): It is the stream where data will resides after downloading,
+                could be in memory or in disk etc.
+            `path_file` (str): The path IN THE SERVER where the data is located at.
+            `offset` (int): The offset is used for when we are reading the data start reading
+                since the offset position for example if the data is 100 bytes long then if offset
+                is 20 I will read since 20 to 100 skiping first 20 bytes. This is useful for when
+                we stop an operation and wanted to restart it again later.
+            `buffer_size` (int): Is the size of the buffer, while bigger faster will be the
+                communication, of course server wont give you always the amount you request,
+                because may be that server's bandwidth is getting filled.
+        """
+        # TODO: TEST
+        response = self.client.translate(
+            TfProtocolMessage('GET', path_file)
+            .add(' ')
+            .add(offset)
+            .add(buffer_size, size=LONG_SIZE)
+        )
+        if response.status is not StatusServerCode.OK:
+            self.protocol_handler.getstatus_callback(response)
+            return
+        response.code = MessageUtils.decode_int(response.message)
+        self.protocol_handler.getstatus_callback(response)
+
+        # SEEK TO THE OFFSET POSX
+        try:
+            data_sink.seek(offset)
+        except IOError as e:
+            raise TfException(exception=e)
+
+        # SET UP SHARED VARIABLES
+        cond_lock = Condition()
+        code_sr = CodesSenderRecvr(self.client)
+        t_handler: TfThread
+        t_command: TfThread
+        try:
+            t_handler = TfThread(
+                self.protocol_handler.get_callback, cond_lock=cond_lock, args=(code_sr),
+            )
+            t_command = TfThread(
+                self.__get_command_t, cond_lock=cond_lock, args=(data_sink, code_sr),
+            )
+        except Exception as e:
+            raise TfException(
+                exception=e,
+                message='FATAL ERROR!!! incorrect callback found, reinstall module...',
+            )
+        t_handler.start()
+        t_command.start()
+
+        while t_command.is_alive() or t_handler.is_alive():
+            try:
+                cond_lock.wait()
+                if not t_handler.is_alive() and code_sr.sending_signal:
+                    code_sr.send_get(PutGetCommandEnum.HPFFIN.value)
+            except InterruptedError as e:
+                raise TfException(exception=e)
+
+        # FINAL HANDSHAKE
+        if code_sr.last_command is not PutGetCommandEnum.HPFFIN.value:
+            self.client.just_send(PutGetCommandEnum.HPFFIN.value, size=LONG_SIZE)
+        if code_sr.last_header is not PutGetCommandEnum.HPFFIN.value:
+            self.client.just_recv_int(size=LONG_SIZE)
+        self.protocol_handler.getstatus_callback(
+            StatusInfo(status=StatusServerCode.OK, code=PutGetCommandEnum.HPFFIN.value)
+        )
+
+    def __get_command_t(self, data_sink: BytesIO, code_sr: CodesSenderRecvr):
+        """This command is intended to be used ONLY by the getCommand function not by
+        user DO NOT CALL THIS METHOD DIRECTLY.
+
+        Args:
+            `data_sink` (BytesIO): It is the sink where data will resides after downloading,
+                could be in memory or in disk etc.
+            `code_sr` (CodesSenderRecvr): Stateful codes sender and receiver helper.
+        """
+        header_size = LONG_SIZE
+        while True:
+            try:
+                header = self.client.just_recv_int(size=header_size)
+                if (
+                    not code_sr.sending_signal
+                    or header <= PutGetCommandEnum.HPFEND.value
+                ):
+                    self.protocol_handler.getstatus_callback(
+                        StatusInfo(StatusServerCode.OK, header)
+                    )
+                if header <= PutGetCommandEnum.HPFEND.value:
+                    code_sr.sending_signal = False
+                    return
+                chunk = self.client.just_recv(size=header)
+                if not code_sr.sending_signal:
+                    data_sink.write(chunk)
+            except IOError as e:
+                raise TfException(exception=e)
     def freesp_command(self):
         pass
 
