@@ -1101,7 +1101,7 @@ class TfProtocol(TfProtocolSuper):
         length should be a number equal or greater than 8 and multiple of 4.
 
         Args:
-            keylen (int): Is the new session key length
+            `keylen` (int): Is the new session key length
 
         Raises:
             TfException: In case of invalid keylen.
@@ -1134,8 +1134,8 @@ class TfProtocol(TfProtocolSuper):
         directory specified as the second parameter.
 
         Args:
-            secure_token (str): This token allows you to remove the secure folder
-            path_dir (str): The target folder to be deleted.
+            `secure_token` (str): This token allows you to remove the secure folder
+            `path_dir` (str): The target folder to be deleted.
         """
         # TODO: TEST
         self.protocol_handler.rmsecuredirectory_callback(
@@ -1145,7 +1145,7 @@ class TfProtocol(TfProtocolSuper):
         )
 
     def tlb_command(self):
-        """requests a tuple 2 ip/port from the Transfer Load Balancer pool. The clients can use
+        """Requests a tuple 2 ip/port from the Transfer Load Balancer pool. The clients can use
         this command -in ‘advisory’ way- to retrieve other servers in order to balance the
         overall traffic. By ‘advisory’ we mean that it’s up to the clients to agree in asking for
         a server from the pool before start any further interaction.
@@ -1157,9 +1157,9 @@ class TfProtocol(TfProtocolSuper):
         """Downloads the specified file in the command argument.
 
         Args:
-            path (str): File path to the server file to be download.
-            data_sink (BytesIO): Data sink open in write/append mode.
-            timeout (float): Time out (in seconds) used to shutdown pending connection.
+            `path` (str): File path to the server file to be download.
+            `data_sink` (BytesIO): Data sink open in write/append mode.
+            `timeout` (float): Time out (in seconds) used to shutdown pending connection.
         """
         # TODO: TEST
         socket_timeout = self.client.socket.timeout
@@ -1185,12 +1185,12 @@ class TfProtocol(TfProtocolSuper):
         return header == 0 and not has_error
 
     def sup_command(self, path: str, data_stream: BytesIO, timeout: float):
-        """uploads the specified file in the command argument.
+        """Uploads the specified file in the command argument.
 
         Args:
-            path (str): Path to store uploaded file.
-            data_stream (BytesIO): Data stream open in read mode.
-            timeout (float): Time out (in seconds) used to shutdown pending connection.
+            `path` (str): Path to store uploaded file.
+            `data_stream` (BytesIO): Data stream open in read mode.
+            `timeout` (float): Time out (in seconds) used to shutdown pending connection.
         """
         # TODO: TEST
         socket_timeout = self.client.socket.timeout
@@ -1229,10 +1229,10 @@ class TfProtocol(TfProtocolSuper):
         return header == 0
 
     def fsize_command(self, path_file: str):
-        """gets the file size -in bytes- of the specified file in the parameter.
+        """Gets the file size -in bytes- of the specified file in the parameter.
 
         Args:
-            path_file (str): Path to server file.
+            `path_file` (str): Path to server file.
         """
         # TODO: TEST
         self.client.send(TfProtocolMessage('FSIZE', path_file))
@@ -1250,7 +1250,7 @@ class TfProtocol(TfProtocolSuper):
         file size -in bytes- of each path.
 
         Args:
-            path_file (str): Path to a server file with paths.
+            `path_file` (str): Path to a server file with paths.
         """
         # TODO: TEST
         self.client.send(TfProtocolMessage('FSIZE', path_file))
@@ -1266,3 +1266,33 @@ class TfProtocol(TfProtocolSuper):
                     message=str(size),
                 )
             )
+
+    def lsv2_command(self, path: str, path_file_to_store: str):
+        """Lists the directory indicated by the first parameter. It stores all listed files in
+        the file indicated by the second parameter, one file per line.
+
+        Args:
+            `path` (str): Path to be list in the server.
+            `path_file_to_store` (str): Path to store the 'ls' output list.
+        """
+        # TODO: TEST
+        self.protocol_handler.lsv2_handler(
+            self.client.translate(
+                TfProtocolMessage('LSV2', path, '@||@', path_file_to_store)
+            )
+        )
+
+    def lsrv2_command(self, path: str, path_file_to_store: str):
+        """Lists (recursively) the directory indicated by the first parameter. It stores all
+        listed files in the file indicated by the second parameter, one file per line.
+
+        Args:
+            `path` (str): Path to be list in the server.
+            `path_file_to_store` (str): Path to store the 'ls' output list.
+        """
+        # TODO: TEST
+        self.protocol_handler.lsrv2_handler(
+            self.client.translate(
+                TfProtocolMessage('LSRV2', path, '@||@', path_file_to_store)
+            )
+        )
