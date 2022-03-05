@@ -139,26 +139,41 @@ class TfProtoHandler(SuperProtoHandler):
     def putstatus_callback(self, status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    def nigma_callback(self, bld_status: StatusInfo):
+    def nigma_callback(self, status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    def rmsecuredirectory_callback(self, bld_status: StatusInfo):
+    def rmsecuredirectory_callback(self, status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    def injail_callback(self, injail_status: StatusInfo):
+    def injail_callback(self, status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    def tlb_callback(self, tlb_status: StatusInfo):
+    def tlb_callback(self, status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    def sdown_callback(self, sdown_status: StatusInfo):
+    def sdown_callback(self, status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    def sup_callback(self, sup_status: StatusInfo):
+    def sup_callback(self, status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    def fsize_callback(self, fsize_status: StatusInfo):
+    def fsize_callback(self, status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    def fsizels_callback(self, fsizels_status: StatusInfo):
+    def fsizels_callback(self, status: StatusInfo):
+        raise NotImplementedError("Callback is not implemented: exception")
+
+    def lsv2_callback(self, status: StatusInfo):
+        raise NotImplementedError("Callback is not implemented: exception")
+
+    def lsrv2_callback(self, status: StatusInfo):
+        raise NotImplementedError("Callback is not implemented: exception")
+
+    def ftype_callback(self, status: StatusInfo):
+        raise NotImplementedError("Callback is not implemented: exception")
+
+    def ftypels_callback(self, status: StatusInfo):
+        raise NotImplementedError("Callback is not implemented: exception")
+
+    def fstatls_callback(self, status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
