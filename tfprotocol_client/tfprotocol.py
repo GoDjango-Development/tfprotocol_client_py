@@ -1302,3 +1302,56 @@ class TfProtocol(TfProtocolSuper):
                 TfProtocolMessage('LSRV2', path, '@||@', path_file_to_store)
             )
         )
+
+    def ftype_command(self, path: str):
+        """Returns a byte indicating the type of the file that the first parameter points to.
+
+        Args:
+            `path` (str): Path to file to get type.
+        """
+        # TODO: TEST
+        self.client.send(TfProtocolMessage('FTYPE', path))
+        f_type = self.client.just_recv_int(size=BYTE_SIZE)
+        self.protocol_handler.ftype_callback(
+            StatusInfo(
+                status=StatusServerCode.OK if f_type > -1 else StatusServerCode.FAILED,
+                code=f_type,
+                message=str(f_type),
+            )
+        )
+
+    def ftypels_command(self, path: str):
+        """Works pretty much like FTYPE except it return a byte with the type per each line in
+        the file indicated by the first parameter.
+
+        Args:
+            `path` (str): Path to file containing the paths to files to get type.
+        """
+        # TODO: TEST
+        self.client.send(TfProtocolMessage('FTYPELS', path))
+        f_type = 0
+        while f_type != -2:
+            f_type = self.client.just_recv_int(size=BYTE_SIZE)
+            self.protocol_handler.ftypels_callback(
+                StatusInfo(
+                    status=StatusServerCode.OK
+                    if f_type != -1
+                    else StatusServerCode.FAILED,
+                    code=f_type,
+                    message=str(f_type),
+                )
+            )
+
+    def fstatls_command(self, path: str):
+        """returns a special structure per each line in the file indicated by the first parameter.
+
+        Args:
+            `path` (str): Path to file containing the paths to files to get stats.
+        """
+        # TODO: TEST
+        self.client.send(TfProtocolMessage('FSTATLS', path))
+        _code = 0
+        while _code != -2:
+            fraw_stats = self.client.just_recv(size=26)
+            _code, file_stat = FileStat.build_from_structure(fraw_stats)
+            self.protocol_handler.fstatls_callback(file_stat)

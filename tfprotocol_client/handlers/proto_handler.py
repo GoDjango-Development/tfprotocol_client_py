@@ -175,5 +175,5 @@ class TfProtoHandler(SuperProtoHandler):
     def ftypels_callback(self, status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    def fstatls_callback(self, status: StatusInfo):
+    def fstatls_callback(self, file_stat: FileStat):
         raise NotImplementedError("Callback is not implemented: exception")
