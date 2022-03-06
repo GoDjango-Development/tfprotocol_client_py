@@ -2,6 +2,7 @@ import struct
 from typing import Final, Optional
 from multipledispatch import dispatch
 from tfprotocol_client.misc.constants import (
+    BYTE_SIZE,
     DFLT_HEADER_SIZE,
     ENDIANESS,
     INT_SIZE,
@@ -27,6 +28,9 @@ class MessageUtils:
     # pylint: disable=function-redefined
     def encode_value(value: int, size: int = DFLT_HEADER_SIZE, **_,) -> bytes:
         value_size = value.bit_length() // 8 + (value.bit_length() % 8 != 0)
+        if value_size <= BYTE_SIZE and size <= BYTE_SIZE:
+            # 1-8 bit // 1 byte
+            return struct.pack(f'{ENDIANESS}b', value)
         if value_size <= SHORT_SIZE and size <= SHORT_SIZE:
             # 1-16 bit // 2 bytes
             return struct.pack(f'{ENDIANESS}h', value)
