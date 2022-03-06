@@ -9,6 +9,7 @@ from tfprotocol_client.handlers.super_proto_handler import SuperProtoHandler
 from tfprotocol_client.handlers.proto_handler import TfProtoHandler
 from tfprotocol_client.misc.build_utils import MessageUtils
 from tfprotocol_client.misc.constants import (
+    BYTE_SIZE,
     DFLT_MAX_BUFFER_SIZE,
     KEY_LEN_INTERVAL,
     LONG_SIZE,
@@ -295,7 +296,9 @@ class TfProtocol(TfProtocolSuper):
             raw_filestat = response.message.split(' ')
             self.protocol_handler.fstat_callback(
                 FileStat(
-                    raw_filestat[0][0],
+                    FileStatTypeEnum.from_char(
+                        raw_filestat[0][0], dflt=FileStatTypeEnum.UNKNOWN,
+                    ),
                     int(raw_filestat[1]),
                     int(raw_filestat[2]),
                     int(raw_filestat[3]),
