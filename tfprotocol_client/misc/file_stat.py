@@ -1,6 +1,10 @@
 from datetime import datetime
 from enum import Enum
-from typing import Final, Union
+import struct
+from typing import Final, Tuple, Union
+from tfprotocol_client.misc.constants import ENDIANESS
+
+from tfprotocol_client.models.exceptions import TfException
 
 
 class FileStatTypeEnum(Enum):
@@ -12,9 +16,12 @@ class FileStatTypeEnum(Enum):
     UNKNOWN = 2
 
     @staticmethod
-    def from_str(label: str, dflt=None):
+    def from_char(bchar: str, dflt=None):
         try:
-            return FileStatTypeEnum[label]
+            for enum_v in FileStatTypeEnum:
+                if enum_v.name.startswith(bchar):
+                    return enum_v
+            return dflt
         except (KeyError, ValueError):
             return dflt
 
@@ -34,7 +41,7 @@ class FileStat:
         if isinstance(filestat_type, FileStatTypeEnum):
             _type = filestat_type
         elif isinstance(filestat_type, str) and len(filestat_type) == 1:
-            _type = FileStatTypeEnum.from_str(
+            _type = FileStatTypeEnum.from_char(
                 filestat_type, dflt=FileStatTypeEnum.UNKNOWN,
             )
         self.type: Final[FileStatTypeEnum] = _type
