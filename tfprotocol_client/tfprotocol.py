@@ -512,7 +512,10 @@ class TfProtocol(TfProtocolSuper):
         it lists the root directory of the protocol daemon. The return value of this command
         is a file with the listed content. In fact, it is like issuing the command RCVFILE to
         a temporary file with the listed content of the directory.The file returned by LS has
-        the following syntax.F | D | U /path/to/file-or-directoryThe F stands for “file”; the
+        the following syntax.
+        
+        F | D | U /path/to/file-or-directory
+        The F stands for “file”; the
         D for “directory” and the U for “unknown”.
         
         Args:
