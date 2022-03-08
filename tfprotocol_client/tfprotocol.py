@@ -594,7 +594,7 @@ class TfProtocol(TfProtocolSuper):
         useful for clients behind NAT boxes. If there is some idle time in the established
         connection -no data transmission- the NAT box could close or unset the connection
         without the peers knowing it. In contexts where it is predictable that an established
-        connection could be ‘in silent’ for long periods of time, and it is possible that
+        connection could be 'in silent' for long periods of time, and it is possible that
         clients are behind NAT boxes, it is necessary to set the TCP keepalive packets.
 
         Args:
