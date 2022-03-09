@@ -1,5 +1,9 @@
 from typing import Optional, Tuple, Union
 from multipledispatch import dispatch
+from tfprotocol_client.connection.keep_alive_thread import (
+    KeepAliveHandler,
+    KeepAliveThread,
+)
 from tfprotocol_client.connection.protocol_client import ProtocolClient
 from tfprotocol_client.handlers.super_proto_handler import SuperProtoHandler
 from tfprotocol_client.misc.constants import DFLT_MAX_BUFFER_SIZE, KEY_LEN_INTERVAL
@@ -85,7 +89,9 @@ class TfProtocolSuper:
         final_status: StatusInfo = self._connect()
         if final_status.status is StatusServerCode.OK:
             # START KEEP ALIVE MECHANISM
-            # TODO: ALL OF THIS
+            udp_keep_alive = KeepAliveThread(self.client, keepalive_options)
+            udp_keep_alive.setDaemon(True)
+            udp_keep_alive.start()
             return True
         else:
             # FIXME: WHY THIS METHOD RAISE AN EXCEPTION AND THE STANDARD 'connect()' do not
@@ -126,12 +132,14 @@ class TfProtocolSuper:
             # INCOMPATIBLE PROTOCOLS
             self._protocol_handler.response_server_callback(status)
             return status
+
         # GENERATE AND SEND THE SESSION KEY
         session_key = CryptographyUtils.get_random_bytes(self._keybyteslen)
         enc_session_key = CryptographyUtils.rsa_encrypt(session_key, self._public_key)
         status: StatusInfo = self._proto_client.translate(enc_session_key)
         if status.status is not StatusServerCode.OK:
             return status
+
         # SAVE SESSION KEY
         self._proto_client.set_sessionkey(session_key)
 
