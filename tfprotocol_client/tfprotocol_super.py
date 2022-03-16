@@ -141,7 +141,7 @@ class TfProtocolSuper:
             return status
 
         # SAVE SESSION KEY
-        self._proto_client.set_sessionkey(session_key)
+        self._proto_client.session_key = session_key
 
         # SEND CLIENT HASH
         status: StatusInfo = self._proto_client.translate(self._client_hash)
@@ -155,8 +155,7 @@ class TfProtocolSuper:
     def disconnect(self):
         """Disconect the protocol"""
 
-    @property
-    def len_channel(self) -> int:
+    def get_len_channel(self) -> int:
         """Gets the len of the channel
 
         Returns:
@@ -164,9 +163,10 @@ class TfProtocolSuper:
         """
         return self._len_channel
 
-    @len_channel.setter
     def set_len_channel(self, value: int):
         self._len_channel = value
+
+    len_channel = property(fget=get_len_channel, fset=set_len_channel)
 
     @property
     def tcp_timeout_options(self) -> TCPTimeoutOptions:
