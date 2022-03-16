@@ -33,6 +33,7 @@ class TfProtocolMessage:
         self.body_buffer.write(MessageUtils.encode_value(payload))
         return self
 
+    # pylint: disable=function-redefined
     @dispatch(int)
     def add(self, payload: int, size: int = INT_SIZE, **_):
         self.body_buffer.write(MessageUtils.encode_value(payload, size=size))
@@ -43,7 +44,7 @@ class TfProtocolMessage:
         if self.custom_header is not None:
             header = MessageUtils.encode_value(self.custom_header)
         else:
-            header = MessageUtils.encode_value(len(self.body_buffer.getvalue()))
+            header = MessageUtils.encode_value(len(self.payload))
         return header
 
     @property
