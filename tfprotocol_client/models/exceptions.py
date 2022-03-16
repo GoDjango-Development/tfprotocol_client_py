@@ -53,7 +53,7 @@ class TfException(Exception):
 
     def __str__(self) -> str:
         return f'''\n--------------------------------------------------
-            {self.status_info.status}
-            {self.status_info.code}
-            {self.status_info.message}
-            --------------------------------------------------\n'''
+{self.status_info.status}
+{self.status_info.code}
+{self.status_info.message}
+--------------------------------------------------\n'''
