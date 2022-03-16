@@ -428,9 +428,8 @@ class TfProtocol(TfProtocolSuper):
             self.client.translate(TfProtocolMessage('LOCK', lock_filename))
         )
 
-    @dispatch(bool, str, (bytes, bytearray))
     def sendfile_command(
-        self, is_overriten: bool, path: str, payload: Union[bytes, bytearray],
+        self, is_overriten: bool, path: str, stream: BytesIO, _: StatusInfo = None,
     ):
         """Sends a file to the server.
 
@@ -439,14 +438,14 @@ class TfProtocol(TfProtocolSuper):
                 for true. If “/path/to/filename” it exists in the server, this flag indicates
                 whether it should be overwritten or not.
             `path` (str): The path in the server where the file be stored.
-            `payload` (Union[bytes, bytearray]): The data of the file to be sent.
+            `stream` (BytesIO): The data of the file to be sent.
         """
         # TODO: TEST
         response = self.client.translate(
             TfProtocolMessage('SNDFILE', '1' if (is_overriten) else '0', path),
         )
         self.protocol_handler.sendfile_callback(
-            is_overriten, path, response, payload,
+            is_overriten, path, response, stream,
         )
 
         while True:  # TODO: HERE ALL
@@ -456,32 +455,21 @@ class TfProtocol(TfProtocolSuper):
                 > self.len_channel
             ):
                 self.protocol_handler.sendfile_callback(
-                    is_overriten, path, StatusInfo.parse('PAYLOAD_TOO_BIG'), payload,
+                    is_overriten, path, StatusInfo.parse('PAYLOAD_TOO_BIG'), stream,
                 )
             elif payload is not None:
                 response = self.client.translate(TfProtocolMessage('CONT', payload),)
                 self.protocol_handler.sendfile_callback(
-                    is_overriten, path, response, payload,
+                    is_overriten, path, response, stream,
                 )
             else:
                 break
             if response.status != StatusServerCode.CONT:
                 break
 
-    # pylint: disable=function-redefined
-    @dispatch(bool, str, StatusInfo, (bytes, bytearray))
-    def sendfile_command(
-        self,
-        is_overriten: bool,
-        path: str,
-        _: StatusInfo,
-        payload: Union[bytes, bytearray],
+    def rcvfile_command(
+        self, delete_after: bool, path: str, sink: BytesIO = None, _: StatusInfo = None
     ):
-        """DEPRECATED"""
-        self.sendfile_command(is_overriten, path, payload)
-
-    @dispatch(bool, str)
-    def rcvfile_command(self, delete_after: bool, path: str):
         """Receives a file from the server.
 
         Args:
@@ -489,25 +477,19 @@ class TfProtocol(TfProtocolSuper):
                 true and tells the server whether the file must be deleted after successfully
                 received by the client.
             `path` (str): The path to the file in the server to be retrieved.
+            `sink` (BytesIO): The sink to send data in byte mode.
         """
         response = self.client.translate(
             TfProtocolMessage('RCVFILE', '1' if delete_after else '0', path)
         )
-        self.protocol_handler.rcvfile_callback(delete_after, path, response)
+        self.protocol_handler.rcvfile_callback(delete_after, path, response, sink)
         while True:  # TODO: TEST THIS WITH A GOOD HANDLER IMPLEMENTATION
             response = self.client.translate(TfProtocolMessage('CONT'))
-            self.protocol_handler.rcvfile_callback(delete_after, path, response)
+            self.protocol_handler.rcvfile_callback(delete_after, path, response, sink)
             if response.status != StatusServerCode.CONT:
                 break
 
-    # pylint: disable=function-redefined
-    @dispatch(bool, str, StatusInfo)
-    def rcvfile_command(self, delete_after: bool, path: str, _: StatusInfo):
-        """DEPRECATED"""
-        self.rcvfile_command(delete_after, path)
-
-    @dispatch(str, StatusInfo)
-    def ls_command(self, path: str, _: StatusInfo):
+    def ls_command(self, path: str, _: StatusInfo = None):
         """Command list the directory entries for the indicated path, if the argument is missing,
         it lists the root directory of the protocol daemon. The return value of this command
         is a file with the listed content. In fact, it is like issuing the command RCVFILE to
@@ -517,7 +499,7 @@ class TfProtocol(TfProtocolSuper):
         F | D | U /path/to/file-or-directory
         The F stands for “file”; the
         D for “directory” and the U for “unknown”.
-        
+
         Args:
             `path` (str): The path to the folder to be listed.
         """
@@ -553,17 +535,10 @@ class TfProtocol(TfProtocolSuper):
             if response.status != StatusServerCode.CONT:
                 break
 
-    # pylint: disable=function-redefined
-    @dispatch(str, StatusInfo)
-    def lsr_command(self, path: str, status_client: StatusInfo):
-        """DEPRECATED"""
-        self.lsr_command(path)
-
-    @dispatch(str, str)
-    def renam_command(self, path_oldname: str, path_newname: str):
+    def renam_command(self, path_oldname: str, path_newname: str, _: str = None):
         """Renames the file or directory specified at first parameter into the name specified at
         second parameter. RENAM operates atomically; there is no instant at which “newname” is
-        non-existent between the operation’s steps if “newname” already exists. If a system
+        non-existent between the operation's steps if “newname” already exists. If a system
         crash occurs, it is possible for both names “oldname” and “newname” to still exist,
         but “newname” will be intact.RENAM has some restrictions to operate.1) “oldname” it
         must exist.2) If “newname” is a directory must be empty.3) If “oldname” is a directory
@@ -571,8 +546,8 @@ class TfProtocol(TfProtocolSuper):
         must not specify a subdirectory of the directory “oldname” which is being renamed.
 
         Args:
-            path_oldname (str): The target to be renamed.
-            path_newname (str): The new name for this target.
+            `path_oldname` (str): The target to be renamed.
+            `path_newname` (str): The new name for this target.
         """
         # TODO: TEST
         self.protocol_handler.renam_callback(
@@ -580,12 +555,6 @@ class TfProtocol(TfProtocolSuper):
                 TfProtocolMessage('RENAM', path_oldname, '|', path_newname)
             )
         )
-
-    # pylint: disable=function-redefined
-    @dispatch(str, str)
-    def renam_command(self, path_oldname: str, _: str, path_newname: str):
-        """DEPRECATED"""
-        self.renam_command(path_oldname, path_newname)
 
     def keepalive_command(
         self, is_on: bool, time_connection: int, interval: int, count: int,

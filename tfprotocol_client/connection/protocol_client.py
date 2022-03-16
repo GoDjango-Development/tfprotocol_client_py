@@ -1,4 +1,4 @@
-from typing import Any, Optional, Union
+from typing import Optional, Union
 from multipledispatch import dispatch
 from tfprotocol_client.connection.client import SocketClient
 from tfprotocol_client.misc.constants import DFLT_MAX_BUFFER_SIZE, ENDIANESS_NAME, INT_SIZE
@@ -35,15 +35,16 @@ class ProtocolClient(SocketClient):
         self.xor_output = None
         self._session_key = None
 
-    @property
-    def session_key(self):
+    def get_sessionkey(self):
         return self._session_key
 
-    @session_key.setter
     def set_sessionkey(self, session_key: bytes):
-        self.xor_input = Xor(session_key)
-        self.xor_output = Xor(session_key)
+        if session_key is not None:
+            self.xor_input = Xor(session_key)
+            self.xor_output = Xor(session_key)
         self._session_key = session_key
+
+    session_key = property(fget=get_sessionkey, fset=set_sessionkey)
 
     def _decrypt(self, payload: bytes) -> bytes:
         if self.xor_input is not None:
@@ -101,7 +102,7 @@ class ProtocolClient(SocketClient):
         self._send(encrypted_message)
 
     @dispatch(TfProtocolMessage)
-    def send(self, message: TfProtocolMessage):
+    def send(self, message: TfProtocolMessage, **_):
         self.exception_guard()
         # BUILD
         header, encoded_message = message
@@ -122,6 +123,7 @@ class ProtocolClient(SocketClient):
         message: Union[str, bytes],
         custom_header: Union[str, bytes, int, bool, None] = None,
         header_size: int = None,
+        **_,
     ):
         self.send(
             TfProtocolMessage(
@@ -146,7 +148,7 @@ class ProtocolClient(SocketClient):
         return status
 
     @dispatch(TfProtocolMessage)
-    def translate(self, message: TfProtocolMessage) -> StatusInfo:
+    def translate(self, message: TfProtocolMessage, **_) -> StatusInfo:
         self.exception_guard()
         self.send(message)
         return self.recv(header_size=message.header_size)

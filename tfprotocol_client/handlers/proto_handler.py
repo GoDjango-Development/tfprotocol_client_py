@@ -1,4 +1,5 @@
 from datetime import date as Date
+from io import BytesIO
 from tfprotocol_client.connection.protocol_client import ProtocolClient
 from tfprotocol_client.handlers.super_proto_handler import SuperProtoHandler
 from tfprotocol_client.misc.file_stat import FileStat
@@ -64,12 +65,12 @@ class TfProtoHandler(SuperProtoHandler):
         raise NotImplementedError("Callback is not implemented: exception")
 
     def sendfile_callback(
-        self, is_overriten: bool, path: str, send_to_server: StatusInfo, payload: bytes
+        self, is_overriten: bool, path: str, status: StatusInfo, payload: bytes
     ):
         raise NotImplementedError("Callback is not implemented: exception")
 
     def rcvfile_callback(
-        self, delete_after: bool, path: str, send_to_server: StatusInfo
+        self, delete_after: bool, path: str, status: StatusInfo, sink: BytesIO=None
     ):
         raise NotImplementedError("Callback is not implemented: exception")
 
