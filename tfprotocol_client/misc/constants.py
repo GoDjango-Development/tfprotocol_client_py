@@ -1,5 +1,3 @@
-import sys
-
 LONG_SIZE = 8
 INT_SIZE = 4
 SHORT_SIZE = 2
@@ -12,5 +10,6 @@ DFLT_HEADER_SIZE = INT_SIZE
 KEY_LEN_INTERVAL = (16, 42)
 
 
-ENDIANESS = '>' if sys.byteorder == 'little' else '<'
-STRING_ENCODING = 'utf-8'
+ENDIANESS = '>'
+ENDIANESS_NAME = 'little' if ENDIANESS == '<' else 'big'
+STRING_ENCODING = 'UTF-8'  # UTF-8,LATIN-1, ISO-8859-1

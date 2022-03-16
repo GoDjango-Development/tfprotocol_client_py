@@ -5,6 +5,7 @@ from tfprotocol_client.misc.constants import (
     BYTE_SIZE,
     DFLT_HEADER_SIZE,
     ENDIANESS,
+    ENDIANESS_NAME,
     INT_SIZE,
     SHORT_SIZE,
     STRING_ENCODING,
@@ -64,5 +65,5 @@ class MessageUtils:
 
     @staticmethod
     def decode_int(value: bytes) -> int:
-        return int.from_bytes(value, byteorder='big')
+        return int.from_bytes(value, byteorder=ENDIANESS_NAME)
 

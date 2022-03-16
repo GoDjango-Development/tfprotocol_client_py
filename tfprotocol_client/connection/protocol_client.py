@@ -1,16 +1,13 @@
 from typing import Any, Optional, Union
 from multipledispatch import dispatch
 from tfprotocol_client.connection.client import SocketClient
-from tfprotocol_client.misc.constants import DFLT_MAX_BUFFER_SIZE, INT_SIZE
+from tfprotocol_client.misc.constants import DFLT_MAX_BUFFER_SIZE, ENDIANESS_NAME, INT_SIZE
 from tfprotocol_client.misc.build_utils import MessageUtils
 from tfprotocol_client.models.exceptions import TfException
 from tfprotocol_client.models.message import TfProtocolMessage
 from tfprotocol_client.models.proxy_options import ProxyOptions
 from tfprotocol_client.models.status_info import StatusInfo
 from tfprotocol_client.security.cryptography import Xor
-
-# DecryptFunc = Callable[[bytes], bytes]
-# EncryptFunc = DecryptFunc
 
 
 class ProtocolClient(SocketClient):
@@ -108,7 +105,7 @@ class ProtocolClient(SocketClient):
         self.exception_guard()
         # BUILD
         header, encoded_message = message
-        print(f'CLIENT: [{header}] {encoded_message}')
+        print(f'CLIENT: {int.from_bytes(header, byteorder=ENDIANESS_NAME)} {encoded_message}')
 
         # ENCRYPT
         encrypted_header: bytes = self._encrypt(header)
