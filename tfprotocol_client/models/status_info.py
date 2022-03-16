@@ -50,12 +50,14 @@ class StatusInfo:
         header: int, message: bytes, parse_code: bool = True
     ) -> 'StatusInfo':
         code: int = header
-        msg_str: str = str(message, encoding=STRING_ENCODING)
-        status_str, msg_str = separate_status_name(msg_str)
+        msg_str_full: str = str(message, encoding=STRING_ENCODING)
+        status_str, msg_str = separate_status_name(msg_str_full)
         status: StatusServerCode = StatusServerCode.from_str(status_str.upper())
-        status: StatusServerCode = StatusServerCode.UNKNOWN if status is None else status
 
-        if (status != StatusServerCode.FAILED) or not parse_code:
+        if status is None:
+            # ? <msg_str>
+            status, msg_str = StatusServerCode.UNKNOWN, msg_str_full
+        elif (status is not StatusServerCode.FAILED) or not parse_code:
             # ? <status> [<msg_str>]
             msg_str = msg_str.replace(status.name, '', 1).strip()
             code = status.value
