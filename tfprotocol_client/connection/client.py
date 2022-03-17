@@ -137,10 +137,10 @@ class SocketClient:
         while bytes_received < size:
             read = 0
             try:
-                read = self.socket.recv_into(raw_chunk, size - bytes_received)
-            except Exception as excpt:
+                read = self.socket.recv_into(raw_chunk, min(len(raw_chunk), size - bytes_received))
+            except OSError as e:
                 raise TfException(
-                    exception=excpt, message="Cannot read from socket ..."
+                    exception=e, message="Cannot read from socket ..."
                 )
 
             try:
