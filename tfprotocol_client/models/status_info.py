@@ -1,7 +1,8 @@
 from typing import Optional
 from tfprotocol_client.misc.parse_utils import (
-    separate_status_codenumber,
-    separate_status_name,
+    separate_status_b,
+    separate_status_codenumber_b,
+    tryparse_int,
 )
 from tfprotocol_client.misc.constants import STRING_ENCODING
 from tfprotocol_client.misc.status_server_code import StatusServerCode
@@ -50,23 +51,33 @@ class StatusInfo:
         header: int, message: bytes, parse_code: bool = True
     ) -> 'StatusInfo':
         code: int = header
-        msg_str_full: str = str(message, encoding=STRING_ENCODING)
-        status_str, msg_str = separate_status_name(msg_str_full)
-        status: StatusServerCode = StatusServerCode.from_str(status_str.upper())
+        # msg_str_full: str = str(message, encoding=STRING_ENCODING)
+        status, msg = separate_status_b(message)
 
         if status is None:
-            # ? <msg_str>
-            status, msg_str = StatusServerCode.UNKNOWN, msg_str_full
+            # ? <msg>
+            status, msg = StatusServerCode.UNKNOWN, message
         elif (status is not StatusServerCode.FAILED) or not parse_code:
-            # ? <status> [<msg_str>]
-            msg_str = msg_str.replace(status.name, '', 1).strip()
+            # ? <status> [<msg>]
+            # msg = msg.replace(
+            #     str.encode(status.name, encoding=STRING_ENCODING), b'', 1
+            # ).strip()
             code = status.value
         else:
-            # ? FAILED <str_code> : <msg_str>
-            str_code, msg_str = separate_status_codenumber(msg_str)
-            msg_str = msg_str.strip().replace(' : ', '', 1)
-            code = int(str_code)
-        return StatusInfo(status, code=code, message=msg_str, payload=message)
+            # ? FAILED <str_code> : <msg>
+            str_code, msg = separate_status_codenumber_b(msg)
+            msg = msg.strip().replace(b': ', b'', 1)
+            code = tryparse_int(str_code, dflt_value=status.value)
+
+        return StatusInfo(
+            status,
+            code=code,
+            message=str(
+                msg[:1024] + b'...' if len(msg) > 1024 else msg,
+                encoding=STRING_ENCODING,
+            ),
+            payload=msg,
+        )
 
     def __str__(self):
-        return f'StatusInfo[{self.status.name}]<{self.code}, "{self.message[:1000]}">'
+        return f'StatusInfo[{self.status.name}]<{self.code}, "{self.message}">'
