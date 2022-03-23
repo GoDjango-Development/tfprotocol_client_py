@@ -139,6 +139,7 @@ class ProtocolClient(SocketClient):
         received_header = self._recv(header_size)
         decrypted_header = self._decrypt(received_header)
         decoded_header = MessageUtils.decode_int(decrypted_header)
+        print(f'SERVER: Header({decoded_header})')
 
         # RECEIVE AND DECRYPT BODY
         received_body = self._recv(decoded_header)

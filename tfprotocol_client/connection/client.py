@@ -91,7 +91,7 @@ class SocketClient:
         if self._socket is not None:
             try:
                 self._socket.close()
-            except Exception: #pylint: disable=broad-except
+            except Exception:  # pylint: disable=broad-except
                 pass
         self._is_connect = False
 
@@ -131,21 +131,21 @@ class SocketClient:
         Returns:
             bytes: message received.
         """
-        raw_chunk = bytearray(min(self.max_buffer_size, size))
-        raw_bytes = BytesIO()
+        binary_message = BytesIO()
         bytes_received = 0
         while bytes_received < size:
+            raw_chunk = bytearray(min(self.max_buffer_size, size - bytes_received))
             read = 0
             try:
-                read = self.socket.recv_into(raw_chunk, min(len(raw_chunk), size - bytes_received))
+                read = self.socket.recv_into(raw_chunk, len(raw_chunk))
             except OSError as e:
-                raise TfException(
-                    exception=e, message="Cannot read from socket ..."
-                )
+                raise TfException(exception=e, message="Cannot read from socket ...")
 
             try:
-                raw_bytes.write(raw_chunk)
+                # read chunk
+                binary_message.write(raw_chunk.rstrip())
                 bytes_received += read
+                print('-readed: ', read, 'left: ', size - bytes_received)
             except MemoryError as excpt:
                 # header_size is not going to reach this line
                 # cause is an integer of up to 8 bytes only
@@ -155,7 +155,7 @@ class SocketClient:
                     message=f'Heap space not enough server answer with a very \
                         high header number\nheader:{size}',
                 )
-        return raw_bytes.getvalue()
+        return binary_message.getvalue()
 
     def exception_guard(self):
         if self.socket is None or not self.is_connect():
