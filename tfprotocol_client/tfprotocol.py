@@ -494,7 +494,8 @@ class TfProtocol(TfProtocolSuper):
             TfProtocolMessage('RCVFILE', '1' if delete_after else '0', path)
         )
         self.protocol_handler.rcvfile_callback(delete_after, path, response, sink)
-        while True:  # TODO: TEST THIS WITH A GOOD HANDLER IMPLEMENTATION
+        while True:
+            # TODO: Review server implementation, second header sended is corrupted or unformatted
             response = self.client.translate(TfProtocolMessage('CONT'))
             self.protocol_handler.rcvfile_callback(delete_after, path, response, sink)
             if response.status != StatusServerCode.CONT:
@@ -506,7 +507,7 @@ class TfProtocol(TfProtocolSuper):
         is a file with the listed content. In fact, it is like issuing the command RCVFILE to
         a temporary file with the listed content of the directory.The file returned by LS has
         the following syntax.
-        
+
         F | D | U /path/to/file-or-directory
         The F stands for “file”; the
         D for “directory” and the U for “unknown”.
@@ -523,7 +524,7 @@ class TfProtocol(TfProtocolSuper):
             if response.status != StatusServerCode.CONT:
                 break
 
-    def lsr_command(self, path: str, _: StatusInfo):
+    def lsr_command(self, path: str, _: StatusInfo = None):
         """Command list the directory entries for the indicated path, if the argument is missing,
         it lists the root directory of the protocol daemon. The return value of this command
         is a file with the listed content. In fact, it is like issuing the command RCVFILE to
