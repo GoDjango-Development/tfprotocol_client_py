@@ -133,19 +133,20 @@ class SocketClient:
         """
         binary_message = BytesIO()
         bytes_received = 0
+        raw_chunk = bytearray(min(self.max_buffer_size, size - bytes_received))
         while bytes_received < size:
-            raw_chunk = bytearray(min(self.max_buffer_size, size - bytes_received))
-            read = 0
-            try:
-                read = self.socket.recv_into(raw_chunk, len(raw_chunk))
-            except OSError as e:
-                raise TfException(exception=e, message="Cannot read from socket ...")
-
             try:
                 # read chunk
-                binary_message.write(raw_chunk.rstrip())
+                read = 0
+                read = self.socket.recv_into(raw_chunk, len(raw_chunk))
+                
+                # save chunk
                 bytes_received += read
+                binary_message.write(raw_chunk[:read])
+                
                 print('-readed: ', read, 'left: ', size - bytes_received)
+            except OSError as e:
+                raise TfException(exception=e, message="Cannot read from socket ...")
             except MemoryError as excpt:
                 # header_size is not going to reach this line
                 # cause is an integer of up to 8 bytes only

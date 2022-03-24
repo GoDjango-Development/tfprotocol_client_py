@@ -317,7 +317,6 @@ class TfProtocol(TfProtocolSuper):
         Args:
             `path` (str): The path to the target which timestamp is going to be updated.
         """
-        # TODO: TEST
         self.protocol_handler.fupd_callback(
             self.client.translate(TfProtocolMessage('FUPB', path))
         )
