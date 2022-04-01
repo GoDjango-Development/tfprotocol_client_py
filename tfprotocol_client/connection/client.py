@@ -139,12 +139,10 @@ class SocketClient:
                 # read chunk
                 read = 0
                 read = self.socket.recv_into(raw_chunk, len(raw_chunk))
-                
+
                 # save chunk
                 bytes_received += read
                 binary_message.write(raw_chunk[:read])
-                
-                print('-readed: ', read, 'left: ', size - bytes_received)
             except OSError as e:
                 raise TfException(exception=e, message="Cannot read from socket ...")
             except MemoryError as excpt:

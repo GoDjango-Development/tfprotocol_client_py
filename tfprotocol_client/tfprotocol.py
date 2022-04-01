@@ -303,7 +303,9 @@ class TfProtocol(TfProtocolSuper):
                     int(raw_filestat[2]),
                     int(raw_filestat[3]),
                     # TODO: Check if these integers come as strings or encoded in little-endian.
-                ),
+                )
+                if raw_filestat
+                else None,
                 response,
             )
         else:
@@ -493,8 +495,8 @@ class TfProtocol(TfProtocolSuper):
             TfProtocolMessage('RCVFILE', '1' if delete_after else '0', path)
         )
         self.protocol_handler.rcvfile_callback(delete_after, path, response, sink)
+
         while True:
-            # TODO: Review server implementation, second header sended is corrupted or unformatted
             response = self.client.translate(TfProtocolMessage('CONT'))
             self.protocol_handler.rcvfile_callback(delete_after, path, response, sink)
             if response.status != StatusServerCode.CONT:
@@ -534,7 +536,6 @@ class TfProtocol(TfProtocolSuper):
         Args:
             path (str): The path to the folder to be listed.
         """
-        # TODO: TEST
         response: StatusInfo = self.client.translate(TfProtocolMessage('LSR', path))
         self.protocol_handler.lsr_callback(response)
 
@@ -544,7 +545,7 @@ class TfProtocol(TfProtocolSuper):
             if response.status != StatusServerCode.CONT:
                 break
 
-    def renam_command(self, path_oldname: str, path_newname: str, _: str = None):
+    def renam_command(self, path_dir: str, dir_newname: str, _: str = None):
         """Renames the file or directory specified at first parameter into the name specified at
         second parameter. RENAM operates atomically; there is no instant at which “newname” is
         non-existent between the operation's steps if “newname” already exists. If a system
@@ -555,13 +556,12 @@ class TfProtocol(TfProtocolSuper):
         must not specify a subdirectory of the directory “oldname” which is being renamed.
 
         Args:
-            `path_oldname` (str): The target to be renamed.
-            `path_newname` (str): The new name for this target.
+            `path_dir` (str): The target to be renamed.
+            `dir_newname` (str): The new name for this target directory.
         """
-        # TODO: TEST
         self.protocol_handler.renam_callback(
             self.client.translate(
-                TfProtocolMessage('RENAM', path_oldname, '|', path_newname)
+                TfProtocolMessage('RENAM', path_dir, '|', dir_newname)
             )
         )
 
@@ -628,9 +628,9 @@ class TfProtocol(TfProtocolSuper):
         at unix systems.
 
         Args:
-            path_file (str): The location to the file.
-            user (str): The new username who is going to owns the file.
-            group (str): The new group for the file.
+            `path_file` (str): The location to the file.
+            `user` (str): The new username who is going to owns the file.
+            `group` (str): The new group for the file.
         """
         # TODO: TEST
         self.protocol_handler.chown_callback(
