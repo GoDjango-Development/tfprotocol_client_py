@@ -1,5 +1,6 @@
 from datetime import date as Date
 from io import BytesIO
+from tfprotocol_client.connection.codes_sender_recvr import CodesSenderRecvr
 from tfprotocol_client.connection.protocol_client import ProtocolClient
 from tfprotocol_client.handlers.super_proto_handler import SuperProtoHandler
 from tfprotocol_client.misc.file_stat import FileStat
@@ -129,12 +130,10 @@ class TfProtoHandler(SuperProtoHandler):
     def getstatus_callback(self, status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    def get_callback(self, codes: any):
-        # FIX: CODES HAVE TO BE A SPECIFIC TYPE
+    def get_callback(self, codes: CodesSenderRecvr):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    def put_callback(self, codes: any):
-        # FIX: CODES HAVE TO BE A SPECIFIC TYPE
+    def put_callback(self, codes: CodesSenderRecvr):
         raise NotImplementedError("Callback is not implemented: exception")
 
     def putstatus_callback(self, status: StatusInfo):

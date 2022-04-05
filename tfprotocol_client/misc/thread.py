@@ -13,9 +13,9 @@ class TfThread(Thread):
         target: Callable[..., Any],
         quite_errors: bool = False,
         cond_lock: Condition = None,
-        name: str = ...,
-        args: Iterable[Any] = ...,
-        kwargs: Mapping[str, Any] = ...,
+        name: str = None,
+        args: Iterable[Any] = None,
+        kwargs: Mapping[str, Any] = None,
         *,
         daemon: bool = ...,
     ) -> None:

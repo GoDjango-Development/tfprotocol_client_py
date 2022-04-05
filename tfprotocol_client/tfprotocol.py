@@ -11,6 +11,7 @@ from tfprotocol_client.misc.build_utils import MessageUtils
 from tfprotocol_client.misc.constants import (
     BYTE_SIZE,
     DFLT_MAX_BUFFER_SIZE,
+    INT_SIZE,
     KEY_LEN_INTERVAL,
     LONG_SIZE,
 )
@@ -237,7 +238,7 @@ class TfProtocol(TfProtocolSuper):
         self.protocol_handler.datef_callback(date, response)
 
     @dispatch((int, float))
-    def dtof_command(self, timestamp: int):
+    def dtof_command(self, timestamp: Union[int, float]):
         """Converts date in Unix timestamp format -seconds since the epoch-
         in human-readable format “yyyy-mm-dd HH:MM:SS” UTC.
 
@@ -265,7 +266,7 @@ class TfProtocol(TfProtocolSuper):
         except ValueError as e:
             raise TfException(exception=e)
 
-    def ftod_command(self, formatter: str):
+    def ftod_command(self, formatted_date: str):
         """Converts date in human-readable format “ yyyy-mm-dd HH:MM:SS” to its Unix
         timestamp format.
 
@@ -278,7 +279,7 @@ class TfProtocol(TfProtocolSuper):
         timestamp = int(get_time_value.total_seconds() * 1000)
 
         self.protocol_handler.ftod_callback(
-            timestamp, self.client.translate(TfProtocolMessage('FTOD', formatter)),
+            timestamp, self.client.translate(TfProtocolMessage('FTOD', formatted_date)),
         )
 
     def fstat_command(self, path: str):
@@ -302,7 +303,6 @@ class TfProtocol(TfProtocolSuper):
                     int(raw_filestat[1]),
                     int(raw_filestat[2]),
                     int(raw_filestat[3]),
-                    # TODO: Check if these integers come as strings or encoded in little-endian.
                 )
                 if raw_filestat
                 else None,
@@ -313,14 +313,14 @@ class TfProtocol(TfProtocolSuper):
                 FileStat(FileStatTypeEnum.UNKNOWN, 0, 0, 0), response,
             )
 
-    def fupb_command(self, path: str):
+    def fupd_command(self, path: str):
         """Update the timestamps of the file or directory to server current time.
 
         Args:
             `path` (str): The path to the target which timestamp is going to be updated.
         """
         self.protocol_handler.fupd_callback(
-            self.client.translate(TfProtocolMessage('FUPB', path))
+            self.client.translate(TfProtocolMessage('FUPD', path))
         )
 
     def cpdir_command(self, path_from: str, path_to: str):
