@@ -665,7 +665,7 @@ class TfProtocol(TfProtocolSuper):
         response = self.client.translate(
             TfProtocolMessage('PUTCAN ', path_file, separate_by_spaces=False)
             .add(' ')
-            .add(offset)
+            .add(offset, size=LONG_SIZE)
             .add(buffer_size, size=LONG_SIZE)
             .add(canpt)
         )
@@ -775,7 +775,7 @@ class TfProtocol(TfProtocolSuper):
         response = self.client.translate(
             TfProtocolMessage('GETCAN ', path_file, separate_by_spaces=False)
             .add(' ')
-            .add(offset)
+            .add(offset, size=LONG_SIZE)
             .add(buffer_size, size=LONG_SIZE)
             .add(canpt)
         )
@@ -896,13 +896,13 @@ class TfProtocol(TfProtocolSuper):
         response = self.client.translate(
             TfProtocolMessage('GET', path_file)
             .add(' ')
-            .add(offset)
+            .add(offset, size=LONG_SIZE)
             .add(buffer_size, size=LONG_SIZE)
         )
         if response.status is not StatusServerCode.OK:
             self.protocol_handler.getstatus_callback(response)
             return
-        response.code = MessageUtils.decode_int(response.message)
+        response.code = MessageUtils.decode_int(response.payload)
         self.protocol_handler.getstatus_callback(response)
 
         # SEEK TO THE OFFSET POSX
@@ -998,13 +998,13 @@ class TfProtocol(TfProtocolSuper):
         response = self.client.translate(
             TfProtocolMessage('PUT', path_file)
             .add(' ')
-            .add(offset)
+            .add(offset, size=LONG_SIZE)
             .add(buffer_size, size=LONG_SIZE)
         )
         if response.status is not StatusServerCode.OK:
             self.protocol_handler.getstatus_callback(response)
             return
-        response.code = MessageUtils.decode_int(response.message)
+        response.code = MessageUtils.decode_int(response.payload)
         self.protocol_handler.getstatus_callback(response)
 
         # SEEK TO THE OFFSET POSX
