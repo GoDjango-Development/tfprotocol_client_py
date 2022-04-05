@@ -67,7 +67,7 @@ class ProtocolClient(SocketClient):
         return MessageUtils.decode_str(decrypted_data)
 
     def just_recv(self, size: int = None) -> bytes:
-        if size:
+        if not size:
             raise TfException(message="Bytes to receive not specified ...")
         # RECEIVE AND DECRYPT CHUNK
         received_header = self._recv(size)
