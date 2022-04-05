@@ -1094,8 +1094,7 @@ class TfProtocol(TfProtocolSuper):
         Raises:
             TfException: In case of invalid keylen.
         """
-        # TODO: TEST
-        if keylen % 4 == 0 and keylen >= 8:
+        if keylen % 4 != 0 or keylen < 8:
             raise TfException(
                 code=-1,
                 message='Invalid key length,'
@@ -1109,7 +1108,8 @@ class TfProtocol(TfProtocolSuper):
             self.protocol_handler.nigma_callback(
                 StatusInfo(
                     status=StatusServerCode.OK,
-                    message=MessageUtils.decode_str(self.client.session_key),
+                    message=str(bytes(self.client.session_key)),
+                    payload=self.client.session_key,
                 )
             )
         else:
@@ -1186,7 +1186,6 @@ class TfProtocol(TfProtocolSuper):
 
         # SEND: SUP 'path/to/store/uploaded/file'
         self.client.send(TfProtocolMessage('SUP', path))
-        read = None
         buffer_size = self.client.max_buffer_size
         readed = b''
         header = 0
