@@ -331,7 +331,6 @@ class TfProtocol(TfProtocolSuper):
             `path_from` (str): The source target directory.
             `path_to` (str): The destiny target directory.
         """
-        # TODO: TEST
         self.protocol_handler.cpdir_callback(
             self.client.translate(TfProtocolMessage('CPDIR', path_from, '|', path_to))
         )
@@ -384,7 +383,6 @@ class TfProtocol(TfProtocolSuper):
                 for directoryName.
             `directory_name` (str): The name of the directories to be deleted.
         """
-        # TODO: TEST
         self.protocol_handler.xrmdir_callback(
             self.client.translate(TfProtocolMessage('XRMDIR', path, directory_name))
         )
