@@ -665,7 +665,7 @@ class TfProtocol(TfProtocolSuper):
             .add(' ')
             .add(offset, size=LONG_SIZE)
             .add(buffer_size, size=LONG_SIZE)
-            .add(canpt)
+            .add(canpt, size=LONG_SIZE)
         )
         self.protocol_handler.putcan_callback(response, None, None)
 
@@ -676,7 +676,7 @@ class TfProtocol(TfProtocolSuper):
         transfer_status.command = PutGetCommandEnum.HPFCONT
         if response is None or response.code != 0:
             return
-        server_buffer_size = int(response.message)
+        server_buffer_size = MessageUtils.decode_int(response.payload)
         i = 0
         while True:
             i += 1
@@ -724,11 +724,7 @@ class TfProtocol(TfProtocolSuper):
                 PutGetCommandEnum.HPFCANCEL.value,
                 PutGetCommandEnum.HPFSTOP.value,
             ):
-                self.client.send(
-                    TfProtocolMessage(
-                        custom_header=transfer_status.dummy, header_size=header_size
-                    )
-                )
+                self.client.just_send(transfer_status.dummy, header_size=header_size)
 
             # BREAK STOP THE CYCLE IF THERE IS NO DATA LEFT IN THE 'data_stream'
             try:
@@ -775,7 +771,7 @@ class TfProtocol(TfProtocolSuper):
             .add(' ')
             .add(offset, size=LONG_SIZE)
             .add(buffer_size, size=LONG_SIZE)
-            .add(canpt)
+            .add(canpt, size=LONG_SIZE)
         )
         self.protocol_handler.getcan_callback(response, None, None)
 
@@ -786,7 +782,7 @@ class TfProtocol(TfProtocolSuper):
         transfer_status.command = PutGetCommandEnum.HPFCONT
         if response is None or response.code != 0:
             return
-        server_buffer_size = int(response.message)
+        server_buffer_size = MessageUtils.decode_int(response.payload)
         i = 0
         while True:
             i += 1
@@ -1000,10 +996,10 @@ class TfProtocol(TfProtocolSuper):
             .add(buffer_size, size=LONG_SIZE)
         )
         if response.status is not StatusServerCode.OK:
-            self.protocol_handler.getstatus_callback(response)
+            self.protocol_handler.putstatus_callback(response)
             return
         response.code = MessageUtils.decode_int(response.payload)
-        self.protocol_handler.getstatus_callback(response)
+        self.protocol_handler.putstatus_callback(response)
 
         # SEEK TO THE OFFSET POSX
         try:
