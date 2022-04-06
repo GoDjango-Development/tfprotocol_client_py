@@ -56,21 +56,22 @@ class TfThread(Thread):
         Raises:
             `TfException`: _description_
         """
-        try:
-            self._method(*self._args, **self._kwargs)
-        except Exception as e:  # pylint: disable=broad-except
-            if not self._quite_errors:
-                raise TfException(
-                    exception=e,
-                    message=f'{self.getName()}:\n {self._method.__name__}()',
-                )
-        finally:
-            self.conditional_lock.notify_all()
-            self._stop()
-    
+        with self.conditional_lock:
+            try:
+                self._method(*self._args, **self._kwargs)
+            except Exception as e:  # pylint: disable=broad-except
+                if not self._quite_errors:
+                    raise TfException(
+                        exception=e,
+                        message=f'{self.getName()}:\n {self._method.__name__}()',
+                    )
+            finally:
+                self.conditional_lock.notify_all()
+        # self._stop()
+        
     def interrupt(self):
         self._quite_errors = True
-        self._stop()
+        # self._stop()
     
     def set_handled_t(self):
         self.__class__.HANDLED_THREAD = self
