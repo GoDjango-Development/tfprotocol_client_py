@@ -682,7 +682,7 @@ class TfProtocol(TfProtocolSuper):
             i += 1
             if canpt > 0 and i == canpt:
                 i = 0
-                cur_header = self.client.just_recv_int(header_size=header_size)
+                cur_header = self.client.just_recv_int(size=header_size)
                 transfer_status.dummy_state = True
                 if cur_header == PutGetCommandEnum.HPFCANCEL.value:
                     transfer_status.command = PutGetCommandEnum.HPFCANCEL.value
@@ -886,7 +886,6 @@ class TfProtocol(TfProtocolSuper):
                 communication, of course server wont give you always the amount you request,
                 because may be that server's bandwidth is getting filled.
         """
-        # TODO: TEST
         response = self.client.translate(
             TfProtocolMessage('GET', path_file)
             .add(' ')
@@ -912,7 +911,9 @@ class TfProtocol(TfProtocolSuper):
         t_command: TfThread
         try:
             t_handler = TfThread(
-                self.protocol_handler.get_callback, cond_lock=cond_lock, args=(code_sr),
+                self.protocol_handler.get_callback,
+                cond_lock=cond_lock,
+                args=(code_sr,),
             )
             t_command = TfThread(
                 self.__get_command_t, cond_lock=cond_lock, args=(data_sink, code_sr),
@@ -925,13 +926,14 @@ class TfProtocol(TfProtocolSuper):
         t_handler.start()
         t_command.start()
 
-        while t_command.is_alive() or t_handler.is_alive():
-            try:
-                cond_lock.wait()
-                if not t_handler.is_alive() and code_sr.sending_signal:
-                    code_sr.send_get(PutGetCommandEnum.HPFFIN.value)
-            except InterruptedError as e:
-                raise TfException(exception=e)
+        with cond_lock:
+            while t_command.is_alive() or t_handler.is_alive():
+                try:
+                    cond_lock.wait()
+                    if not t_handler.is_alive() and code_sr.sending_signal:
+                        code_sr.send_get(PutGetCommandEnum.HPFFIN.value)
+                except InterruptedError as e:
+                    raise TfException(exception=e)
 
         # FINAL HANDSHAKE
         if code_sr.last_command is not PutGetCommandEnum.HPFFIN.value:
@@ -1061,13 +1063,16 @@ class TfProtocol(TfProtocolSuper):
             try:
                 if code_sr.recveing_signal:
                     return
+
                 readed = data_stream.read(buffer_size)
                 if not readed:
-                    # TODO: TEST THIS "IF"
                     self.client.just_send(
                         PutGetCommandEnum.HPFEND.value, size=LONG_SIZE
                     )
                     return
+                else:
+                    self.client.send(readed, header_size=LONG_SIZE)
+
                 self.protocol_handler.put_callback(code_sr)
                 self.protocol_handler.putstatus_callback(
                     StatusInfo(StatusServerCode.OK, code=len(readed))
