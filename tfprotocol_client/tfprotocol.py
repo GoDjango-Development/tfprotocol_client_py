@@ -679,7 +679,6 @@ class TfProtocol(TfProtocolSuper):
         server_buffer_size = MessageUtils.decode_int(response.payload)
         i = 0
         while True:
-            i += 1
             if canpt > 0 and i == canpt:
                 i = 0
                 cur_header = self.client.just_recv_int(size=header_size)
@@ -706,6 +705,7 @@ class TfProtocol(TfProtocolSuper):
                     )
                 transfer_status.dummy_state = False
                 continue
+            i += 1
             # LOAD DATA TO BE SENT
             payl: bytearray = None
             try:
@@ -763,7 +763,6 @@ class TfProtocol(TfProtocolSuper):
             `canpt` (int): Cancellation Points, determines the cancellation points where the
                 user, it will have to read from the server to know if it continues or not.
         """
-        # TODO: TEST
         offset, canpt = max(offset, 0), max(canpt, 0)
         # SEND INITIAL OPTIONS
         response = self.client.translate(
@@ -779,30 +778,31 @@ class TfProtocol(TfProtocolSuper):
         transfer_status = TransferStatus()
         header_size = LONG_SIZE
         server_buffer_size = buffer_size
-        transfer_status.command = PutGetCommandEnum.HPFCONT
         if response is None or response.code != 0:
             return
         server_buffer_size = MessageUtils.decode_int(response.payload)
         i = 0
         while True:
-            i += 1
             if canpt > 0 and i == canpt:
                 i = 0
+                transfer_status.dummy = None
                 transfer_status.dummy_state = True
+
                 self.protocol_handler.getcan_callback(
                     None, self.client, transfer_status
                 )
-                if transfer_status.dummy:
+                if not transfer_status.dummy:
                     transfer_status.dummy = PutGetCommandEnum.HPFCONT.value
-                self.client.send(
-                    TfProtocolMessage(
-                        custom_header=transfer_status.dummy, header_size=header_size,
-                    )
+                self.client.just_send(
+                    transfer_status.dummy, size=header_size,
                 )
+
                 if transfer_status.dummy == PutGetCommandEnum.HPFCANCEL.value:
                     break
                 transfer_status.dummy_state = False
                 continue
+            i += 1
+
             cur_header = self.client.just_recv_int(size=header_size)
             if cur_header in (
                 PutGetCommandEnum.HPFCANCEL.value,
@@ -810,16 +810,18 @@ class TfProtocol(TfProtocolSuper):
             ):
                 # CANCELATION FROM SERVER OR END OF FILE REACHED
                 transfer_status.dummy = cur_header
+
+                # handle hpffin command exchange at the end of getcan command
                 self.protocol_handler.getcan_callback(
                     None, self.client, transfer_status,
                 )
                 break
-            pyld = self.client.just_recv(size=server_buffer_size)
+            pyld = self.client.just_recv(size=cur_header)
             try:
                 data_sink.write(pyld)
             except IOError as e:
                 raise TfException(exception=e)
-            transfer_status.dummy(len(pyld))
+            transfer_status.dummy = len(pyld)
             self.protocol_handler.getcan_callback(None, self.client, transfer_status)
 
     def end_command(self):
