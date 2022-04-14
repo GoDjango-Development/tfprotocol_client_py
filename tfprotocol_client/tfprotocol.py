@@ -1218,7 +1218,6 @@ class TfProtocol(TfProtocolSuper):
         Args:
             `path_file` (str): Path to server file.
         """
-        # TODO: TEST
         self.client.send(TfProtocolMessage('FSIZE', path_file))
         size = self.client.just_recv_int(size=LONG_SIZE, signed=True)
         self.protocol_handler.fsize_callback(
@@ -1236,16 +1235,15 @@ class TfProtocol(TfProtocolSuper):
         Args:
             `path_file` (str): Path to a server file with paths.
         """
-        # TODO: TEST
-        self.client.send(TfProtocolMessage('FSIZE', path_file))
+        self.client.send(TfProtocolMessage('FSIZELS', path_file))
         size: int = None
         while size != -3:
-            size = self.client.just_recv_int(size=LONG_SIZE)
+            print(size)
             size = self.client.just_recv_int(size=LONG_SIZE, signed=True)
             self.protocol_handler.fsizels_callback(
                 StatusInfo(
-                    status=StatusServerCode.OK
-                    if size >= 0
+                    status=StatusServerCode.CONT
+                    if size != -1
                     else StatusServerCode.FAILED,
                     code=size,
                     message=str(size),
