@@ -663,9 +663,9 @@ class TfProtocol(TfProtocolSuper):
         response = self.client.translate(
             TfProtocolMessage('PUTCAN ', path_file, separate_by_spaces=False)
             .add(' ')
-            .add(offset, size=LONG_SIZE)
-            .add(buffer_size, size=LONG_SIZE)
-            .add(canpt, size=LONG_SIZE)
+            .add(offset, size=LONG_SIZE, signed=False)
+            .add(buffer_size, size=LONG_SIZE, signed=True)
+            .add(canpt, size=LONG_SIZE, signed=False)
         )
         self.protocol_handler.putcan_callback(response, None, None)
 
@@ -676,12 +676,12 @@ class TfProtocol(TfProtocolSuper):
         transfer_status.command = PutGetCommandEnum.HPFCONT
         if response is None or response.code != 0:
             return
-        server_buffer_size = MessageUtils.decode_int(response.payload)
+        server_buffer_size = MessageUtils.decode_int(response.payload, signed=True)
         i = 0
         while True:
             if canpt > 0 and i == canpt:
                 i = 0
-                cur_header = self.client.just_recv_int(size=header_size)
+                cur_header = self.client.just_recv_int(size=header_size, signed=True)
                 transfer_status.dummy_state = True
                 if cur_header == PutGetCommandEnum.HPFCANCEL.value:
                     transfer_status.command = PutGetCommandEnum.HPFCANCEL.value
@@ -729,11 +729,8 @@ class TfProtocol(TfProtocolSuper):
             # BREAK STOP THE CYCLE IF THERE IS NO DATA LEFT IN THE 'data_stream'
             try:
                 if not payl or transfer_status.dummy == PutGetCommandEnum.HPFEND.value:
-                    self.client.send(
-                        TfProtocolMessage(
-                            custom_header=PutGetCommandEnum.HPFEND.value,
-                            header_size=header_size,
-                        )
+                    self.client.just_send(
+                        PutGetCommandEnum.HPFEND.value, size=header_size, signed=True,
                     )
                     transfer_status.dummy = PutGetCommandEnum.HPFEND.value
                     self.protocol_handler.putcan_callback(
@@ -766,11 +763,11 @@ class TfProtocol(TfProtocolSuper):
         offset, canpt = max(offset, 0), max(canpt, 0)
         # SEND INITIAL OPTIONS
         response = self.client.translate(
-            TfProtocolMessage('GETCAN ', path_file, separate_by_spaces=False)
+            TfProtocolMessage('GETCAN', path_file)
             .add(' ')
-            .add(offset, size=LONG_SIZE)
-            .add(buffer_size, size=LONG_SIZE)
-            .add(canpt, size=LONG_SIZE)
+            .add(offset, size=LONG_SIZE, signed=False)
+            .add(buffer_size, size=LONG_SIZE, signed=True)
+            .add(canpt, size=LONG_SIZE, signed=False)
         )
         self.protocol_handler.getcan_callback(response, None, None)
 
@@ -780,7 +777,7 @@ class TfProtocol(TfProtocolSuper):
         server_buffer_size = buffer_size
         if response is None or response.code != 0:
             return
-        server_buffer_size = MessageUtils.decode_int(response.payload)
+        server_buffer_size = MessageUtils.decode_int(response.payload, signed=True)
         i = 0
         while True:
             if canpt > 0 and i == canpt:
@@ -803,7 +800,7 @@ class TfProtocol(TfProtocolSuper):
                 continue
             i += 1
 
-            cur_header = self.client.just_recv_int(size=header_size)
+            cur_header = self.client.just_recv_int(size=header_size, signed=True)
             if cur_header in (
                 PutGetCommandEnum.HPFCANCEL.value,
                 PutGetCommandEnum.HPFEND.value,
@@ -888,13 +885,13 @@ class TfProtocol(TfProtocolSuper):
         response = self.client.translate(
             TfProtocolMessage('GET', path_file)
             .add(' ')
-            .add(offset, size=LONG_SIZE)
-            .add(buffer_size, size=LONG_SIZE)
+            .add(offset, size=LONG_SIZE, signed=False)
+            .add(buffer_size, size=LONG_SIZE, signed=True)
         )
         if response.status is not StatusServerCode.OK:
             self.protocol_handler.getstatus_callback(response)
             return
-        response.code = MessageUtils.decode_int(response.payload)
+        response.code = MessageUtils.decode_int(response.payload, signed=True)
         self.protocol_handler.getstatus_callback(response)
 
         # SEEK TO THE OFFSET POSX
@@ -936,9 +933,11 @@ class TfProtocol(TfProtocolSuper):
 
         # FINAL HANDSHAKE
         if code_sr.last_command is not PutGetCommandEnum.HPFFIN.value:
-            self.client.just_send(PutGetCommandEnum.HPFFIN.value, size=LONG_SIZE)
+            self.client.just_send(
+                PutGetCommandEnum.HPFFIN.value, size=LONG_SIZE, signed=True
+            )
         if code_sr.last_header is not PutGetCommandEnum.HPFFIN.value:
-            self.client.just_recv_int(size=LONG_SIZE)
+            self.client.just_recv_int(size=LONG_SIZE, signed=True)
         self.protocol_handler.getstatus_callback(
             StatusInfo(status=StatusServerCode.OK, code=PutGetCommandEnum.HPFFIN.value)
         )
@@ -955,7 +954,7 @@ class TfProtocol(TfProtocolSuper):
         header_size = LONG_SIZE
         while True:
             try:
-                header = self.client.just_recv_int(size=header_size)
+                header = self.client.just_recv_int(size=header_size, signed=True)
                 if (
                     not code_sr.sending_signal
                     or header <= PutGetCommandEnum.HPFEND.value
@@ -993,13 +992,13 @@ class TfProtocol(TfProtocolSuper):
         response = self.client.translate(
             TfProtocolMessage('PUT', path_file)
             .add(' ')
-            .add(offset, size=LONG_SIZE)
-            .add(buffer_size, size=LONG_SIZE)
+            .add(offset, size=LONG_SIZE, signed=False)
+            .add(buffer_size, size=LONG_SIZE, signed=True)
         )
         if response.status is not StatusServerCode.OK:
             self.protocol_handler.putstatus_callback(response)
             return
-        response.code = MessageUtils.decode_int(response.payload)
+        response.code = MessageUtils.decode_int(response.payload, signed=True)
         self.protocol_handler.putstatus_callback(response)
 
         # SEEK TO THE OFFSET POSX
@@ -1041,7 +1040,7 @@ class TfProtocol(TfProtocolSuper):
 
         # FINAL HANDSHAKE
         if code_sr.last_header is not PutGetCommandEnum.HPFFIN.value:
-            self.client.just_recv_int(size=LONG_SIZE)
+            self.client.just_recv_int(size=LONG_SIZE, signed=True)
         code_sr.send_put(PutGetCommandEnum.HPFFIN.value)
         code_sr.block = True
         self.protocol_handler.put_callback(code_sr)
@@ -1101,7 +1100,7 @@ class TfProtocol(TfProtocolSuper):
             )
         response = self.client.translate(TfProtocolMessage('NIGMA', str(keylen)))
         if response.status is StatusServerCode.OK:
-            hdr = self.client.just_recv_int()
+            hdr = self.client.just_recv_int(signed=True)
             self.client.session_key = self.client.just_recv(size=hdr)
             self.protocol_handler.nigma_callback(
                 StatusInfo(
@@ -1156,7 +1155,7 @@ class TfProtocol(TfProtocolSuper):
         has_error = False
         header = None
         while True:
-            header = self.client.just_recv_int()
+            header = self.client.just_recv_int(signed=True)
             if header > 0:
                 try:
                     data_sink.write(self.client.just_recv(size=header))
@@ -1195,8 +1194,8 @@ class TfProtocol(TfProtocolSuper):
                     self.client.send(readed)
                 else:
                     break
-            self.client.just_send(0)
-            header = self.client.just_recv_int()
+            self.client.just_send(0, signed=True)
+            header = self.client.just_recv_int(signed=True)
         except TfException as e:
             self.client.stop_connection()
             raise TfException(
@@ -1205,7 +1204,7 @@ class TfProtocol(TfProtocolSuper):
                 message='Socket exception',
             )
         except:  # pylint: disable=bare-except
-            self.client.just_send(-1)
+            self.client.just_send(-1, signed=True)
             return False
         try:
             self.client.socket.settimeout(socket_timeout)
@@ -1221,7 +1220,7 @@ class TfProtocol(TfProtocolSuper):
         """
         # TODO: TEST
         self.client.send(TfProtocolMessage('FSIZE', path_file))
-        size = self.client.just_recv_int(size=LONG_SIZE)
+        size = self.client.just_recv_int(size=LONG_SIZE, signed=True)
         self.protocol_handler.fsize_callback(
             StatusInfo(
                 status=StatusServerCode.OK if size >= 0 else StatusServerCode.FAILED,
@@ -1242,6 +1241,7 @@ class TfProtocol(TfProtocolSuper):
         size: int = None
         while size != -3:
             size = self.client.just_recv_int(size=LONG_SIZE)
+            size = self.client.just_recv_int(size=LONG_SIZE, signed=True)
             self.protocol_handler.fsizels_callback(
                 StatusInfo(
                     status=StatusServerCode.OK
@@ -1296,7 +1296,7 @@ class TfProtocol(TfProtocolSuper):
         """
         # TODO: TEST
         self.client.send(TfProtocolMessage('FTYPE', path))
-        f_type = self.client.just_recv_int(size=BYTE_SIZE)
+        f_type = self.client.just_recv_int(size=BYTE_SIZE, signed=True)
         self.protocol_handler.ftype_callback(
             StatusInfo(
                 status=StatusServerCode.OK if f_type > -1 else StatusServerCode.FAILED,
@@ -1316,7 +1316,7 @@ class TfProtocol(TfProtocolSuper):
         self.client.send(TfProtocolMessage('FTYPELS', path))
         f_type = 0
         while f_type != -2:
-            f_type = self.client.just_recv_int(size=BYTE_SIZE)
+            f_type = self.client.just_recv_int(size=BYTE_SIZE, signed=True)
             self.protocol_handler.ftypels_callback(
                 StatusInfo(
                     status=StatusServerCode.OK

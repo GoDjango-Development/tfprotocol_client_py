@@ -27,19 +27,21 @@ class MessageUtils:
     @staticmethod
     @dispatch(int)
     # pylint: disable=function-redefined
-    def encode_value(value: int, size: int = DFLT_HEADER_SIZE, **_,) -> bytes:
+    def encode_value(
+        value: int, size: int = DFLT_HEADER_SIZE, signed=False, **_
+    ) -> bytes:
         value_size = value.bit_length() // 8 + (value.bit_length() % 8 != 0)
         if value_size <= BYTE_SIZE and size <= BYTE_SIZE:
             # 1-8 bit // 1 byte
-            return struct.pack(f'{ENDIANESS}b', value)
+            return struct.pack(f'{ENDIANESS}{"b" if signed else "B"}', value)
         if value_size <= SHORT_SIZE and size <= SHORT_SIZE:
             # 1-16 bit // 2 bytes
-            return struct.pack(f'{ENDIANESS}h', value)
+            return struct.pack(f'{ENDIANESS}{"h" if signed else "H"}', value)
         if value_size <= INT_SIZE and size <= INT_SIZE:
             # 17-32 bit // 4 bytes
-            return struct.pack(f'{ENDIANESS}i', value)
+            return struct.pack(f'{ENDIANESS}{"i" if signed else "I"}', value)
         # 33-64 bit // 8 bytes
-        return struct.pack(f'{ENDIANESS}q', value)
+        return struct.pack(f'{ENDIANESS}{"q" if signed else "Q"}', value)
 
     @staticmethod
     @dispatch(bytes)
@@ -60,10 +62,10 @@ class MessageUtils:
         return struct.pack(f'{ENDIANESS}?', value)
 
     @staticmethod
-    def decode_str(value: bytes) -> str:
+    def decode_str(value: bytes, **_) -> str:
         return str(value, encoding=STRING_ENCODING)
 
     @staticmethod
-    def decode_int(value: bytes) -> int:
-        return int.from_bytes(value, byteorder=ENDIANESS_NAME)
+    def decode_int(value: bytes, signed=False) -> int:
+        return int.from_bytes(value, byteorder=ENDIANESS_NAME, signed=signed)
 

@@ -1,7 +1,11 @@
 from typing import Optional, Union
 from multipledispatch import dispatch
 from tfprotocol_client.connection.client import SocketClient
-from tfprotocol_client.misc.constants import DFLT_MAX_BUFFER_SIZE, ENDIANESS_NAME, INT_SIZE
+from tfprotocol_client.misc.constants import (
+    DFLT_MAX_BUFFER_SIZE,
+    ENDIANESS_NAME,
+    INT_SIZE,
+)
 from tfprotocol_client.misc.build_utils import MessageUtils
 from tfprotocol_client.models.exceptions import TfException
 from tfprotocol_client.models.message import TfProtocolMessage
@@ -56,10 +60,10 @@ class ProtocolClient(SocketClient):
             payload = self.xor_output.encrypt(payload)
         return payload
 
-    def just_recv_int(self, size: int = INT_SIZE) -> int:
+    def just_recv_int(self, size: int = INT_SIZE, signed=False) -> int:
         # RECEIVE, DECRYPT AND DECODE INTEGER
         decrypted_data = self.just_recv(size)
-        return MessageUtils.decode_int(decrypted_data)
+        return MessageUtils.decode_int(decrypted_data, signed=signed)
 
     def just_recv_str(self, size: int) -> int:
         # RECEIVE, DECRYPT AND DECODE TEXT-STRING
@@ -75,11 +79,11 @@ class ProtocolClient(SocketClient):
         return decrypted_header
 
     @dispatch((int, str, bytes, bool))
-    def just_send(self, message: int, size=INT_SIZE):
+    def just_send(self, message: int, size=INT_SIZE, signed=False, **_):
         self.exception_guard()
 
         # BUILD
-        encoded_message = MessageUtils.encode_value(message, size=size)
+        encoded_message = MessageUtils.encode_value(message, size=size, signed=signed)
 
         # ENCRYPT
         encrypted_message: bytes = self._encrypt(encoded_message)
@@ -106,7 +110,9 @@ class ProtocolClient(SocketClient):
         self.exception_guard()
         # BUILD
         header, encoded_message = message
-        print(f'CLIENT: {int.from_bytes(header, byteorder=ENDIANESS_NAME)} {encoded_message}')
+        print(
+            f'CLIENT: {int.from_bytes(header, byteorder=ENDIANESS_NAME)} {encoded_message}'
+        )
 
         # ENCRYPT
         encrypted_header: bytes = self._encrypt(header)
@@ -132,13 +138,13 @@ class ProtocolClient(SocketClient):
         )
 
     @dispatch()
-    def recv(self, header_size=None) -> StatusInfo:
+    def recv(self, header_size=None, header_signed=True) -> StatusInfo:
         self.exception_guard()
         header_size = header_size if header_size > 0 else self.header_size
         # RECEIVE, DECRYPT AND DECODE HEADER
         received_header = self._recv(header_size)
         decrypted_header = self._decrypt(received_header)
-        decoded_header = MessageUtils.decode_int(decrypted_header)
+        decoded_header = MessageUtils.decode_int(decrypted_header, signed=header_signed)
         # print(f'SERVER: Header({decoded_header})')
 
         # RECEIVE AND DECRYPT BODY
@@ -149,10 +155,14 @@ class ProtocolClient(SocketClient):
         return status
 
     @dispatch(TfProtocolMessage)
-    def translate(self, message: TfProtocolMessage, **_) -> StatusInfo:
+    def translate(
+        self, message: TfProtocolMessage, recv_header_signed=True, **_
+    ) -> StatusInfo:
         self.exception_guard()
         self.send(message)
-        return self.recv(header_size=message.header_size)
+        return self.recv(
+            header_size=message.header_size, header_signed=recv_header_signed
+        )
 
     # pylint: disable=function-redefined
     @dispatch((str, bytes))
@@ -161,10 +171,12 @@ class ProtocolClient(SocketClient):
         message: Union[str, bytes],
         custom_header: Union[str, bytes, int, bool, None] = None,
         header_size: int = None,
+        recv_header_signed=True,
         **_,
     ) -> StatusInfo:
         return self.translate(
             TfProtocolMessage(
                 message, custom_header=custom_header, header_size=header_size
-            )
+            ),
+            recv_header_signed=recv_header_signed,
         )

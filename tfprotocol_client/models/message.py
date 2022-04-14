@@ -15,13 +15,17 @@ class TfProtocolMessage:
         self,
         *payloads,
         custom_header: Union[int, bytes, None] = None,
+        header_signed: bool = True,
         trim_body: bool = True,
         separate_by_spaces: bool = True,
         header_size: int = DFLT_HEADER_SIZE,
     ) -> None:
-        self.custom_header = MessageUtils.encode_value(custom_header, size=header_size)
+        self.custom_header = MessageUtils.encode_value(
+            custom_header, size=header_size, signed=header_signed
+        )
         self.body_buffer = BytesIO()
         self.header_size = header_size if header_size else DFLT_HEADER_SIZE
+        self.header_signed = header_signed
         for e in payloads:
             if separate_by_spaces:
                 self.add(b' ')
@@ -29,14 +33,16 @@ class TfProtocolMessage:
         self.trim_body = trim_body
 
     @dispatch((str, bytes, bool))
-    def add(self, payload: Union[str, bytes, int, bool], **_):
+    def add(self, payload: Union[str, bytes, bool], **_):
         self.body_buffer.write(MessageUtils.encode_value(payload))
         return self
 
     # pylint: disable=function-redefined
     @dispatch(int)
-    def add(self, payload: int, size: int = INT_SIZE, **_):
-        self.body_buffer.write(MessageUtils.encode_value(payload, size=size))
+    def add(self, payload: int, size: int = INT_SIZE, signed=False, **_):
+        self.body_buffer.write(
+            MessageUtils.encode_value(payload, size=size, signed=signed)
+        )
         return self
 
     @property
@@ -44,7 +50,9 @@ class TfProtocolMessage:
         if self.custom_header is not None:
             header = MessageUtils.encode_value(self.custom_header)
         else:
-            header = MessageUtils.encode_value(len(self.payload))
+            header = MessageUtils.encode_value(
+                len(self.payload), size=self.header_size, signed=self.header_signed
+            )
         return header
 
     @property
