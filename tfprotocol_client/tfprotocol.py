@@ -2,6 +2,7 @@
 import datetime as dt
 from io import BytesIO
 from multiprocessing import Condition
+import socket
 from typing import Union
 from multipledispatch import dispatch
 from tfprotocol_client.connection.codes_sender_recvr import CodesSenderRecvr
@@ -714,8 +715,8 @@ class TfProtocol(TfProtocolSuper):
                 raise TfException(exception=e)
 
             # SEND DATA CHUNK
-            # TODO: TEST WHEN  payl  IS EMPTY b''
-            self.client.send(payl)
+            if payl:
+                self.client.send(payl, header_size=LONG_SIZE)
             transfer_status.dummy = len(payl)
             self.protocol_handler.putcan_callback(None, self.client, transfer_status)
 
@@ -724,7 +725,9 @@ class TfProtocol(TfProtocolSuper):
                 PutGetCommandEnum.HPFCANCEL.value,
                 PutGetCommandEnum.HPFSTOP.value,
             ):
-                self.client.just_send(transfer_status.dummy, header_size=header_size)
+                self.client.just_send(
+                    transfer_status.dummy, size=header_size, signed=True
+                )
 
             # BREAK STOP THE CYCLE IF THERE IS NO DATA LEFT IN THE 'data_stream'
             try:
@@ -791,7 +794,7 @@ class TfProtocol(TfProtocolSuper):
                 if not transfer_status.dummy:
                     transfer_status.dummy = PutGetCommandEnum.HPFCONT.value
                 self.client.just_send(
-                    transfer_status.dummy, size=header_size,
+                    transfer_status.dummy, size=header_size, signed=True,
                 )
 
                 if transfer_status.dummy == PutGetCommandEnum.HPFCANCEL.value:
@@ -1024,22 +1027,22 @@ class TfProtocol(TfProtocolSuper):
             )
         # RUN THREAD
         t_command.start()
-
         # WHILE HEADERS NOT AN END-OF-FILE OR AN ERROR CONTINUES
-        while True:
-            code_sr.last_header = self.client.just_recv_int(size=LONG_SIZE)
-            if code_sr.last_header <= 0:
-                code_sr.recveing_signal = True
-                break
-
-        while t_command.is_alive():
-            try:
+        # code_sr.last_header = 1
+        with cond_lock:
+            while True:
                 cond_lock.wait()
-            except InterruptedError as e:
-                raise TfException(exception=e)
+                code_sr.last_header = self.client.just_recv_int(
+                    size=LONG_SIZE, signed=True
+                )
+                if code_sr.last_header <= 0:
+                    code_sr.recveing_signal = True
+                    break
+
+        t_command.join()
 
         # FINAL HANDSHAKE
-        if code_sr.last_header is not PutGetCommandEnum.HPFFIN.value:
+        if code_sr.last_header != PutGetCommandEnum.HPFFIN.value:
             self.client.just_recv_int(size=LONG_SIZE, signed=True)
         code_sr.send_put(PutGetCommandEnum.HPFFIN.value)
         code_sr.block = True
@@ -1065,7 +1068,7 @@ class TfProtocol(TfProtocolSuper):
                 readed = data_stream.read(buffer_size)
                 if not readed:
                     self.client.just_send(
-                        PutGetCommandEnum.HPFEND.value, size=LONG_SIZE
+                        PutGetCommandEnum.HPFEND.value, size=LONG_SIZE, signed=True
                     )
                     return
                 else:
@@ -1155,14 +1158,22 @@ class TfProtocol(TfProtocolSuper):
         has_error = False
         header = None
         while True:
-            header = self.client.just_recv_int(signed=True)
-            if header > 0:
-                try:
-                    data_sink.write(self.client.just_recv(size=header))
-                except IOError:
-                    has_error = True
-            else:
-                break
+            try:
+                header = self.client.just_recv_int(signed=True)
+                if header > 0:
+                    try:
+                        data = self.client.just_recv(size=header)
+                        data_sink.write(data)
+                    except IOError:
+                        has_error = True
+                else:
+                    break
+            except TfException as e:
+                if isinstance(e.original_exception, socket.timeout):
+                    print('Connection timeout...')
+                    break
+                else:
+                    raise e
 
         if socket_timeout > 0:
             self.client.socket.settimeout(socket_timeout)
@@ -1191,10 +1202,10 @@ class TfProtocol(TfProtocolSuper):
                 readed = data_stream.read(buffer_size)
                 if readed:
                     # TODO: TEST THIS IF
-                    self.client.send(readed)
+                    self.client.send(readed, header_size=INT_SIZE)
                 else:
                     break
-            self.client.just_send(0, signed=True)
+            self.client.just_send(0, size=INT_SIZE,signed=True)
             header = self.client.just_recv_int(signed=True)
         except TfException as e:
             self.client.stop_connection()
@@ -1204,7 +1215,7 @@ class TfProtocol(TfProtocolSuper):
                 message='Socket exception',
             )
         except:  # pylint: disable=bare-except
-            self.client.just_send(-1, signed=True)
+            self.client.just_send(-1, size=INT_SIZE, signed=True)
             return False
         try:
             self.client.socket.settimeout(socket_timeout)
@@ -1238,7 +1249,6 @@ class TfProtocol(TfProtocolSuper):
         self.client.send(TfProtocolMessage('FSIZELS', path_file))
         size: int = None
         while size != -3:
-            print(size)
             size = self.client.just_recv_int(size=LONG_SIZE, signed=True)
             self.protocol_handler.fsizels_callback(
                 StatusInfo(

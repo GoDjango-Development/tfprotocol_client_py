@@ -31,7 +31,7 @@ class CodesSenderRecvr:
         if not self.block:
             self.recveing_signal = True
             self._last_command = command
-            self._client.just_send(command, int_size=LONG_SIZE)
+            self._client.just_send(command, size=LONG_SIZE, signed=True)
 
     def send_get(self, command: int):
         """Send a code to the server codes can only be codes described at XSAceConsts
@@ -43,7 +43,7 @@ class CodesSenderRecvr:
         if not self.block:
             self.sending_signal = True
             self._last_command = command
-            self._client.just_send(command, int_size=LONG_SIZE)
+            self._client.just_send(command, size=LONG_SIZE, signed=True)
 
     @property
     def last_command(self):
