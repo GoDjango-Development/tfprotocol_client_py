@@ -138,7 +138,9 @@ class SocketClient:
             try:
                 # read chunk
                 read = 0
-                read = self.socket.recv_into(raw_chunk, len(raw_chunk))
+                read = self.socket.recv_into(
+                    raw_chunk, min(len(raw_chunk), size - bytes_received)
+                )
 
                 # save chunk
                 bytes_received += read
