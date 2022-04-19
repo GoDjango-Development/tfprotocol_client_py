@@ -127,10 +127,13 @@ class SocketClient:
         Raises:
             TfException: Memory limit reached.
             TfException: Socket sudently closed.
+            TfException: Invalid size.
 
         Returns:
             bytes: message received.
         """
+        if size < 0:
+            raise TfException(message='Invalid byte size message to recieve.')
         binary_message = BytesIO()
         bytes_received = 0
         raw_chunk = bytearray(min(self.max_buffer_size, size - bytes_received))
