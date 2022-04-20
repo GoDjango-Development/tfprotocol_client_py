@@ -24,6 +24,7 @@ class SocketClient:
         proxy_options: ProxyOptions = None,
         max_buffer_size: int = DFLT_MAX_BUFFER_SIZE,
         header_size: int = DFLT_HEADER_SIZE,
+        verbosity_mode: bool = False,
     ) -> None:
         self._socket: socks.socksocket = socks.socksocket(
             socket.AF_INET, socket.SOCK_STREAM
@@ -42,6 +43,7 @@ class SocketClient:
         self.header_size: int = header_size
         self.max_buffer_size: int = max_buffer_size
         self._is_connect: bool = False
+        self.verbosity_mode = verbosity_mode
 
     def is_connect(self):
         return self._is_connect

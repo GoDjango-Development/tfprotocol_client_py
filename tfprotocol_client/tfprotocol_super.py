@@ -35,6 +35,7 @@ class TfProtocolSuper:
         proxy: ProxyOptions = None,
         keylen: int = KEY_LEN_INTERVAL[0],
         channel_len: int = DFLT_MAX_BUFFER_SIZE,
+        verbosity_mode: bool = False,
     ) -> None:
         """ Constructor for Transfer Protocol super class.
 
@@ -54,6 +55,7 @@ class TfProtocolSuper:
                 used to encrypt communication whit the server. Defaults to KEY_LEN_INTERVAL[0].
             `channel_len` (int, optional): The length of the channel.
                 Defaults to DFLT_MAX_BUFFER_SIZE.
+            `verbosity_mode` (bool): Debug mode enabled for verbosity.
         """
         self._protocol_version = protocol_version
         self._public_key = public_key

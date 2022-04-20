@@ -34,9 +34,13 @@ class TfProtocol(TfProtocolSuper):
     """
 
     # pylint: disable=super-init-not-called
-    @dispatch(SuperProtoHandler, protocol_handler=SuperProtoHandler)
+    @dispatch(SuperProtoHandler, protocol_handler=SuperProtoHandler, verbosity_mode=False)
     def __init__(
-        self, tfprotocol: SuperProtoHandler, protocol_handler: TfProtoHandler = None,
+        self,
+        tfprotocol: SuperProtoHandler,
+        protocol_handler: TfProtoHandler = None,
+        verbosity_mode: bool = False,
+        **_,
     ) -> None:
         """ Constructor for Transfer Protocol class.
 
@@ -44,12 +48,13 @@ class TfProtocol(TfProtocolSuper):
             `tfprotocol` (TfProtocol): A created transfer protocol instance.
             `protocol_handler` (SuperProtoHandler): The instance of
                 the command handler which must extends from ISuperCallback.
+            `verbosity_mode` (bool): Debug mode enabled for verbosity.
         """
-
         self.protocol_handler = (
             protocol_handler if protocol_handler else tfprotocol.protocol_handler
         )
         self._proto_client = tfprotocol._proto_client
+        self.verbosity_mode = verbosity_mode
 
     # pylint: disable=function-redefined
     @dispatch(
@@ -62,6 +67,7 @@ class TfProtocol(TfProtocolSuper):
         proxy=ProxyOptions,
         keylen=int,
         channel_len=int,
+        verbosity_mode=bool,
     )
     def __init__(
         self,
@@ -74,6 +80,8 @@ class TfProtocol(TfProtocolSuper):
         proxy: ProxyOptions = None,
         keylen: int = KEY_LEN_INTERVAL[0],
         channel_len: int = DFLT_MAX_BUFFER_SIZE,
+        verbosity_mode=False,
+        **_
     ) -> None:
         """ Constructor for Transfer Protocol class.
 
@@ -93,6 +101,7 @@ class TfProtocol(TfProtocolSuper):
                 used to encrypt communication whit the server. Defaults to KEY_LEN_INTERVAL[0].
             `channel_len` (int, optional): The length of the channel.
                 Defaults to DFLT_MAX_BUFFER_SIZE.
+            `verbosity_mode` (bool): Debug mode enabled for verbosity.
         """
         super().__init__(
             protocol_version,
@@ -104,6 +113,7 @@ class TfProtocol(TfProtocolSuper):
             proxy,
             keylen,
             channel_len,
+            verbosity_mode=verbosity_mode
         )
 
     @property
@@ -367,7 +377,6 @@ class TfProtocol(TfProtocolSuper):
             `path` (str): The parent folder where the protocol is going to search for the files.
             `file_name` (str): The file name that you want to erase.
         """
-        # TODO: TEST
         self.protocol_handler.xdel_callback(
             self.client.translate(TfProtocolMessage('XDEL', path, file_name))
         )
@@ -404,7 +413,6 @@ class TfProtocol(TfProtocolSuper):
             `destination_pattern` (str): The pattern that is going to be used for selecting
                 the folders.
         """
-        # TODO: TEST
         self.protocol_handler.xcpdir_callback(
             self.client.translate(
                 TfProtocolMessage(
@@ -423,7 +431,6 @@ class TfProtocol(TfProtocolSuper):
         Args:
             lock_filename (str): The name of the file who locks directories.
         """
-        # TODO: TEST
         self.protocol_handler.lock_callback(
             self.client.translate(TfProtocolMessage('LOCK', lock_filename))
         )
@@ -583,7 +590,6 @@ class TfProtocol(TfProtocolSuper):
             `count` (int): The fourth parameter is the maximum number of keepalive probes TCP
                 should send before dropping the connection.
         """
-        # TODO: TEST
         self.protocol_handler.keepalive_callback(
             self.client.translate(
                 TfProtocolMessage(
@@ -605,7 +611,6 @@ class TfProtocol(TfProtocolSuper):
             `user` (str): The username for the login action.
             `passw` (str): The password for the login action.
         """
-        # TODO: TEST
         self.protocol_handler.login_callback(
             self.client.translate(TfProtocolMessage('LOGIN', user, passw))
         )
@@ -631,7 +636,6 @@ class TfProtocol(TfProtocolSuper):
             `user` (str): The new username who is going to owns the file.
             `group` (str): The new group for the file.
         """
-        # TODO: TEST
         self.protocol_handler.chown_callback(
             self.client.translate(TfProtocolMessage('CHOWN', path_file, user, group))
         )
@@ -657,7 +661,6 @@ class TfProtocol(TfProtocolSuper):
             `canpt` (int): Cancellation Points, determines the cancellation points where the
                 user, it will have to read from the server to know if it continues or not.
         """
-        # TODO: TEST
         offset, canpt = max(0, offset), max(0, canpt)
 
         # SEND INITIAL OPTIONS
@@ -991,7 +994,6 @@ class TfProtocol(TfProtocolSuper):
                 communication, of course server wont give you always the amount you request,
                 because may be that server's bandwidth is getting filled.
         """
-        # TODO: TEST
         response = self.client.translate(
             TfProtocolMessage('PUT', path_file)
             .add(' ')
@@ -1059,7 +1061,6 @@ class TfProtocol(TfProtocolSuper):
             `buffer_size` (int): Max buffer size of the payloads sended to the server.
             `code_sr` (CodesSenderRecvr): Stateful codes sender and receiver helper.
         """
-        # TODO: TEST
         while True:
             try:
                 if code_sr.recveing_signal:
@@ -1094,6 +1095,7 @@ class TfProtocol(TfProtocolSuper):
         Raises:
             TfException: In case of invalid keylen.
         """
+        # TODO: TEST
         if keylen % 4 != 0 or keylen < 8:
             raise TfException(
                 code=-1,
@@ -1149,7 +1151,6 @@ class TfProtocol(TfProtocolSuper):
             `data_sink` (BytesIO): Data sink open in write/append mode.
             `timeout` (float): Time out (in seconds) used to shutdown pending connection.
         """
-        # TODO: TEST
         socket_timeout = self.client.socket.timeout
         self.client.socket.settimeout(timeout if timeout > 0 else socket_timeout)
 
@@ -1170,7 +1171,8 @@ class TfProtocol(TfProtocolSuper):
                     break
             except TfException as e:
                 if isinstance(e.original_exception, socket.timeout):
-                    print('Connection timeout...')
+                    if self.verbosity_mode:
+                        print('Connection timeout...')
                     break
                 else:
                     raise e
@@ -1188,7 +1190,6 @@ class TfProtocol(TfProtocolSuper):
             `data_stream` (BytesIO): Data stream open in read mode.
             `timeout` (float): Time out (in seconds) used to shutdown pending connection.
         """
-        # TODO: TEST
         socket_timeout = self.client.socket.timeout
         self.client.socket.settimeout(timeout if timeout > 0 else socket_timeout)
 
@@ -1201,11 +1202,10 @@ class TfProtocol(TfProtocolSuper):
             while True:
                 readed = data_stream.read(buffer_size)
                 if readed:
-                    # TODO: TEST THIS IF
                     self.client.send(readed, header_size=INT_SIZE)
                 else:
                     break
-            self.client.just_send(0, size=INT_SIZE,signed=True)
+            self.client.just_send(0, size=INT_SIZE, signed=True)
             header = self.client.just_recv_int(signed=True)
         except TfException as e:
             self.client.stop_connection()
@@ -1302,7 +1302,6 @@ class TfProtocol(TfProtocolSuper):
         Args:
             `path` (str): Path to file to get type.
         """
-        # TODO: TEST
         self.client.send(TfProtocolMessage('FTYPE', path))
         f_type = self.client.just_recv_int(size=BYTE_SIZE, signed=True)
         self.protocol_handler.ftype_callback(
@@ -1320,7 +1319,6 @@ class TfProtocol(TfProtocolSuper):
         Args:
             `path` (str): Path to file containing the paths to files to get type.
         """
-        # TODO: TEST
         self.client.send(TfProtocolMessage('FTYPELS', path))
         f_type = 0
         while f_type != -2:
@@ -1341,7 +1339,6 @@ class TfProtocol(TfProtocolSuper):
         Args:
             `path` (str): Path to file containing the paths to files to get stats.
         """
-        # TODO: TEST
         self.client.send(TfProtocolMessage('FSTATLS', path))
         _code = 0
         while _code != -2:

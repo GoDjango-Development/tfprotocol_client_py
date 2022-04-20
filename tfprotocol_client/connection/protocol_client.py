@@ -26,13 +26,15 @@ class ProtocolClient(SocketClient):
         address: str = 'localhost',
         port: int = 1234,
         proxy_options: Optional[ProxyOptions] = None,
-        max_buffer_size=DFLT_MAX_BUFFER_SIZE,
+        max_buffer_size = DFLT_MAX_BUFFER_SIZE,
+        verbosity_mode: bool = False,
     ) -> None:
         super().__init__(
             address=address,
             port=port,
             proxy_options=proxy_options,
             max_buffer_size=max_buffer_size,
+            verbosity_mode=verbosity_mode,
         )
         self.builder_utils: MessageUtils = MessageUtils(max_buffer_size=max_buffer_size)
         self.xor_input = None
@@ -110,9 +112,10 @@ class ProtocolClient(SocketClient):
         self.exception_guard()
         # BUILD
         header, encoded_message = message
-        print(
-            f'CLIENT: {int.from_bytes(header, byteorder=ENDIANESS_NAME)} {encoded_message}'
-        )
+        if self.verbosity_mode:
+            print(
+                f'CLIENT: {int.from_bytes(header, byteorder=ENDIANESS_NAME)} {encoded_message}'
+            )
 
         # ENCRYPT
         encrypted_header: bytes = self._encrypt(header)
@@ -151,7 +154,8 @@ class ProtocolClient(SocketClient):
         received_body = self._recv(decoded_header)
         decrypted_body = self._decrypt(received_body)
         status = StatusInfo.build_status(decoded_header, decrypted_body)
-        print(f'SERVER: {decoded_header} {status}')
+        if self.verbosity_mode:
+            print(f'SERVER: {decoded_header} {status}')
         return status
 
     @dispatch(TfProtocolMessage)
