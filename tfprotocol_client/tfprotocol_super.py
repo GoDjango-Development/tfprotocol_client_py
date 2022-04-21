@@ -73,15 +73,7 @@ class TfProtocolSuper:
         #
         self._tcp_timeout_options: Optional[TCPTimeoutOptions] = None
 
-    @dispatch()
-    def connect(self):
-        """Connect to the server with keep-alive mechanism disabled
-        """
-        self._connect()
-
-    # pylint: disable=function-redefined
-    @dispatch(KeepAliveOptions)
-    def connect(self, keepalive_options: KeepAliveOptions):
+    def connect(self, keepalive_options: Optional[KeepAliveOptions]=None):
         """Connect to the server with keep-alive mechanism enabled or disabled
 
         Args:
@@ -90,10 +82,11 @@ class TfProtocolSuper:
         # TRY TO INITIATE CONNECTION
         final_status: StatusInfo = self._connect()
         if final_status.status is StatusServerCode.OK:
-            # START KEEP ALIVE MECHANISM
-            udp_keep_alive = KeepAliveThread(self.client, keepalive_options)
-            udp_keep_alive.setDaemon(True)
-            udp_keep_alive.start()
+            if keepalive_options:
+                # START KEEP ALIVE MECHANISM
+                udp_keep_alive = KeepAliveThread(self.client, keepalive_options)
+                udp_keep_alive.setDaemon(True)
+                udp_keep_alive.start()
             return True
         else:
             # FIXME: WHY THIS METHOD RAISE AN EXCEPTION AND THE STANDARD 'connect()' do not

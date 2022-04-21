@@ -36,6 +36,7 @@ class KeepAliveThread(Thread):
         ka_handler: KeepAliveHandler = None,
     ) -> None:
         super().__init__(name='keepalive_t')
+        self.is_active=False
         self._keepalive_mechanism: KeepAliveMechanismType = options.keepalive_mechanism
         self._proxy_options: ProxyOptions = proxy_options
         self._proto_client: ProtocolClient = proto_client
@@ -68,10 +69,10 @@ class KeepAliveThread(Thread):
                 proto_wrapper = TfProtocolKeepAliveWrapper(self._proto_client)
                 for _ in range(options.max_tries):
                     self._prockey = proto_wrapper.prockey_command()
-                    is_active = proto_wrapper.keepalive_command(
+                    self.is_active = proto_wrapper.keepalive_command(
                         True, 1, options.idle, options.max_tries
                     )
-                    if not self._prockey or not is_active:
+                    if not self._prockey or not self.is_active:
                         continue
                     self._proto_client.socket.settimeout(0)
                     success = True
