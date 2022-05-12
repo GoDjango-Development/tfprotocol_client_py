@@ -6,7 +6,7 @@ from tfprotocol_client.misc.status_server_code import StatusServerCode
 
 
 def separate_status(string: str):
-    res = re.split(r'\s+', string.strip(), maxsplit=1)
+    res = re.split(r'\s+', string, maxsplit=1)
     # res_f = [r.strip() for r in res if r is not None and r.strip() != '']
     if len(res) > 1:
         return res[0], ''.join(res[1:])
@@ -15,7 +15,7 @@ def separate_status(string: str):
 
 
 def separate_status_b(data: bytes) -> Tuple[StatusServerCode, bytes]:
-    res = re.split(br'\s+', data.strip(), maxsplit=1)
+    res = re.split(br'\s+', data, maxsplit=1)
     # res_f = [r.strip() for r in res if r is not None and r.strip() != '']
     status: StatusServerCode = StatusServerCode.from_str(
         str(res[0], encoding=STRING_ENCODING).upper()

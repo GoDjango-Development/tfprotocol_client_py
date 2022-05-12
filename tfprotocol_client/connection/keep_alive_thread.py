@@ -36,7 +36,7 @@ class KeepAliveThread(Thread):
         ka_handler: KeepAliveHandler = None,
     ) -> None:
         super().__init__(name='keepalive_t')
-        self.is_active=False
+        self.is_active = False
         self._keepalive_mechanism: KeepAliveMechanismType = options.keepalive_mechanism
         self._proxy_options: ProxyOptions = proxy_options
         self._proto_client: ProtocolClient = proto_client
