@@ -16,7 +16,7 @@ class TfProtocolMessage:
         *payloads,
         custom_header: Union[int, bytes, None] = None,
         header_signed: bool = True,
-        trim_body: bool = True,
+        trim_body: bool = False,
         separate_by_spaces: bool = True,
         header_size: int = DFLT_HEADER_SIZE,
     ) -> None:
@@ -26,8 +26,8 @@ class TfProtocolMessage:
         self.body_buffer = BytesIO()
         self.header_size = header_size if header_size else DFLT_HEADER_SIZE
         self.header_signed = header_signed
-        for e in payloads:
-            if separate_by_spaces:
+        for i, e in enumerate(payloads):
+            if separate_by_spaces and 0 != i:
                 self.add(b' ')
             self.add(e)
         self.trim_body = trim_body
