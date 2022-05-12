@@ -27,7 +27,7 @@ class TfProtocolMessage:
         self.header_size = header_size if header_size else DFLT_HEADER_SIZE
         self.header_signed = header_signed
         for i, e in enumerate(payloads):
-            if separate_by_spaces and 0 != i:
+            if separate_by_spaces and i != 0:
                 self.add(b' ')
             self.add(e)
         self.trim_body = trim_body

@@ -57,11 +57,12 @@ class TfProtocolSuper:
                 Defaults to DFLT_MAX_BUFFER_SIZE.
             `verbosity_mode` (bool): Debug mode enabled for verbosity.
         """
+        self.verbosity_mode = verbosity_mode
         self._protocol_version = protocol_version
         self._public_key = public_key
         self._client_hash = client_hash
         self._proto_client = ProtocolClient(
-            address=address, port=port, proxy_options=proxy,
+            address=address, port=port, proxy_options=proxy,verbosity_mode=verbosity_mode,
         )
         self._sleep_time_milisec = 3000
         self._len_channel = channel_len if channel_len is not None else 512 * 1024
