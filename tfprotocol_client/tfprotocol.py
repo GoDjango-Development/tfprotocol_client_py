@@ -34,7 +34,9 @@ class TfProtocol(TfProtocolSuper):
     """
 
     # pylint: disable=super-init-not-called
-    @dispatch(SuperProtoHandler, protocol_handler=SuperProtoHandler, verbosity_mode=False)
+    @dispatch(
+        SuperProtoHandler, protocol_handler=SuperProtoHandler, verbosity_mode=False
+    )
     def __init__(
         self,
         tfprotocol: SuperProtoHandler,
@@ -81,7 +83,7 @@ class TfProtocol(TfProtocolSuper):
         keylen: int = KEY_LEN_INTERVAL[0],
         channel_len: int = DFLT_MAX_BUFFER_SIZE,
         verbosity_mode=False,
-        **_
+        **_,
     ) -> None:
         """ Constructor for Transfer Protocol class.
 
@@ -113,7 +115,7 @@ class TfProtocol(TfProtocolSuper):
             proxy,
             keylen,
             channel_len,
-            verbosity_mode=verbosity_mode
+            verbosity_mode=verbosity_mode,
         )
 
     @property
@@ -914,7 +916,7 @@ class TfProtocol(TfProtocolSuper):
         try:
             t_handler = TfThread(
                 self.protocol_handler.get_callback,
-                cond_lock=cond_lock,
+                cond_lock=Condition(),
                 args=(code_sr,),
             )
             t_command = TfThread(
@@ -1127,10 +1129,9 @@ class TfProtocol(TfProtocolSuper):
             `secure_token` (str): This token allows you to remove the secure folder
             `path_dir` (str): The target folder to be deleted.
         """
-        # TODO: TEST
         self.protocol_handler.rmsecuredirectory_callback(
             self.client.translate(
-                TfProtocolMessage('RMSD', secure_token, '|', path_dir)
+                TfProtocolMessage('RMSECDIR', secure_token, '|', path_dir)
             )
         )
 
