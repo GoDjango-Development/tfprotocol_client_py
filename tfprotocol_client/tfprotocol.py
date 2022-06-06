@@ -1035,16 +1035,13 @@ class TfProtocol(TfProtocolSuper):
         # RUN THREAD
         t_command.start()
         # WHILE HEADERS NOT AN END-OF-FILE OR AN ERROR CONTINUES
-        # code_sr.last_header = 1
-        with cond_lock:
-            while True:
-                cond_lock.wait()
-                code_sr.last_header = self.client.just_recv_int(
-                    size=LONG_SIZE, signed=True
-                )
-                if code_sr.last_header <= 0:
-                    code_sr.recveing_signal = True
-                    break
+
+        while True:
+            code_sr.last_header = self.client.just_recv_int(size=LONG_SIZE, signed=True)
+            print('SERVER-HEADER:-', code_sr.last_header)
+            if code_sr.last_header <= 0:
+                code_sr.recveing_signal = True
+                break
 
         t_command.join()
 
@@ -1077,8 +1074,7 @@ class TfProtocol(TfProtocolSuper):
                         PutGetCommandEnum.HPFEND.value, size=LONG_SIZE, signed=True
                     )
                     return
-                else:
-                    self.client.send(readed, header_size=LONG_SIZE)
+                self.client.send(readed, header_size=LONG_SIZE)
 
                 self.protocol_handler.put_callback(code_sr)
                 self.protocol_handler.putstatus_callback(
@@ -1100,7 +1096,6 @@ class TfProtocol(TfProtocolSuper):
         Raises:
             TfException: In case of invalid keylen.
         """
-        # TODO: TEST
         if keylen % 4 != 0 or keylen < 8:
             raise TfException(
                 code=-1,
@@ -1111,7 +1106,7 @@ class TfProtocol(TfProtocolSuper):
         response = self.client.translate(TfProtocolMessage('NIGMA', str(keylen)))
         if response.status is StatusServerCode.OK:
             hdr = self.client.just_recv_int(signed=True)
-            self.client.session_key = self.client.just_recv(size=hdr)
+            self.client.session_key = bytes(self.client.just_recv(size=hdr))
             self.protocol_handler.nigma_callback(
                 StatusInfo(
                     status=StatusServerCode.OK,
