@@ -1,7 +1,7 @@
 from io import BytesIO
 from typing import Any
 import socket
-import socks
+import tfprotocol_client.connection.socks_prox as socks
 from tfprotocol_client.misc.constants import DFLT_HEADER_SIZE, DFLT_MAX_BUFFER_SIZE
 from tfprotocol_client.misc.guard_exception import (
     on_except,

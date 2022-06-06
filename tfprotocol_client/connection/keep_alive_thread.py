@@ -2,7 +2,7 @@ from io import BytesIO
 import sys
 import time
 import socket
-import socks
+import tfprotocol_client.connection.socks_prox as socks
 from threading import Thread
 from typing import Optional
 from tfprotocol_client.connection.protocol_client import ProtocolClient
