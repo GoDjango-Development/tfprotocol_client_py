@@ -932,12 +932,15 @@ class TfProtocol(TfProtocolSuper):
 
         with cond_lock:
             while t_command.is_alive() or t_handler.is_alive():
+                cond_lock.wait(0.5)
                 try:
-                    cond_lock.wait()
                     if not t_handler.is_alive() and code_sr.sending_signal:
                         code_sr.send_get(PutGetCommandEnum.HPFFIN.value)
                 except InterruptedError as e:
                     raise TfException(exception=e)
+
+        t_command.join()
+        t_handler.join()
 
         # FINAL HANDSHAKE
         if code_sr.last_command is not PutGetCommandEnum.HPFFIN.value:
@@ -967,9 +970,9 @@ class TfProtocol(TfProtocolSuper):
                     not code_sr.sending_signal
                     or header <= PutGetCommandEnum.HPFEND.value
                 ):
-                    self.protocol_handler.getstatus_callback(
-                        StatusInfo(StatusServerCode.OK, header)
-                    )
+                    status = StatusInfo(StatusServerCode.OK)
+                    status.code = header
+                    self.protocol_handler.getstatus_callback(status)
                 if header <= PutGetCommandEnum.HPFEND.value:
                     code_sr.sending_signal = False
                     return
