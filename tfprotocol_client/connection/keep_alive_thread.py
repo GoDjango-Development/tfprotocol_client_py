@@ -61,7 +61,6 @@ class KeepAliveThread(Thread):
             self._handler: KeepAliveHandler = ka_handler if ka_handler else KeepAliveHandler()
             #
             # TODO: TEST DATAGRAM SOCKET (BIND FIRST)
-            self._datagram_socket.connect(dest_pair=self.addrs)
             self._datagram_socket.settimeout(options.timeout)
             success = False
             if options.keepalive_mechanism is KeepAliveMechanismType.UDP_PROCHECK:
@@ -100,23 +99,26 @@ class KeepAliveThread(Thread):
         self.is_active = False
         if self._handler:
             self._handler.connection_closed()
-        return self.client.socket.isClosed()
+        return self.client.is_connect()
 
     def _stop(self):
         self.stop_connection()
         super()._stop()
 
     def udp_hostcheck(self):
+        print(f'KA: udp_hostcheck (tries: {self._counter})')
         try:
             data_to_send = bytes((0,))
             _ = self.udp_sock.sendto(data_to_send, self.addrs)
             data_recvd, _ = self.udp_sock.recvfrom(1)
+            print(f'KA: udp_hostcheck (recv: {data_recvd})')
             if data_recvd[0] == 1:
                 self._counter = 0
-        except IOError:
-            pass
+        except IOError as e:
+            print('UDP_SOCKET-IOError: ', e.strerror, e.args)
+        except e:
+            print('UDP_SOCKET-Error: ', e)
         finally:
-            self._counter += 1
             if self._counter == self._max_tries:
                 self.stop_connection()
             else:
@@ -124,8 +126,10 @@ class KeepAliveThread(Thread):
                     time.sleep(self._idle)
                 except InterruptedError:
                     pass
+            self._counter += 1
 
     def udp_procheck(self):
+        print('KA: udp_procheck')
         try:
             payload = BytesIO()
             payload.write(MessageUtils.encode_value(1, size=BYTE_SIZE))
@@ -152,6 +156,8 @@ class KeepAliveThread(Thread):
 
     def run(self) -> None:
         # return super().run()
+        print('KA: run')
+        self.is_active = True
         while self.is_active and self.client.is_connect():
             if self._keepalive_mechanism is KeepAliveMechanismType.UDP_HOSTCHECK:
                 self.udp_hostcheck()
