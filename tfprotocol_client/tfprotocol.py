@@ -1,4 +1,5 @@
 """ Transfer Protocol API Base implementation. """
+
 import datetime as dt
 from io import BytesIO
 from multiprocessing import Condition
@@ -8,23 +9,29 @@ from multipledispatch import dispatch
 from tfprotocol_client.connection.codes_sender_recvr import CodesSenderRecvr
 from tfprotocol_client.handlers.super_proto_handler import SuperProtoHandler
 from tfprotocol_client.handlers.proto_handler import TfProtoHandler
-from tfprotocol_client.misc.build_utils import MessageUtils
-from tfprotocol_client.misc.constants import (
+from tfprotocol_client.misc import (
+    MessageUtils,
     BYTE_SIZE,
     DFLT_MAX_BUFFER_SIZE,
     INT_SIZE,
     KEY_LEN_INTERVAL,
     LONG_SIZE,
+    FileStat,
+    FileStatTypeEnum,
+    StatusServerCode,
+    TfThread,
 )
-from tfprotocol_client.misc.file_stat import FileStat, FileStatTypeEnum
-from tfprotocol_client.misc.status_server_code import StatusServerCode
-from tfprotocol_client.misc.thread import TfThread
-from tfprotocol_client.models.exceptions import ErrorCode, TfException
-from tfprotocol_client.models.message import TfProtocolMessage
-from tfprotocol_client.models.putget_commands import PutGetCommandEnum
-from tfprotocol_client.models.proxy_options import ProxyOptions
-from tfprotocol_client.models.status_info import StatusInfo
-from tfprotocol_client.models.transfer_state import TransferStatus
+from tfprotocol_client.models import (
+    ErrorCode,
+    TfException,
+    TfProtocolMessage,
+    PutGetCommandEnum,
+    ProxyOptions,
+    StatusInfo,
+    TransferStatus,
+)
+
+
 from tfprotocol_client.tfprotocol_super import TfProtocolSuper
 
 
@@ -286,8 +293,6 @@ class TfProtocol(TfProtocolSuper):
         Args:
             `formatter` (str): The date in human-readable format.
         """
-        # TODO: WHY THE TIMESTAMP RETURNED FROM THE SERVER IS NEGATIVE??
-
         get_time_value = dt.datetime.now() - dt.datetime(1970, 1, 1)
         timestamp = int(get_time_value.total_seconds() * 1000)
 
@@ -361,7 +366,6 @@ class TfProtocol(TfProtocolSuper):
             `path` (str): The target source file.
             `pattern` (str): The pattern that specified where to copy the target source file.
         """
-        # TODO: TEST
         self.protocol_handler.xcopy_callback(
             self.client.translate(
                 TfProtocolMessage('XCOPY', new_name, path, "|", pattern)
@@ -472,7 +476,7 @@ class TfProtocol(TfProtocolSuper):
 
             # SEND DATA IF EXIST
             if payload:
-                # FIXME: CONNECTION BLOCKED WHEN THE PAYLOAD SENT IS THE MAXIMUM POSSIBLE
+                # FIXME: CONNECTION BLOCKED WHEN THE PAYLOAD SENT IS THE MAXIMUM POSSIBLE, USED FOR TINY FILES ONLY
                 response = self.client.translate(TfProtocolMessage('CONT', payload))
                 self.protocol_handler.sendfile_callback(
                     is_overriten, path, response, stream,
@@ -782,10 +786,9 @@ class TfProtocol(TfProtocolSuper):
         # INITIALIZE TRANSFER VARIABLES
         transfer_status = TransferStatus()
         header_size = LONG_SIZE
-        server_buffer_size = buffer_size
         if response is None or response.code != 0:
             return
-        server_buffer_size = MessageUtils.decode_int(response.payload, signed=True)
+        _ = MessageUtils.decode_int(response.payload, signed=True)
         i = 0
         while True:
             if canpt > 0 and i == canpt:
@@ -865,7 +868,6 @@ class TfProtocol(TfProtocolSuper):
             `pathtojail_directory` (str): The jail folder where tfprotocol will be executing
                 (Use only if your secure token has access to it).
         """
-        # TODO: TEST
         self.protocol_handler.injail_callback(
             self.client.translate(
                 TfProtocolMessage('INJAIL', secure_token, '|', pathtojail_directory)

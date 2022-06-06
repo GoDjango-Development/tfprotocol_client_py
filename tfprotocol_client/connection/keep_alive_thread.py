@@ -2,27 +2,20 @@ from io import BytesIO
 import sys
 import time
 import socket
-import tfprotocol_client.connection.socks_prox as socks
 from threading import Thread
 from typing import Optional
+import tfprotocol_client.connection.socks_prox as socks
 from tfprotocol_client.connection.protocol_client import ProtocolClient
+from tfprotocol_client.handlers.keep_alive_handler import KeepAliveHandler
 from tfprotocol_client.misc.build_utils import MessageUtils
 from tfprotocol_client.misc.constants import BYTE_SIZE
 from tfprotocol_client.models.exceptions import TfException
-
 from tfprotocol_client.models.keepalive_options import (
     KeepAliveMechanismType,
     KeepAliveOptions,
 )
 from tfprotocol_client.models.proxy_options import ProxyOptions
 from tfprotocol_client.tfprotocol_keepalive import TfProtocolKeepAliveWrapper
-
-
-class KeepAliveHandler:
-    '''The callback system where server connection close is notified.'''
-
-    def connection_closed(self):
-        pass
 
 
 class KeepAliveThread(Thread):
@@ -59,8 +52,6 @@ class KeepAliveThread(Thread):
                     password=proxy_options.password,
                 )
             self._handler: KeepAliveHandler = ka_handler if ka_handler else KeepAliveHandler()
-            #
-            # TODO: TEST DATAGRAM SOCKET (BIND FIRST)
             self._datagram_socket.settimeout(options.timeout)
             success = False
             if options.keepalive_mechanism is KeepAliveMechanismType.UDP_PROCHECK:

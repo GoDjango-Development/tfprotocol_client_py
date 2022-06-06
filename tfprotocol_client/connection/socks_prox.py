@@ -1,10 +1,8 @@
-# ---- not tested code ----
+# pylint: skip-file
+# ---- not tested code ----\
 from base64 import b64encode
 
-try:
-    from collections.abc import Callable
-except ImportError:
-    from collections import Callable
+from collections.abc import Callable
 from errno import EOPNOTSUPP, EINVAL, EAGAIN
 import functools
 from io import BytesIO
@@ -45,7 +43,7 @@ def set_self_blocking(function):
             if _is_blocking == 0:
                 self.setblocking(True)
             return function(*args, **kwargs)
-        except Exception as e:
+        except Exception as _:  # pylint: disable=try-except-raise
             raise
         finally:
             # set orgin blocking

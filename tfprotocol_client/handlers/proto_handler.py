@@ -87,13 +87,13 @@ class TfProtoHandler(SuperProtoHandler):
     def keepalive_callback(self, status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    def login_callback(self, login_status: StatusInfo):
+    def login_callback(self, status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    def chmod_callback(self, chmod_status: StatusInfo):
+    def chmod_callback(self, status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
-    def chown_callback(self, chown_status: StatusInfo):
+    def chown_callback(self, status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
     def getcan_callback(
