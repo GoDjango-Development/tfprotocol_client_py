@@ -1,5 +1,6 @@
 from datetime import date as Date
 from io import BytesIO
+from typing import Callable
 from tfprotocol_client.connection.codes_sender_recvr import CodesSenderRecvr
 from tfprotocol_client.connection.protocol_client import ProtocolClient
 from tfprotocol_client.handlers.super_proto_handler import SuperProtoHandler
@@ -176,4 +177,12 @@ class TfProtoHandler(SuperProtoHandler):
         raise NotImplementedError("Callback is not implemented: exception")
 
     def fstatls_callback(self, file_stat: FileStat):
+        raise NotImplementedError("Callback is not implemented: exception")
+
+    def addntfy_callback(self, status: StatusInfo):
+        raise NotImplementedError("Callback is not implemented: exception")
+
+    def notification_callback(
+        self, status: StatusInfo, send_ok: Callable, send_del: Callable,
+    ):
         raise NotImplementedError("Callback is not implemented: exception")

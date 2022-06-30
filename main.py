@@ -1,7 +1,7 @@
 from io import BytesIO
 import sys
 from time import sleep
-from typing import Union
+from typing import Callable, Union
 from datetime import datetime, date as Date
 
 from tfprotocol_client import (
@@ -471,6 +471,25 @@ class MyHandler(TfProtoHandler):
             '-'.ljust(8, '-'),
             file_stat,
         )
+
+    def addntfy_callback(self, status: StatusInfo):
+        print(
+            "CLIENT-HANDLER: ",
+            sys._getframe().f_code.co_name.removesuffix('_callback').ljust(10, ' '),
+            '-'.ljust(8, '-'),
+        )
+
+    def notification_callback(
+        self, status: StatusInfo, send_ok: Callable, send_del: Callable,
+    ):
+        print(
+            "CLIENT-HANDLER: ",
+            sys._getframe().f_code.co_name.removesuffix('_callback').ljust(10, ' '),
+            '-'.ljust(8, '-'),
+        )
+        # The handler always have to end with send_ok() or send_del() and should be
+        # called once per notification.
+        send_ok()
 
     def echo_callback(self, value: str):
         print(
