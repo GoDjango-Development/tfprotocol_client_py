@@ -1346,3 +1346,55 @@ class TfProtocol(TfProtocolSuper):
             fraw_stats = self.client.just_recv(size=26)
             _code, file_stat = FileStat.build_from_structure(fraw_stats)
             self.protocol_handler.fstatls_callback(file_stat)
+
+    # Notify system
+    def addntfy_command(self, token: str, path_file_to_listen: str = ''):
+        """Sets a new notification wich starts name is `token`, and the directory is specified
+        in the second parameter.
+
+        Args:
+            `token` (str): Start name for the notification.
+            `path_file_to_listen` (str): Path to set notifications. If it is specified by an
+            empty string “” then the root directory of the protocol daemon is used.
+        """
+        self.protocol_handler.addntfy_callback(
+            self.client.translate(
+                TfProtocolMessage('ADDNTFY')
+                .add(' ')
+                .add(token)
+                .add(' ')
+                .add(path_file_to_listen),
+            )
+        )
+
+    def startnfy_command(self, interval: Union[float, str, int]):
+        """Starts the notification system. Starts the watchdog to the list of directory specified
+        by the ADDNTFY command. Once STARTNTFY is issued there is no way back to the standard mode.
+
+        Args:
+            `interval` (float, str, int): Interval to check the directories. If present, it is a
+            decimal number expressed in seconds as 3.3 which means 3 seconds and 300 miliseconds.
+        """
+        self.client.send(TfProtocolMessage('STARTNTFY', str(interval)))
+
+        while True:
+            size_ms = self.client.just_recv_int(size=INT_SIZE, signed=False)
+            file_notif_b = self.client.just_recv(size=size_ms)
+            file_notif = None
+            try:
+                file_notif = MessageUtils.decode_str(file_notif_b)
+            except UnicodeDecodeError:
+                pass
+
+            # Clients handles when to send back an OK or DEL response.
+            self.protocol_handler.notification_callback(
+                StatusInfo(
+                    payload=file_notif_b,
+                    message=file_notif,
+                    status=StatusServerCode.OK,
+                    code=size_ms,
+                    sz=size_ms,
+                ),
+                send_ok=lambda : self.client.send(TfProtocolMessage('OK')),
+                send_del=lambda : self.client.send(TfProtocolMessage('DEL')),
+            )
