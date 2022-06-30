@@ -72,7 +72,7 @@ class TfProtoHandler(SuperProtoHandler):
         raise NotImplementedError("Callback is not implemented: exception")
 
     def rcvfile_callback(
-        self, delete_after: bool, path: str, status: StatusInfo, sink: BytesIO=None
+        self, delete_after: bool, path: str, status: StatusInfo, sink: BytesIO = None
     ):
         raise NotImplementedError("Callback is not implemented: exception")
 

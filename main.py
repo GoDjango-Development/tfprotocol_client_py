@@ -19,12 +19,8 @@ from tfprotocol_client import (
 from tfprotocol_client.misc.file_stat import FileStat
 
 
-def get_publickey():
-    """[summary]
-
-    Returns:
-        [type]: [description]
-    """
+def get_publickey() -> str:
+    """extract public key from the keyfile"""
     with open('public.key', mode='r', encoding='utf8') as f:
         public_key = f.read()
     return public_key

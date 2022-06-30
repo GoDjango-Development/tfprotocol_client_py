@@ -1335,7 +1335,7 @@ class TfProtocol(TfProtocolSuper):
             )
 
     def fstatls_command(self, path: str):
-        """returns a special structure per each line in the file indicated by the first parameter.
+        """Returns a special structure per each line in the file indicated by the first parameter.
 
         Args:
             `path` (str): Path to file containing the paths to files to get stats.

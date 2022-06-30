@@ -67,7 +67,7 @@ class ProtocolClient(SocketClient):
         decrypted_data = self.just_recv(size)
         return MessageUtils.decode_int(decrypted_data, signed=signed)
 
-    def just_recv_str(self, size: int) -> int:
+    def just_recv_str(self, size: int) -> str:
         # RECEIVE, DECRYPT AND DECODE TEXT-STRING
         decrypted_data = self.just_recv(size)
         return MessageUtils.decode_str(decrypted_data)
