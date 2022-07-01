@@ -1,5 +1,6 @@
 from io import BytesIO
 import sys
+from platform import system as current_operating_system
 import time
 import socket
 from threading import Thread
@@ -54,7 +55,31 @@ class KeepAliveThread(Thread):
             self._handler: KeepAliveHandler = ka_handler if ka_handler else KeepAliveHandler()
             self._datagram_socket.settimeout(options.timeout)
             success = False
+            if options.keepalive_mechanism is KeepAliveMechanismType.TCP_NATIVE:
+                if current_operating_system() == 'Windows':
+                    set_keepalive_windows(
+                        self._proto_client.socket,
+                        self._idle,
+                        self._timeout,
+                        self._max_tries,
+                    )
+                elif current_operating_system() == 'Linux':
+                    set_keepalive_linux(
+                        self._proto_client.socket,
+                        self._idle,
+                        self._timeout,
+                        self._max_tries,
+                    )
+                elif current_operating_system() == 'MacOS':
+                    set_keepalive_linux(
+                        self._proto_client.socket,
+                        self._idle,
+                        self._timeout,
+                        self._max_tries,
+                    )
+
             if options.keepalive_mechanism is KeepAliveMechanismType.UDP_PROCHECK:
+                dflt_timout = self._proto_client.socket.gettimeout()
                 self._proto_client.socket.settimeout(options.timeout)
                 proto_wrapper = TfProtocolKeepAliveWrapper(self._proto_client)
                 for _ in range(options.max_tries):
@@ -64,7 +89,7 @@ class KeepAliveThread(Thread):
                     )
                     if not self._prockey or not self.is_active:
                         continue
-                    self._proto_client.socket.settimeout(0)
+                    self._proto_client.socket.settimeout(dflt_timout)
                     success = True
                     break
                 if not success:
@@ -125,9 +150,11 @@ class KeepAliveThread(Thread):
             payload = BytesIO()
             payload.write(MessageUtils.encode_value(1, size=BYTE_SIZE))
             payload.write(MessageUtils.encode_value(self._prockey))
+            print('KA: udp_procheck - send', payload.getvalue())
             _ = self.udp_sock.sendto(payload.getvalue(), self.addrs)
 
             data_recvd, _ = self.udp_sock.recvfrom(1)
+            print('KA: udp_procheck - recv', data_recvd)
             if data_recvd[0] == 0:
                 self.stop_connection()
                 return
@@ -154,7 +181,49 @@ class KeepAliveThread(Thread):
                 self.udp_hostcheck()
             elif self._keepalive_mechanism is KeepAliveMechanismType.UDP_PROCHECK:
                 self.udp_procheck()
+            elif self._keepalive_mechanism is KeepAliveMechanismType.TCP_NATIVE:
+                break
             else:
                 sys.stderr.write(
                     f'Unhandled exception: {self._keepalive_mechanism} implementation not found.'
                 )
+                sys.exit(1)
+
+
+def set_keepalive_linux(sock, after_idle_sec=3600, interval_sec=3, max_fails=5):
+    """Set TCP keepalive on an open socket.
+
+    It activates after 3600 seconds (after_idle_sec) of idleness,
+    then sends a keepalive ping once every 3 seconds (interval_sec),
+    and closes the connection after 5 failed ping (max_fails), or 15 seconds
+    """
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+    sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPIDLE, after_idle_sec)
+    sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPINTVL, interval_sec)
+    sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPCNT, max_fails)
+
+
+def set_keepalive_windows(sock, after_idle_sec=3600, interval_sec=3, max_fails=5):
+    """Set TCP keepalive on an open socket.
+
+    It activates after 3600 seconds (after_idle_sec) of idleness,
+    then sends a keepalive ping once every 3 seconds (interval_sec),
+    and closes the connection after 5 failed ping (max_fails), or 15 seconds
+    """
+    sock.ioctl(
+        socket.SIO_KEEPALIVE_VALS,
+        (1, after_idle_sec * 1000, interval_sec * 1000),
+    )
+
+
+def set_keepalive_mac(sock, after_idle_sec=3600, interval_sec=3, max_fails=5):
+    """Set TCP keepalive on an open socket.
+
+    It activates after 3600 seconds (after_idle_sec) of idleness,
+    then sends a keepalive ping once every 3 seconds (interval_sec),
+    and closes the connection after 5 failed ping (max_fails), or 15 seconds
+    """
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+    sock.setsockopt(socket.SOL_TCP, socket.TCP_KEEPIDLE, after_idle_sec)
+    sock.setsockopt(socket.SOL_TCP, socket.TCP_KEEPINTVL, interval_sec)
+    sock.setsockopt(socket.SOL_TCP, socket.TCP_KEEPCNT, max_fails)

@@ -7,6 +7,7 @@ class KeepAliveMechanismType(Enum):
 
     UDP_HOSTCHECK = 0
     UDP_PROCHECK = 1
+    TCP_NATIVE = 2
 
 
 class KeepAliveOptions:

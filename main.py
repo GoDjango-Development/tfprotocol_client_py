@@ -670,10 +670,9 @@ def main():
 
     proto.connect(
         keepalive_options=KeepAliveOptions(
-            KeepAliveMechanismType.UDP_HOSTCHECK, 1, 5, 3
+            KeepAliveMechanismType.TCP_NATIVE, 1, 5, 3
         )
     )
-    proto.echo_command('dime que?')
     sleep(20)
     proto.echo_command('a dormir')
     # test_updown_tinyfiles(proto)
