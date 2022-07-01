@@ -1,37 +1,29 @@
 """ Transfer Protocol API Base implementation. """
 
 import datetime as dt
+import socket
 from io import BytesIO
 from multiprocessing import Condition
-import socket
 from typing import Union
+
 from multipledispatch import dispatch
+
 from tfprotocol_client.connection.codes_sender_recvr import CodesSenderRecvr
-from tfprotocol_client.handlers.super_proto_handler import SuperProtoHandler
 from tfprotocol_client.handlers.proto_handler import TfProtoHandler
-from tfprotocol_client.misc import (
-    MessageUtils,
-    BYTE_SIZE,
-    DFLT_MAX_BUFFER_SIZE,
-    INT_SIZE,
-    KEY_LEN_INTERVAL,
-    LONG_SIZE,
-    FileStat,
-    FileStatTypeEnum,
-    StatusServerCode,
-    TfThread,
-)
-from tfprotocol_client.models import (
-    ErrorCode,
-    TfException,
-    TfProtocolMessage,
-    PutGetCommandEnum,
-    ProxyOptions,
-    StatusInfo,
-    TransferStatus,
-)
-
-
+from tfprotocol_client.handlers.super_proto_handler import SuperProtoHandler
+from tfprotocol_client.misc.build_utils import MessageUtils
+from tfprotocol_client.misc.constants import (BYTE_SIZE, DFLT_MAX_BUFFER_SIZE,
+                                              INT_SIZE, KEY_LEN_INTERVAL,
+                                              LONG_SIZE)
+from tfprotocol_client.misc.file_stat import FileStat, FileStatTypeEnum
+from tfprotocol_client.misc.status_server_code import StatusServerCode
+from tfprotocol_client.misc.thread import TfThread
+from tfprotocol_client.models.exceptions import ErrorCode, TfException
+from tfprotocol_client.models.message import TfProtocolMessage
+from tfprotocol_client.models.proxy_options import ProxyOptions
+from tfprotocol_client.models.putget_commands import PutGetCommandEnum
+from tfprotocol_client.models.status_info import StatusInfo
+from tfprotocol_client.models.transfer_state import TransferStatus
 from tfprotocol_client.tfprotocol_super import TfProtocolSuper
 
 

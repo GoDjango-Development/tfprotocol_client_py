@@ -3,7 +3,6 @@ from enum import Enum
 import struct
 from typing import Final, Tuple, Union
 from tfprotocol_client.misc.constants import ENDIANESS
-
 from tfprotocol_client.models.exceptions import TfException
 
 

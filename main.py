@@ -4,19 +4,18 @@ from time import sleep
 from typing import Callable, Union
 from datetime import datetime, date as Date
 
-from tfprotocol_client import (
-    FileStatTypeEnum,
+from tfprotocol_client.misc.file_stat import FileStat
+from tfprotocol_client.models.keepalive_options import (
     KeepAliveMechanismType,
     KeepAliveOptions,
-    PutGetCommandEnum,
-    StatusInfo,
-    TfProtocol,
-    TransferStatus,
-    CodesSenderRecvr,
-    ProtocolClient,
-    TfProtoHandler,
 )
-from tfprotocol_client.misc.file_stat import FileStat
+from tfprotocol_client.tfprotocol import TfProtoHandler, TfProtocol
+from tfprotocol_client.models.status_info import StatusInfo
+from tfprotocol_client.misc.file_stat import FileStatTypeEnum
+from tfprotocol_client.connection.protocol_client import ProtocolClient
+from tfprotocol_client.models.putget_commands import PutGetCommandEnum
+from tfprotocol_client.models.transfer_state import TransferStatus
+from tfprotocol_client.connection.codes_sender_recvr import CodesSenderRecvr
 
 
 def get_publickey() -> str:
@@ -485,7 +484,7 @@ class MyHandler(TfProtoHandler):
         )
         # The handler always have to end with send_ok() or send_del() and should be
         # called once per notification.
-        send_ok()
+        send_del()
 
     def echo_callback(self, value: str):
         print(
@@ -631,6 +630,11 @@ def test_files_modification_commands(proto: TfProtocol):
 
     proto.fupd_command('/leo_test/file_touch.txt')
     proto.fstat_command('/leo_test/file_touch.txt')
+
+
+def test_notify_system_commands(proto: TfProtocol):
+    proto.addntfy_command('test', '')
+    proto.startnfy_command(3)
 
 
 def test_regular_commands(proto: TfProtocol):
