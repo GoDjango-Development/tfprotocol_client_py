@@ -655,7 +655,7 @@ def test_regular_commands(proto: TfProtocol):
 
 
 def main():
-    ADDRESS = '192.168.0.125'
+    ADDRESS = '192.168.0.104'
     # ADDRESS = 'tfproto.expresscuba.com'
     PORT = 10345
     proto = TfProtocol(
@@ -673,8 +673,10 @@ def main():
             KeepAliveMechanismType.TCP_NATIVE, 1, 5, 3
         )
     )
-    sleep(20)
-    proto.echo_command('a dormir')
+    # proto.prockey_command()
+    # sleep(20)
+    proto.echo_command('sacamos cuela')
+
     # test_updown_tinyfiles(proto)
     # test_supsdown_files(proto)
     # test_putget_files(proto)
@@ -682,6 +684,7 @@ def main():
     # test_folders_commands(proto)
     # test_files_modification_commands(proto)
     # test_regular_commands(proto)
+    test_notify_system_commands(proto)
 
     # proto.rmdir_command('prueba.sd')
     # proto.tlb_command()
