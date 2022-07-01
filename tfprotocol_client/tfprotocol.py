@@ -15,9 +15,13 @@ from tfprotocol_client.connection.codes_sender_recvr import CodesSenderRecvr
 from tfprotocol_client.handlers.proto_handler import TfProtoHandler
 from tfprotocol_client.handlers.super_proto_handler import SuperProtoHandler
 from tfprotocol_client.misc.build_utils import MessageUtils
-from tfprotocol_client.misc.constants import (BYTE_SIZE, DFLT_MAX_BUFFER_SIZE,
-                                              INT_SIZE, KEY_LEN_INTERVAL,
-                                              LONG_SIZE)
+from tfprotocol_client.misc.constants import (
+    BYTE_SIZE,
+    DFLT_MAX_BUFFER_SIZE,
+    INT_SIZE,
+    KEY_LEN_INTERVAL,
+    LONG_SIZE,
+)
 from tfprotocol_client.misc.file_stat import FileStat, FileStatTypeEnum
 from tfprotocol_client.misc.status_server_code import StatusServerCode
 from tfprotocol_client.misc.thread import TfThread
@@ -1035,7 +1039,8 @@ class TfProtocol(TfProtocolSuper):
 
         while True:
             code_sr.last_header = self.client.just_recv_int(size=LONG_SIZE, signed=True)
-            print('SERVER-HEADER:-', code_sr.last_header)
+            if self.verbosity_mode:
+                print('SERVER-HEADER:-', code_sr.last_header)
             if code_sr.last_header <= 0:
                 code_sr.recveing_signal = True
                 break
@@ -1132,11 +1137,10 @@ class TfProtocol(TfProtocolSuper):
 
     def tlb_command(self):
         """Requests a tuple 2 ip/port from the Transfer Load Balancer pool. The clients can use
-        this command -in ‘advisory’ way- to retrieve other servers in order to balance the
-        overall traffic. By ‘advisory’ we mean that it’s up to the clients to agree in asking for
+        this command -in 'advisory' way- to retrieve other servers in order to balance the
+        overall traffic. By 'advisory' we mean that it's up to the clients to agree in asking for
         a server from the pool before start any further interaction.
         """
-        # TODO: TEST
         self.protocol_handler.tlb_callback(self.client.translate('TLB'))
 
     def sdown_command(self, path: str, data_sink: BytesIO, timeout: float):
@@ -1390,6 +1394,7 @@ class TfProtocol(TfProtocolSuper):
                     code=size_ms,
                     sz=size_ms,
                 ),
-                send_ok=lambda : self.client.send(TfProtocolMessage('OK')),
-                send_del=lambda : self.client.send(TfProtocolMessage('DEL')),
+                send_ok=lambda: self.client.send(TfProtocolMessage('OK')),
+                send_del=lambda: self.client.send(TfProtocolMessage('DEL')),
             )
+
