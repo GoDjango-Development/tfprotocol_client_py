@@ -1,3 +1,6 @@
+# coded by lagcleaner
+# email: lagcleaner@gmail.com
+
 from datetime import datetime
 from enum import Enum
 import struct

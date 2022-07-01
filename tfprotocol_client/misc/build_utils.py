@@ -1,3 +1,6 @@
+# coded by lagcleaner
+# email: lagcleaner@gmail.com
+
 import struct
 from typing import Final, Optional
 from multipledispatch import dispatch

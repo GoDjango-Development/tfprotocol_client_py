@@ -1,3 +1,6 @@
+# coded by lagcleaner
+# email: lagcleaner@gmail.com
+
 class ProxyOptions:
     """Proxy Options model to contain the options in case of proxy usage.
     """

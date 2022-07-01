@@ -1,3 +1,6 @@
+# coded by lagcleaner
+# email: lagcleaner@gmail.com
+
 class TransferStatus:
     """Transfer status"""
 

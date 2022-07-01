@@ -1,9 +1,12 @@
+# coded by lagcleaner
+# email: lagcleaner@gmail.com
+
 LONG_SIZE = 8
 INT_SIZE = 4
 SHORT_SIZE = 2
 BYTE_SIZE = 1
 
-DFLT_MAX_BUFFER_SIZE = 512 * 1024
+DFLT_MAX_BUFFER_SIZE = 8 * 1024 # 512 * 1024
 DFLT_HEADER_SIZE = INT_SIZE
 
 # Key len interval in bytes

@@ -1,3 +1,6 @@
+# coded by lagcleaner
+# email: lagcleaner@gmail.com
+
 from typing import Optional, Union
 from multipledispatch import dispatch
 from tfprotocol_client.connection.client import SocketClient

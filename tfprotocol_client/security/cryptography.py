@@ -1,3 +1,6 @@
+# coded by lagcleaner
+# email: lagcleaner@gmail.com
+
 from io import BytesIO
 from struct import unpack
 from typing import Union

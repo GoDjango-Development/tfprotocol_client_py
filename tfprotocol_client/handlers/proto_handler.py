@@ -1,3 +1,6 @@
+# coded by lagcleaner
+# email: lagcleaner@gmail.com
+
 from datetime import date as Date
 from io import BytesIO
 from typing import Callable

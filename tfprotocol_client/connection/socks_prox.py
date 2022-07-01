@@ -1,3 +1,6 @@
+# coded by lagcleaner
+# email: lagcleaner@gmail.com
+
 # pylint: skip-file
 # ---- not tested code ----\
 from base64 import b64encode

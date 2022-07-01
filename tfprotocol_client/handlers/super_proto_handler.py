@@ -1,3 +1,6 @@
+# coded by lagcleaner
+# email: lagcleaner@gmail.com
+
 from abc import ABC, abstractmethod
 
 from tfprotocol_client.models.status_info import StatusInfo

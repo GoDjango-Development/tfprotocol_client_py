@@ -1,3 +1,6 @@
+# coded by lagcleaner
+# email: lagcleaner@gmail.com
+
 from threading import Condition, Thread
 from typing import Any, Callable, Iterable, Mapping
 from tfprotocol_client.models.exceptions import TfException

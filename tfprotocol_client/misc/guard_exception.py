@@ -1,3 +1,6 @@
+# coded by lagcleaner
+# email: lagcleaner@gmail.com
+
 from functools import wraps
 from typing import Any, Callable, Dict, Union
 from tfprotocol_client.models.exceptions import ErrorCode, TfException

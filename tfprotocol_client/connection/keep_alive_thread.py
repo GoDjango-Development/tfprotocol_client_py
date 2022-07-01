@@ -1,3 +1,6 @@
+# coded by lagcleaner
+# email: lagcleaner@gmail.com
+
 from io import BytesIO
 import sys
 from platform import system as current_operating_system
