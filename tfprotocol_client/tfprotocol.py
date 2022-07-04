@@ -11,6 +11,7 @@ from typing import Union
 
 from multipledispatch import dispatch
 
+from tfprotocol_client.security.hash_utils import hexstr, sha256_for
 from tfprotocol_client.connection.codes_sender_recvr import CodesSenderRecvr
 from tfprotocol_client.handlers.proto_handler import TfProtoHandler
 from tfprotocol_client.handlers.super_proto_handler import SuperProtoHandler
@@ -1398,3 +1399,206 @@ class TfProtocol(TfProtocolSuper):
                 send_del=lambda: self.client.send(TfProtocolMessage('DEL')),
             )
 
+    def intread_command(self, path: str, data_sink: BytesIO):
+        """Integrity Read. It is intended to atomically download a file with its integrity
+        checksum, for the case SHA256.
+
+        Args:
+            `path` (str): Path to file to read.
+            `data_sink` (BytesIO): FileInput in write mode.
+        """
+        self.client.send(TfProtocolMessage('INTREAD', path))
+        ms_header = self.client.just_recv_int(size=INT_SIZE, signed=True)
+        if ms_header == -1:
+            # File not found or some error occurs
+            self.protocol_handler.intread_callback(
+                StatusInfo(status=StatusServerCode.FAILED, code=ms_header)
+            )
+            return
+
+        checksum = self.client.just_recv_str(size=66)
+        file_payload = self.client.just_recv(size=ms_header)
+
+        if checksum == hexstr(sha256_for(file_payload)):
+            data_sink.write(file_payload)
+            self.protocol_handler.intread_callback(
+                StatusInfo(status=StatusServerCode.OK, code=ms_header)
+            )
+        else:
+            self.protocol_handler.intread_callback(
+                StatusInfo(status=StatusServerCode.FAILED, code=ms_header)
+            )
+
+    def intwrite_command(self, path: str, data_stream: BytesIO):
+        """Integrity Write. It is intended to atomically upload a file with its integrity
+        checksum, for the case SHA256.
+
+        Args:
+            `path` (str): Path to file to write.
+            `data_stream` (BytesIO): FileInput in read mode.
+        """
+        self.client.send(TfProtocolMessage('INTWRITE', path))
+
+        # Send 66 bytes of file hash
+        payload = data_stream.read()
+        hashdata = hexstr(sha256_for(payload))
+        self.client.just_send(hashdata)
+
+        # Send the file payload
+        # self.client.just_send(len(payload), header_size=INT_SIZE)
+        # self.client.just_send(payload)
+        self.client.send(payload, header_size=INT_SIZE)
+
+        resp_code = self.client.just_recv_int(size=INT_SIZE, signed=True)
+
+        self.protocol_handler.intwrite_callback(
+            StatusInfo(
+                status=StatusServerCode.OK
+                if resp_code == 0
+                else StatusServerCode.FAILED,
+                code=resp_code,
+            )
+        )
+
+    def netlock_command(self, timeout: Union[float, str, int], path_lock: str):
+        """Creates an advisory record lock in the file specified by the second parameter with a
+        timeout in seconds indicated in the first parameter. The system guarantee that each time
+        the network detects activity, the timeout will be reset.
+
+        Args:
+            `timeout` (float, str, int): Timeout to lock the network. If present, it is a
+            decimal number expressed in seconds as 3.3 which means 3 seconds and 300 miliseconds.
+            `path_lock` (str): Path to file to lock.
+        """
+        self.protocol_handler.netlock_callback(
+            self.client.translate(TfProtocolMessage('NETLOCK', str(timeout), path_lock))
+        )
+
+    def netlocktry_command(self, timeout: Union[float, str, int], path_lock: str):
+        """Creates an advisory record lock in the file specified by the second parameter with a
+        timeout in seconds indicated in the first parameter. The system guarantee that each time
+        the network detects activity, the timeout will be reset. (Works exactly like NETLOCK but
+        instead of blocking until obtain the lock, it will return the error FAILED 54.)
+
+        Args:
+            `timeout` (float, str, int): Timeout to lock the network. If present, it is a
+            decimal number expressed in seconds as 3.3 which means 3 seconds and 300 miliseconds.
+            `path_lock` (str): Path to file to lock.
+        """
+        self.protocol_handler.netlocktry_callback(
+            self.client.translate(
+                TfProtocolMessage('NETLOCK_TRY', str(timeout), path_lock)
+            )
+        )
+
+    def netunlock_command(self, lock_id: str):
+        """Removes the advisory record lock in the file specified by the second parameter.
+
+        Args:
+            `path_lock` (str): Path to file to unlock.
+        """
+        self.protocol_handler.netunlock_callback(
+            self.client.translate(TfProtocolMessage('NETUNLOCK', lock_id))
+        )
+
+    def netmutacqtry_command(self, path_mutex: str, token: Union[bytes, str]):
+        """Tries to acquire the ownership of a synchronization object to enter a critical section.
+        Who acquires the mutex 'token' must release it explicitly by calling NETMUTREL command,
+        otherwise the mutex will be considered as acquire forever.
+
+        Args:
+            `path_mutex` (str): Path to mutex.
+            `token` (bytes,str): Token to acquire the mutex.
+        """
+        self.protocol_handler.netmutacqtry_callback(
+            self.client.translate(TfProtocolMessage('NETMUTACQ_TRY', path_mutex, token))
+        )
+
+    def netmutrel_command(self, path_mutex: str, token: Union[bytes, str]):
+        """Releases the ownership of a synchronization object to enter a critical section.
+
+        Args:
+            `path_mutex` (str): Path to mutex.
+            `token` (bytes,str): Token to release the mutex.
+        """
+        self.protocol_handler.netmutrel_callback(
+            self.client.translate(TfProtocolMessage('NETMUTREL', path_mutex, token))
+        )
+
+    def setfsid_command(self, secure_file_sys_identity: str):
+        """sets the process identity that will be used in any operations that involves the
+        TFProtocol Secure Filesystem.
+
+        Args:
+            `secure_file_sys_identity` (str): File system identity.
+        """
+        self.protocol_handler.setfsid_callback(
+            self.client.translate(
+                TfProtocolMessage('SETFSID', secure_file_sys_identity)
+            )
+        )
+
+    def setfsperm_command(self, secid: str, permission_mask: str, path_secref_dir: str):
+        """sets the permissions of a file or directory.
+
+        Args:
+            `secid` (str): Security file system identity.
+            `permission_mask` (str): Permission mask.
+            `path_secref_dir` (str): Path to directory.
+        """
+        self.protocol_handler.setfsperm_callback(
+            self.client.translate(
+                TfProtocolMessage(
+                    'SETFSPERM', f'{secid}:{permission_mask}', path_secref_dir
+                )
+            )
+        )
+
+    def remfsperm_command(self, secid: str, path_secref_dir: str):
+        """Removes the secID indicated by the first parameter from the secure filesystem
+        directory indicated by the second parameter.
+
+        Args:
+            `secid` (str): Security file system identity.
+            `path_secref_dir` (str): Path to directory.
+        """
+        self.protocol_handler.remfsperm_callback(
+            self.client.translate(
+                TfProtocolMessage('REMFSPERM', secid, path_secref_dir)
+            )
+        )
+
+    def getfsperm_command(self, secid: str, path_secref_dir: str):
+        """Gets the secID's permissions of the specified directory in the second parameter.
+
+
+        Args:
+            `secid` (str): Security file system identity.
+            `path_secref_dir` (str): Path to directory.
+        """
+        self.protocol_handler.getfsperm_callback(
+            self.client.translate(
+                TfProtocolMessage('GETFSPERM', secid, path_secref_dir)
+            )
+        )
+
+    def issecfs_command(self, path_to_dir: str):
+        """Checks if 'path/to/directory' belongs to the TFProtocol Secure Filesystem domain.
+
+        Args:
+            `path_to_dir` (str): Path to directory.
+        """
+        self.protocol_handler.issecfs_callback(
+            self.client.translate(TfProtocolMessage('ISSECFS', path_to_dir))
+        )
+
+    def locksys_command(self, path_in_lock: str):
+        """Locks TFProtocol in the specified directory. Once the daemon is locked in a directory,
+        there isn't way back.
+
+        Args:
+            `path_in_lock` (str): Path to lock.
+        """
+        self.protocol_handler.locksys_callback(
+            self.client.translate(TfProtocolMessage('LOCKSYS', path_in_lock))
+        )
