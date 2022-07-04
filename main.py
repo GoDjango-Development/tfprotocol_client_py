@@ -3,10 +3,10 @@
 
 from io import BytesIO
 import sys
-from time import sleep
 from typing import Callable, Union
 from datetime import datetime, date as Date
 
+from tfprotocol_client.security.hash_utils import hexstr, sha256_for
 from tfprotocol_client.misc.file_stat import FileStat
 from tfprotocol_client.models.keepalive_options import (
     KeepAliveMechanismType,
@@ -489,6 +489,110 @@ class MyHandler(TfProtoHandler):
         # called once per notification.
         send_del()
 
+    def intread_callback(self, status: StatusInfo):
+        print(
+            "CLIENT-HANDLER: ",
+            sys._getframe().f_code.co_name.removesuffix('_callback').ljust(10, ' '),
+            status.status.name.ljust(8, ' '),
+            status.code,
+        )
+
+    def intwrite_callback(self, status: StatusInfo):
+        print(
+            "CLIENT-HANDLER: ",
+            sys._getframe().f_code.co_name.removesuffix('_callback').ljust(10, ' '),
+            status.status.name.ljust(8, ' '),
+            status.code,
+        )
+
+    def netlock_callback(self, status: StatusInfo):
+        print(
+            "CLIENT-HANDLER: ",
+            sys._getframe().f_code.co_name.removesuffix('_callback').ljust(10, ' '),
+            status.status.name.ljust(8, ' '),
+            status.payload,
+        )
+
+    def netunlock_callback(self, status: StatusInfo):
+        print(
+            "CLIENT-HANDLER: ",
+            sys._getframe().f_code.co_name.removesuffix('_callback').ljust(10, ' '),
+            status.status.name.ljust(8, ' '),
+            status.payload,
+        )
+
+    def netlocktry_callback(self, status: StatusInfo):
+        print(
+            "CLIENT-HANDLER: ",
+            sys._getframe().f_code.co_name.removesuffix('_callback').ljust(10, ' '),
+            status.status.name.ljust(8, ' '),
+            status.payload,
+        )
+
+    def netmutacqtry_callback(self, status: StatusInfo):
+        print(
+            "CLIENT-HANDLER: ",
+            sys._getframe().f_code.co_name.removesuffix('_callback').ljust(10, ' '),
+            status.status.name.ljust(8, ' '),
+            status.payload,
+        )
+
+    def netmutrel_callback(self, status: StatusInfo):
+        print(
+            "CLIENT-HANDLER: ",
+            sys._getframe().f_code.co_name.removesuffix('_callback').ljust(10, ' '),
+            status.status.name.ljust(8, ' '),
+            status.payload,
+        )
+
+    def setfsid_callback(self, status: StatusInfo):
+        print(
+            "CLIENT-HANDLER: ",
+            sys._getframe().f_code.co_name.removesuffix('_callback').ljust(10, ' '),
+            status.status.name.ljust(8, ' '),
+            status.payload,
+        )
+
+    def setfsperm_callback(self, status: StatusInfo):
+        print(
+            "CLIENT-HANDLER: ",
+            sys._getframe().f_code.co_name.removesuffix('_callback').ljust(10, ' '),
+            status.status.name.ljust(8, ' '),
+            status.payload,
+        )
+
+    def remfsperm_callback(self, status: StatusInfo):
+        print(
+            "CLIENT-HANDLER: ",
+            sys._getframe().f_code.co_name.removesuffix('_callback').ljust(10, ' '),
+            status.status.name.ljust(8, ' '),
+            status.payload,
+        )
+
+    def getfsperm_callback(self, status: StatusInfo):
+        print(
+            "CLIENT-HANDLER: ",
+            sys._getframe().f_code.co_name.removesuffix('_callback').ljust(10, ' '),
+            status.status.name.ljust(8, ' '),
+            status.payload,
+        )
+
+    def issecfs_callback(self, status: StatusInfo):
+        print(
+            "CLIENT-HANDLER: ",
+            sys._getframe().f_code.co_name.removesuffix('_callback').ljust(10, ' '),
+            status.status.name.ljust(8, ' '),
+            status.payload,
+        )
+
+    def locksystem_callback(self, status: StatusInfo):
+        print(
+            "CLIENT-HANDLER: ",
+            sys._getframe().f_code.co_name.removesuffix('_callback').ljust(10, ' '),
+            status.status.name.ljust(8, ' '),
+            status.payload,
+        )
+
     def echo_callback(self, value: str):
         print(
             "CLIENT-HANDLER: ",
@@ -640,6 +744,36 @@ def test_notify_system_commands(proto: TfProtocol):
     proto.startnfy_command(3)
 
 
+def test_integrity_rw_commands(proto: TfProtocol):
+    with open('test2.java', 'rb') as f:
+        proto.intwrite_command('test2.java', f)
+
+    with open('test2-rec.java', 'wb') as f:
+        proto.intread_command('test2.java', f)
+
+
+def test_netsecurity_commands(proto: TfProtocol):
+    proto.netlock_command(5, 'testlag')
+    proto.netlocktry_command(5, 'testlag')
+
+    lock_id = str(input('Enter lock id: '))
+    proto.netunlock_command(lock_id)
+
+    proto.netmutacqtry_command('testlag', '1')
+    proto.netmutrel_command('testlag', '1')
+
+    proto.setfsid_command('testfsid')
+
+    proto.setfsperm_command('testfsid', '128', 'testlag')
+    proto.issecfs_command('testlag')
+    proto.getfsperm_command('testfsid', 'testlag')
+    proto.remfsperm_command('testfsid', 'testlag')
+
+    proto.mkdir_command('/leo_test')
+    proto.locksys_command('/leo_test')
+    proto.touch_command('/leo_test/file_touch.txt')
+
+
 def test_regular_commands(proto: TfProtocol):
     proto.echo_command('Hola mundo')
 
@@ -658,8 +792,8 @@ def test_regular_commands(proto: TfProtocol):
 
 
 def main():
-    ADDRESS = '192.168.0.104'
-    # ADDRESS = 'tfproto.expresscuba.com'
+    # ADDRESS = '192.168.0.104'
+    ADDRESS = 'tfproto.expresscuba.com'
     PORT = 10345
     proto = TfProtocol(
         '0.0',
@@ -672,13 +806,11 @@ def main():
     )
 
     proto.connect(
-        keepalive_options=KeepAliveOptions(
-            KeepAliveMechanismType.TCP_NATIVE, 1, 5, 3
-        )
+        # keepalive_options=KeepAliveOptions(KeepAliveMechanismType.TCP_NATIVE, 1, 5, 3)
     )
     # proto.prockey_command()
     # sleep(20)
-    proto.echo_command('sacamos cuela')
+    # proto.echo_command('sacamos cuela')
 
     # test_updown_tinyfiles(proto)
     # test_supsdown_files(proto)
@@ -687,7 +819,9 @@ def main():
     # test_folders_commands(proto)
     # test_files_modification_commands(proto)
     # test_regular_commands(proto)
-    test_notify_system_commands(proto)
+    # test_notify_system_commands(proto)
+    test_integrity_rw_commands(proto)
+    test_netsecurity_commands(proto)
 
     # proto.rmdir_command('prueba.sd')
     # proto.tlb_command()
