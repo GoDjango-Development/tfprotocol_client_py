@@ -182,6 +182,45 @@ class TfProtoHandler(SuperProtoHandler):
     def fstatls_callback(self, file_stat: FileStat):
         raise NotImplementedError("Callback is not implemented: exception")
 
+    def intread_callback(self, status: StatusInfo):
+        raise NotImplementedError("Callback is not implemented: exception")
+
+    def intwrite_callback(self, status: StatusInfo):
+        raise NotImplementedError("Callback is not implemented: exception")
+
+    def netlock_callback(self, status: StatusInfo):
+        raise NotImplementedError("Callback is not implemented: exception")
+
+    def netunlock_callback(self, status: StatusInfo):
+        raise NotImplementedError("Callback is not implemented: exception")
+
+    def netlocktry_callback(self, status: StatusInfo):
+        raise NotImplementedError("Callback is not implemented: exception")
+
+    def netmutacqtry_callback(self, status: StatusInfo):
+        raise NotImplementedError("Callback is not implemented: exception")
+
+    def netmutrel_callback(self, status: StatusInfo):
+        raise NotImplementedError("Callback is not implemented: exception")
+
+    def setfsid_callback(self, status: StatusInfo):
+        raise NotImplementedError("Callback is not implemented: exception")
+
+    def setfsperm_callback(self, status: StatusInfo):
+        raise NotImplementedError("Callback is not implemented: exception")
+
+    def remfsperm_callback(self, status: StatusInfo):
+        raise NotImplementedError("Callback is not implemented: exception")
+
+    def getfsperm_callback(self, status: StatusInfo):
+        raise NotImplementedError("Callback is not implemented: exception")
+
+    def issecfs_callback(self, status: StatusInfo):
+        raise NotImplementedError("Callback is not implemented: exception")
+
+    def locksystem_callback(self, status: StatusInfo):
+        raise NotImplementedError("Callback is not implemented: exception")
+
     def addntfy_callback(self, status: StatusInfo):
         raise NotImplementedError("Callback is not implemented: exception")
 
