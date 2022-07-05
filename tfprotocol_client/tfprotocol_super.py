@@ -1,15 +1,14 @@
 # coded by lagcleaner
 # email: lagcleaner@gmail.com
 
-from typing import Optional, Tuple, Union
-from multipledispatch import dispatch
-from tfprotocol_client.connection.keep_alive_thread import (
-    KeepAliveHandler,
-    KeepAliveThread,
-)
+from typing import Callable, Optional, Tuple, Union
+from tfprotocol_client.connection.keep_alive_thread import KeepAliveThread
 from tfprotocol_client.connection.protocol_client import ProtocolClient
-from tfprotocol_client.handlers.super_proto_handler import SuperProtoHandler
-from tfprotocol_client.misc.constants import DFLT_MAX_BUFFER_SIZE, KEY_LEN_INTERVAL
+from tfprotocol_client.misc.constants import (
+    DFLT_MAX_BUFFER_SIZE,
+    EMPTY_HANDLER,
+    KEY_LEN_INTERVAL,
+)
 from tfprotocol_client.misc.status_server_code import StatusServerCode
 from tfprotocol_client.models.keepalive_options import KeepAliveOptions
 from tfprotocol_client.models.proxy_options import ProxyOptions
@@ -32,7 +31,6 @@ class TfProtocolSuper:
         protocol_version: str,
         public_key: str,
         client_hash: Union[str, bytes],
-        protocol_handler: SuperProtoHandler,
         address: str,
         port: int,
         proxy: ProxyOptions = None,
@@ -48,8 +46,6 @@ class TfProtocolSuper:
                 the initial encryptation of the communication.
             `client_hash` (Union[str, bytes]): The hash to be used by
                 the server in order to test the integrity of the communication.
-            `protocol_handler` (SuperProtoHandler): The instance of
-                the callback handler which must extends from ISuperCallback.
             `address` (str): The ip/address where the protocol server is running.
             `port` (int): The TCP port where the protocol is listening.
             `proxy` (ProxyOptions, optional): The proxy address for
@@ -65,23 +61,34 @@ class TfProtocolSuper:
         self._public_key = public_key
         self._client_hash = client_hash
         self._proto_client = ProtocolClient(
-            address=address, port=port, proxy_options=proxy,verbosity_mode=verbosity_mode,
+            address=address,
+            port=port,
+            proxy_options=proxy,
+            verbosity_mode=verbosity_mode,
         )
         self._sleep_time_milisec = 3000
         self._len_channel = channel_len if channel_len is not None else 512 * 1024
         self._keybyteslen = (
             keylen if KEY_LEN_INTERVAL[0] <= keylen <= KEY_LEN_INTERVAL[1] else 16
         )
-        self._protocol_handler = protocol_handler
         self._address: Tuple[str, int] = address
         #
         self._tcp_timeout_options: Optional[TCPTimeoutOptions] = None
 
-    def connect(self, keepalive_options: Optional[KeepAliveOptions]=None):
+    def connect(
+        self,
+        keepalive_options: Optional[KeepAliveOptions] = None,
+        on_response: Callable[[StatusInfo], None] = EMPTY_HANDLER,
+        on_connect: Callable[['TfProtocolSuper'], None] = EMPTY_HANDLER,
+    ):
         """Connect to the server with keep-alive mechanism enabled or disabled
 
         Args:
             `keepalive_options` (KeepAliveOptions): Keep alive options.
+            `on_response` ((StatusInfo) -> None): The callback for the server responses in the
+                connection process.
+            `on_connect` ((TfProtocolSuper) -> None): The callback to retrieve the connected
+                instance of tfprotocol after stablishing connection.
         """
         # TRY TO INITIATE CONNECTION
         final_status: StatusInfo = self._connect()
@@ -91,10 +98,11 @@ class TfProtocolSuper:
                 udp_keep_alive = KeepAliveThread(self.client, keepalive_options)
                 udp_keep_alive.setDaemon(True)
                 udp_keep_alive.start()
+            on_connect(self)
             return True
         else:
             # FIXME: WHY THIS METHOD RAISE AN EXCEPTION AND THE STANDARD 'connect()' do not
-            self._protocol_handler.status_server(final_status)
+            on_response(final_status)
             try:
                 self._proto_client.stop_connection()
                 raise TfException(
@@ -105,9 +113,11 @@ class TfProtocolSuper:
             except IOError as ex:
                 raise TfException(exception=ex)
 
-    def _connect(self) -> StatusInfo:
+    def _connect(
+        self, on_response: Callable[[StatusInfo], None] = EMPTY_HANDLER,
+    ) -> StatusInfo:
         self._tcp_timeout_options = TCPTimeoutOptions(
-            status_server_callback=self._protocol_handler.status_server
+            status_server_callback=on_response,
         )
         count = 0
         status: StatusInfo = None
@@ -122,14 +132,12 @@ class TfProtocolSuper:
                 break
         if status.status is not StatusServerCode.OK:
             # FAIL TO STABLISH CONNECTION
-            self._protocol_handler.response_server_callback(status)
             return status
 
         # SEND PROTOCOL TO BE USED
         status: StatusInfo = self._proto_client.translate(self._protocol_version)
         if status.status is not StatusServerCode.OK:
             # INCOMPATIBLE PROTOCOLS
-            self._protocol_handler.response_server_callback(status)
             return status
 
         # GENERATE AND SEND THE SESSION KEY
@@ -145,14 +153,12 @@ class TfProtocolSuper:
         # SEND CLIENT HASH
         status: StatusInfo = self._proto_client.translate(self._client_hash)
         if status.status is not StatusServerCode.OK:
-            self._protocol_handler.status_server(status)
             return status
-        else:
-            self._protocol_handler.instance_tfprotocol(self)
         return StatusInfo(StatusServerCode.OK)
 
     def disconnect(self):
         """Disconect the protocol"""
+        self.client.stop_connection()
 
     def get_len_channel(self) -> int:
         """Gets the len of the channel
@@ -179,19 +185,6 @@ class TfProtocolSuper:
     @tcp_timeout_options.setter
     def set_tcp_timeout_options(self, value: TCPTimeoutOptions):
         self._tcp_timeout_options = value
-
-    @property
-    def protocol_handler(self) -> SuperProtoHandler:
-        """ Gets the protocol handler used.
-
-        Returns:
-            SuperProtoHandler: `protocol_handler`.
-        """
-        return self._protocol_handler
-
-    @protocol_handler.setter
-    def set_protocol_handler(self, handler: SuperProtoHandler):
-        self._protocol_handler = handler
 
     @property
     def client(self) -> ProtocolClient:

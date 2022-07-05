@@ -16,3 +16,6 @@ KEY_LEN_INTERVAL = (16, 40)
 ENDIANESS = '>'
 ENDIANESS_NAME = 'little' if ENDIANESS == '<' else 'big'
 STRING_ENCODING = 'UTF-8'  # UTF-8,LATIN-1, ISO-8859-1
+
+EMPTY_HANDLER = lambda *_: None
+RESPONSE_LOGGER = lambda resp: print(f"RESPONSE: {resp}")
