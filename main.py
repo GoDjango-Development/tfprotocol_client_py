@@ -5,14 +5,14 @@ from io import BytesIO
 import sys
 from typing import Callable, Union
 from datetime import datetime, date as Date
+from tfprotocol_client.misc.constants import RESPONSE_LOGGER
 
-from tfprotocol_client.security.hash_utils import hexstr, sha256_for
 from tfprotocol_client.misc.file_stat import FileStat
 from tfprotocol_client.models.keepalive_options import (
     KeepAliveMechanismType,
     KeepAliveOptions,
 )
-from tfprotocol_client.tfprotocol import TfProtoHandler, TfProtocol
+from tfprotocol_client.tfprotocol import TfProtocol
 from tfprotocol_client.models.status_info import StatusInfo
 from tfprotocol_client.misc.file_stat import FileStatTypeEnum
 from tfprotocol_client.connection.protocol_client import ProtocolClient
@@ -28,7 +28,7 @@ def get_publickey() -> str:
     return public_key
 
 
-class MyHandler(TfProtoHandler):
+class MyHandler:
     """My handler
 
     Args:
@@ -778,8 +778,10 @@ def test_regular_commands(proto: TfProtocol):
     proto.echo_command('Hola mundo')
 
     # proto.nigma_command(KEY_LEN_INTERVAL[1])
-    proto.echo_command('Hola despues de cambiar el cerrojo')
-    proto.date_command()
+    proto.echo_command(
+        'Hola despues de cambiar el cerrojo', response_handler=RESPONSE_LOGGER
+    )
+    proto.date_command(response_handler=MyHandler().date_callback)
     proto.datef_command()
     proto.dtof_command(datetime.timestamp(datetime.now()))
     proto.ftod_command('1999-12-10 12:12:0')
@@ -796,13 +798,7 @@ def main():
     ADDRESS = 'tfproto.expresscuba.com'
     PORT = 10345
     proto = TfProtocol(
-        '0.0',
-        get_publickey(),
-        'testhash',
-        MyHandler(),
-        ADDRESS,
-        PORT,
-        verbosity_mode=True,
+        '0.0', get_publickey(), 'testhash', ADDRESS, PORT, verbosity_mode=True,
     )
 
     proto.connect(
@@ -820,8 +816,8 @@ def main():
     # test_files_modification_commands(proto)
     # test_regular_commands(proto)
     # test_notify_system_commands(proto)
-    test_integrity_rw_commands(proto)
-    test_netsecurity_commands(proto)
+    # test_integrity_rw_commands(proto)
+    # test_netsecurity_commands(proto)
 
     # proto.rmdir_command('prueba.sd')
     # proto.tlb_command()

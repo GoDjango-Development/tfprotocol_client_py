@@ -1164,7 +1164,7 @@ class TfProtocol(TfProtocolSuper):
             self.client.just_recv_int(size=LONG_SIZE, signed=True)
         code_sr.send_put(PutGetCommandEnum.HPFFIN.value)
         code_sr.block = True
-        self.protocol_handler.put_callback(code_sr)
+        transfer_handler(code_sr)
 
     def __put_command_t(
         self,
