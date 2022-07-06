@@ -7,12 +7,11 @@ from platform import system as current_operating_system
 import time
 import socket
 from threading import Thread
-from typing import Optional
+from typing import Callable, Optional
 import tfprotocol_client.connection.socks_prox as socks
 from tfprotocol_client.connection.protocol_client import ProtocolClient
-from tfprotocol_client.handlers.keep_alive_handler import KeepAliveHandler
 from tfprotocol_client.misc.build_utils import MessageUtils
-from tfprotocol_client.misc.constants import BYTE_SIZE
+from tfprotocol_client.misc.constants import BYTE_SIZE, EMPTY_HANDLER
 from tfprotocol_client.models.exceptions import TfException
 from tfprotocol_client.models.keepalive_options import (
     KeepAliveMechanismType,
@@ -30,7 +29,7 @@ class KeepAliveThread(Thread):
         proto_client: ProtocolClient,
         options: KeepAliveOptions,
         proxy_options: ProxyOptions = None,
-        ka_handler: KeepAliveHandler = None,
+        on_connection_closed: Callable[[], None] = EMPTY_HANDLER,
     ) -> None:
         super().__init__(name='keepalive_t')
         self.is_active = False
@@ -42,6 +41,7 @@ class KeepAliveThread(Thread):
         self._max_tries: int = options.max_tries
         self._counter: int = 0
         self._prockey: str = ''
+        self._on_connection_closed: Callable[[],None] = on_connection_closed
 
         try:
             self._datagram_socket: Optional[socks.socksocket] = socks.socksocket(
@@ -55,7 +55,6 @@ class KeepAliveThread(Thread):
                     username=proxy_options.username,
                     password=proxy_options.password,
                 )
-            self._handler: KeepAliveHandler = ka_handler if ka_handler else KeepAliveHandler()
             self._datagram_socket.settimeout(options.timeout)
             success = False
             if options.keepalive_mechanism is KeepAliveMechanismType.TCP_NATIVE:
@@ -116,8 +115,8 @@ class KeepAliveThread(Thread):
         self._datagram_socket.close()
         self.client.stop_connection()
         self.is_active = False
-        if self._handler:
-            self._handler.connection_closed()
+        if self._on_connection_closed:
+            self._on_connection_closed()
         return self.client.is_connect()
 
     def _stop(self):
@@ -214,8 +213,7 @@ def set_keepalive_windows(sock, after_idle_sec=3600, interval_sec=3, max_fails=5
     and closes the connection after 5 failed ping (max_fails), or 15 seconds
     """
     sock.ioctl(
-        socket.SIO_KEEPALIVE_VALS,
-        (1, after_idle_sec * 1000, interval_sec * 1000),
+        socket.SIO_KEEPALIVE_VALS, (1, after_idle_sec * 1000, interval_sec * 1000),
     )
 
 
