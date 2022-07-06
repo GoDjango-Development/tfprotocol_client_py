@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "tfprotocol_client"
+version = "0.1.0"
+description = "Transfer Protocol client implemented in python, the specifications for this protocol is in https://github.com/GoDjango-Development/TFProtocol/blob/main/doc/"
+authors = ["Leonel Garcia <lagcleaner@gmail.com>"]
+license = "Apache-2.0"
+
+[tool.poetry.dependencies]
+python = "^3.7.2"
+pycryptodome = "^3.15.0"
+multipledispatch = "^0.6.0"
+
+[tool.poetry.dev-dependencies]
+pylint = "^2.14.4"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
