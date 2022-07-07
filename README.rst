@@ -1,31 +1,43 @@
-=======================================
-TFProtocol Client implemented in python
-=======================================
+================================================
+TFProtocol Client Implemented in Python :snake:
+================================================
 
-https://img.shields.io/pypi/v/tfprotocol_client?style=plastic
-https://img.shields.io/github/repo-size/lagcleaner/tfprotocol_client_py?style=plastic
+.. image:: https://img.shields.io/pypi/v/tfprotocol-client.svg
+    :target: https://pypi.org/project/tfprotocol-client/
+.. image:: https://img.shields.io/badge/Maintained%3F-yes-green.svg
+    :target: https://GitHub.com/lagcleaner/tfprotocol_client_py/graphs/commit-activity
 
-----------------------
-Introduction
-----------------------
+
+.. image:: https://img.shields.io/github/contributors/lagcleaner/tfprotocol_client_py.svg
+    :target: https://GitHub.com/lagcleaner/tfprotocol_client_py/graphs/contributors/
+
+
+.. image:: https://img.shields.io/github/issues/lagcleaner/tfprotocol_client_py.svg
+    :target: https://GitHub.com/lagcleaner/tfprotocol_client_py/issues/
+.. image:: https://img.shields.io/github/issues-closed/lagcleaner/tfprotocol_client_py.svg
+    :target: https://GitHub.com/lagcleaner/tfprotocol_client_py/issues?q=is%3Aissue+is%3Aclosed
+
+----------------
+Introduction 
+----------------
 
 The especifications for the *Transference Protocol* is available in this `repository
 <https://github.com/GoDjango-Development/TFProtocol/blob/main/doc/>`_.
 
 
-----------------------
-How to install?
-----------------------
-The package is available at `pypi <https://pypi.org>`_, to be installed from **pip** with the
+---------------------------
+Installation :floppy_disk:
+---------------------------
+The package is available at `pypi <https://pypi.org/project/tfprotocol-client/>`_ :package:, to be installed from **pip** with the
 next command:
 
 .. code-block:: bash
 
     pip install tfprotocol_client
 
-----------------------
-How to use?
-----------------------
+-------------------------
+A Simple Example :memo:
+-------------------------
 
 To use the *Transference Protocol* through this library, you must create an instance of
 *TfProtocol* with the specified parameters and have an online server to connect to.
@@ -46,13 +58,13 @@ To use the *Transference Protocol* through this library, you must create an inst
     proto.disconnect()
 
 
-----------------------
-For Contributors
-----------------------
+---------------------------
+For Contributors :wrench:
+---------------------------
 
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-How to install dev environment?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Development Environment Installation :computer:
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 To set up the development environment, all you need as a prerequisite is to have python Python
 2.7  or 3.5+ and `poetry <https://python-poetry.org/>`_ installed. If you need to install poetry
@@ -66,9 +78,9 @@ this project, proceed to run the following command in the root directory of the 
     poetry install
 
 
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-How is structured?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Project Structure :open_file_folder:
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This library is made up of 4 folders and the particular implementations of the ``TfProtocolSuper``
 class, the folders are structured as follows:
@@ -80,13 +92,13 @@ class, the folders are structured as follows:
 
 Here the visual schema for all the classes and his relations with others:
 
-.. image:: https://raw.githubusercontent.com/lagcleaner/tfprotocol_client_py/master/doc/static/classes.png
-   :alt: class relations
-   :align: center
+.. image:: ./doc/statics/classes.png
+    :alt: class relations
+    :align: center
 
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-How is publish the package?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^
+Publishing :rocket:
+^^^^^^^^^^^^^^^^^^^^
 
 To publish the package you need to run the following command in the root directory of the package:
 
@@ -94,3 +106,5 @@ To publish the package you need to run the following command in the root directo
 
     poetry publish
 
+.. image:: https://img.shields.io/badge/Ask%20me-anything-1abc9c.svg
+    :target: https://t.me/LagCleaner

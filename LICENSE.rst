@@ -1,4 +1,4 @@
-Copyright (c) 2022 GoDjango.
+Copyright :copyright: 2022 GoDjango.
 
 All rights reserved.
 
