@@ -772,25 +772,56 @@ def test_integrity_rw_commands(proto: TfProtocol):
 
 
 def test_netsecurity_commands(proto: TfProtocol):
-    proto.netlock_command(5, 'testlag')
-    proto.netlocktry_command(5, 'testlag')
+    myhandler = MyHandler()
+    lock_id: str = None
 
-    lock_id = str(input('Enter lock id: '))
+    def _handler_callback(status: StatusInfo):
+        nonlocal lock_id
+        lock_id = status.message
+        print("CLIENT-HANDLER: ", status)
+
+    proto.netlock_command(5, 'testlag', response_handler=_handler_callback)
+    proto.netlocktry_command(
+        5, 'testlag', response_handler=myhandler.netlocktry_callback
+    )
+
     proto.netunlock_command(lock_id)
 
-    proto.netmutacqtry_command('testlag', '1')
-    proto.netmutrel_command('testlag', '1')
+    proto.touch_command('test.mut')
+    proto.netmutacqtry_command(
+        'test.mut', 'testtoken', response_handler=myhandler.netmutacqtry_callback
+    )
+    proto.netmutrel_command(
+        'test.mut', 'testtoken', response_handler=myhandler.netmutrel_callback
+    )
 
-    proto.setfsid_command('testfsid')
+    proto.setfsid_command(lock_id, response_handler=myhandler.setfsid_callback)
 
-    proto.setfsperm_command('testfsid', '128', 'testlag')
-    proto.issecfs_command('testlag')
-    proto.getfsperm_command('testfsid', 'testlag')
-    proto.remfsperm_command('testfsid', 'testlag')
+    proto.setfsperm_command(
+        lock_id,
+        SECFS_ALL_PERMISSIONS,
+        'testlag',
+        response_handler=myhandler.setfsperm_callback,
+    )
+    proto.issecfs_command(
+        'testlag', response_handler=myhandler.issecfs_callback,
+    )
+    proto.getfsperm_command(
+        lock_id, 'testlag', response_handler=myhandler.getfsperm_callback,
+    )
+    proto.remfsperm_command(
+        lock_id, 'testlag', response_handler=myhandler.remfsperm_callback,
+    )
 
-    proto.mkdir_command('/leo_test')
-    proto.locksys_command('/leo_test')
-    proto.touch_command('/leo_test/file_touch.txt')
+    proto.mkdir_command(
+        '/leo_test_sys', response_handler=myhandler.mkdir_callback,
+    )
+    proto.locksys_command(
+        '/leo_test_sys', response_handler=myhandler.locksystem_callback,
+    )
+    proto.touch_command(
+        '/leo_test_sys/file_touch.txt', response_handler=myhandler.touch_callback,
+    )
 
 
 def test_regular_commands(proto: TfProtocol):
@@ -813,8 +844,8 @@ def test_regular_commands(proto: TfProtocol):
 
 
 def main():
-    # ADDRESS = '192.168.0.104'
-    ADDRESS = 'tfproto.expresscuba.com'
+    ADDRESS = '192.168.0.128'
+    # ADDRESS = 'tfproto.expresscuba.com'
     PORT = 10345
     proto = TfProtocol(
         '0.0', get_publickey(), 'testhash', ADDRESS, PORT, verbosity_mode=True,
@@ -836,7 +867,7 @@ def main():
     # test_regular_commands(proto)
     # test_notify_system_commands(proto)
     # test_integrity_rw_commands(proto)
-    # test_netsecurity_commands(proto)
+    test_netsecurity_commands(proto)
 
     # proto.rmdir_command('prueba.sd')
     # proto.tlb_command()

@@ -1743,15 +1743,16 @@ class TfProtocol(TfProtocolSuper):
     def setfsperm_command(
         self,
         secid: str,
-        permission_mask: str,
+        permission_mask: int,
         path_secref_dir: str,
         response_handler: ResponseHandler = EMPTY_HANDLER,
     ):
         """sets the permissions of a file or directory.
 
         Args:
-            `secid` (str): Security file system identity.
-            `permission_mask` (str): Permission mask.
+            `secid` (str): Security file system identity, can be '' to set "other's" permissions
+                (last resort resource).
+            `permission_mask` (int): Permission mask.
             `path_secref_dir` (str): Path to directory.
             `response_handler` (ResponseHandler): The function to handle the command response.
         """
@@ -1773,7 +1774,8 @@ class TfProtocol(TfProtocolSuper):
         directory indicated by the second parameter.
 
         Args:
-            `secid` (str): Security file system identity.
+            `secid` (str): Security file system identity, can be '' to remove the "other's"
+                permissions.
             `path_secref_dir` (str): Path to directory.
             `response_handler` (ResponseHandler): The function to handle the command response.
         """
