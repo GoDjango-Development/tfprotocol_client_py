@@ -1591,16 +1591,16 @@ class TfProtocol(TfProtocolSuper):
         checksum = self.client.just_recv_str(size=66)
         file_payload = self.client.just_recv(size=ms_header)
 
-        if checksum == hexstr(sha256_for(file_payload)):
-            data_sink.write(file_payload)
-            response_handler(StatusInfo(status=StatusServerCode.OK, code=ms_header))
-        else:
-            response_handler(StatusInfo(status=StatusServerCode.FAILED, code=ms_header))
+        data_sink.write(file_payload)
+        response_handler(
+            StatusInfo(status=StatusServerCode.OK, code=ms_header, message=checksum)
+        )
 
     def intwrite_command(
         self,
         path: str,
         data_stream: BytesIO,
+        checksum: str,
         response_handler: ResponseHandler = EMPTY_HANDLER,
     ):
         """Integrity Write. It is intended to atomically upload a file with its integrity
@@ -1609,18 +1609,16 @@ class TfProtocol(TfProtocolSuper):
         Args:
             `path` (str): Path to file to write.
             `data_stream` (BytesIO): FileInput in read mode.
+            `checksum` (str): Checksum of the file.
             `response_handler` (ResponseHandler): The function to handle the command response.
         """
         self.client.send(TfProtocolMessage('INTWRITE', path))
 
         # Send 66 bytes of file hash
-        payload = data_stream.read()
-        hashdata = hexstr(sha256_for(payload))
-        self.client.just_send(hashdata)
+        self.client.just_send(checksum)
 
         # Send the file payload
-        # self.client.just_send(len(payload), header_size=INT_SIZE)
-        # self.client.just_send(payload)
+        payload = data_stream.read()
         self.client.send(payload, header_size=INT_SIZE)
 
         resp_code = self.client.just_recv_int(size=INT_SIZE, signed=True)

@@ -5,7 +5,10 @@ from io import BytesIO
 import sys
 from typing import Callable, Union
 from datetime import datetime, date as Date
-from tfprotocol_client.misc.constants import RESPONSE_LOGGER
+from tfprotocol_client.misc.constants import (
+    RESPONSE_LOGGER,
+    SECFS_ALL_PERMISSIONS,
+)
 
 from tfprotocol_client.misc.file_stat import FileStat
 from tfprotocol_client.models.keepalive_options import (
@@ -745,11 +748,27 @@ def test_notify_system_commands(proto: TfProtocol):
 
 
 def test_integrity_rw_commands(proto: TfProtocol):
-    with open('test2.java', 'rb') as f:
-        proto.intwrite_command('test2.java', f)
+    checksum: str = None
+
+    def _handler_callback(status: StatusInfo):
+        nonlocal checksum
+        checksum = status.message
+        print("CLIENT-HANDLER: ", status)
+
+    with open('test.java', 'rb') as f:
+        proto.sup_command('test2.java', f, 5)
 
     with open('test2-rec.java', 'wb') as f:
-        proto.intread_command('test2.java', f)
+        proto.intread_command('test2.java', f, response_handler=_handler_callback)
+
+    if checksum is not None:
+        with open('test2.java', 'rb') as f:
+            proto.intwrite_command(
+                'test2.java',
+                f,
+                checksum,
+                response_handler=MyHandler().intwrite_callback,
+            )
 
 
 def test_netsecurity_commands(proto: TfProtocol):
