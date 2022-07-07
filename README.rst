@@ -2,15 +2,8 @@
 TFProtocol Client Implemented in Python :snake:
 ================================================
 
-.. image:: https://img.shields.io/pypi/v/tfprotocol-client.svg
-    :target: https://pypi.org/project/tfprotocol-client/
 .. image:: https://img.shields.io/badge/Maintained%3F-yes-green.svg
     :target: https://GitHub.com/lagcleaner/tfprotocol_client_py/graphs/commit-activity
-
-
-.. image:: https://img.shields.io/github/contributors/lagcleaner/tfprotocol_client_py.svg
-    :target: https://GitHub.com/lagcleaner/tfprotocol_client_py/graphs/contributors/
-
 
 .. image:: https://img.shields.io/github/issues/lagcleaner/tfprotocol_client_py.svg
     :target: https://GitHub.com/lagcleaner/tfprotocol_client_py/issues/
@@ -28,7 +21,11 @@ The especifications for the *Transference Protocol* is available in this `reposi
 ---------------------------
 Installation :floppy_disk:
 ---------------------------
-The package is available at `pypi <https://pypi.org/project/tfprotocol-client/>`_ :package:, to be installed from **pip** with the
+
+.. image:: https://img.shields.io/pypi/v/tfprotocol-client.svg
+    :target: https://pypi.org/project/tfprotocol-client/
+
+The package is available at `pypi <https://pypi.org/project/tfprotocol-client/>`_, to be installed from **pip** with the
 next command:
 
 .. code-block:: bash
@@ -61,6 +58,9 @@ To use the *Transference Protocol* through this library, you must create an inst
 ---------------------------
 For Contributors :wrench:
 ---------------------------
+
+.. image:: https://img.shields.io/github/contributors/lagcleaner/tfprotocol_client_py.svg
+    :target: https://GitHub.com/lagcleaner/tfprotocol_client_py/graphs/contributors/
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Development Environment Installation :computer:
@@ -107,4 +107,4 @@ To publish the package you need to run the following command in the root directo
     poetry publish
 
 .. image:: https://img.shields.io/badge/Ask%20me-anything-1abc9c.svg
-    :target: https://t.me/LagCleaner
+    :target: mailto://lagcleaner@gmail.com
