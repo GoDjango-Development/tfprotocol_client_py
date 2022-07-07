@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "tfprotocol_client"
-version = "1.0.1"
+version = "1.0.2"
 description = "Transfer Protocol client implemented in python."
 authors = ["Leonel Garcia <lagcleaner@gmail.com>"]
 license = "LICENSE.rst"
@@ -8,7 +8,14 @@ readme = "README.rst"
 homepage = "https://github.com/lagcleaner/tfprotocol_client_py"
 repository = "https://github.com/lagcleaner/tfprotocol_client_py"
 keywords = ["transfer", "protocol", "client", "python","tfproto", "tfprotocol"]
-
+classifiers = [
+    "Environment :: Console",
+    "Operating System :: OS Independent",
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Intended Audience :: System Administrators",
+    "Topic :: Communications :: File Sharing"
+]
 
 [tool.poetry.dependencies]
 python = "^3.7.2"
