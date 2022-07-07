@@ -45,6 +45,7 @@ SECFS_UXPERM = 1024
 # Set List Directory Recursively permission for files and directories in the directory.
 SECFS_LRDIR = 2048
 
+# Set all permissions for files and folders
 SECFS_ALL_PERMISSIONS = (
     SECFS_SETPERM
     | SECFS_REMPERM

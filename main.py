@@ -780,9 +780,10 @@ def test_netsecurity_commands(proto: TfProtocol):
         lock_id = status.message
         print("CLIENT-HANDLER: ", status)
 
-    proto.netlock_command(5, 'testlag', response_handler=_handler_callback)
+    proto.touch_command('testlaglock', response_handler=myhandler.touch_callback)
+    proto.netlock_command(5, 'testlaglock', response_handler=_handler_callback)
     proto.netlocktry_command(
-        5, 'testlag', response_handler=myhandler.netlocktry_callback
+        5, 'testlaglock', response_handler=myhandler.netlocktry_callback
     )
 
     proto.netunlock_command(lock_id)
@@ -795,10 +796,11 @@ def test_netsecurity_commands(proto: TfProtocol):
         'test.mut', 'testtoken', response_handler=myhandler.netmutrel_callback
     )
 
-    proto.setfsid_command(lock_id, response_handler=myhandler.setfsid_callback)
+    proto.setfsid_command('secid', response_handler=myhandler.setfsid_callback)
 
+    proto.mkdir_command('testlag')
     proto.setfsperm_command(
-        lock_id,
+        'secid',
         SECFS_ALL_PERMISSIONS,
         'testlag',
         response_handler=myhandler.setfsperm_callback,
@@ -807,10 +809,10 @@ def test_netsecurity_commands(proto: TfProtocol):
         'testlag', response_handler=myhandler.issecfs_callback,
     )
     proto.getfsperm_command(
-        lock_id, 'testlag', response_handler=myhandler.getfsperm_callback,
+        'secid', 'testlag', response_handler=myhandler.getfsperm_callback,
     )
     proto.remfsperm_command(
-        lock_id, 'testlag', response_handler=myhandler.remfsperm_callback,
+        'secid', 'testlag', response_handler=myhandler.remfsperm_callback,
     )
 
     proto.mkdir_command(
