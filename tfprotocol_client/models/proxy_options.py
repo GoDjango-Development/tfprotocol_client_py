@@ -25,5 +25,5 @@ class ProxyOptions:
         self.proxy_type = proxy_type
         self.port = port
         self.address = address
-        self.username = username.encode() if username else None
-        self.password = password.encode() if password else None
+        self.username = username
+        self.password = password
