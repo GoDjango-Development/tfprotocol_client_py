@@ -5,7 +5,7 @@ import re
 from typing import Tuple, Union
 
 from tfprotocol_client.misc.constants import STRING_ENCODING
-from tfprotocol_client.misc.status_server_code import StatusServerCode
+from tfprotocol_client.models.status_server_code import StatusServerCode
 
 
 def separate_status(string: str):

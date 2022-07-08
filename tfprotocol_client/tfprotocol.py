@@ -10,33 +10,34 @@ from multiprocessing import Condition
 from typing import Callable, Union
 
 from multipledispatch import dispatch
-from tfprotocol_client.connection.protocol_client import ProtocolClient
 
 from tfprotocol_client.connection.codes_sender_recvr import CodesSenderRecvr
 from tfprotocol_client.misc.build_utils import MessageUtils
 from tfprotocol_client.misc.constants import (
     BYTE_SIZE,
     DFLT_MAX_BUFFER_SIZE,
+    EMPTY_HANDLER,
     INT_SIZE,
     KEY_LEN_INTERVAL,
     LONG_SIZE,
-    EMPTY_HANDLER,
 )
-from tfprotocol_client.models.file_stat import FileStat, FileStatTypeEnum
-from tfprotocol_client.models.status_server_code import StatusServerCode
+from tfprotocol_client.misc.handlers_aliases import (
+    ResponseHandler,
+    SendRecvFileHandler,
+    TransferAsyncHandler,
+    TransferHandler,
+)
 from tfprotocol_client.misc.thread import TfThread
 from tfprotocol_client.models.exceptions import ErrorCode, TfException
+from tfprotocol_client.models.file_stat import FileStat, FileStatTypeEnum
 from tfprotocol_client.models.message import TfProtocolMessage
 from tfprotocol_client.models.proxy_options import ProxyOptions
 from tfprotocol_client.models.putget_commands import PutGetCommandEnum
 from tfprotocol_client.models.status_info import StatusInfo
+from tfprotocol_client.models.status_server_code import StatusServerCode
 from tfprotocol_client.models.transfer_state import TransferStatus
 from tfprotocol_client.tfprotocol_super import TfProtocolSuper
 
-ResponseHandler = Callable[[StatusInfo], None]
-SendRecvFileHandler = Callable[[bool, str, StatusInfo, BytesIO], None]
-TransferHandler = Callable[[ProtocolClient, TransferStatus], None]
-TransferAsyncHandler = Callable[[CodesSenderRecvr], None]
 Date = dt.date
 
 
