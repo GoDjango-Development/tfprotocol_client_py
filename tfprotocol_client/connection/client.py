@@ -55,7 +55,7 @@ class SocketClient:
     def set_socket(self, new_socket: socks.socksocket):
         self._socket = new_socket
 
-    def start_connection(self, dns_resolution_timeout: int, timeout: int) -> Any:
+    def start_connection(self, dns_resolution_timeout: int, timeout: int) -> StatusInfo:
         """Method to initiate the connection with the server via socket.
 
         Args:
