@@ -82,13 +82,14 @@ this project, proceed to run the following command in the root directory of the 
 Project Structure :open_file_folder:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This library is made up of 4 folders and the particular implementations of the ``TfProtocolSuper``
+This library is made up of 5 folders and the particular implementations of the ``TfProtocolSuper``
 class, the folders are structured as follows:
 
 - **connection**: where all socket and low-level communication is located.
 - **models** where the complex objects used all over the package are defined.
 - **security** where is implemented the methods and classes to encrypt and decrypt the messages for communication and also the utils for do the hashing stuff where is needed.
-- **misc** folder to hold all utils and not related to any other folder concept.
+- **misc** to hold all utils and not related to any other folder concept.
+- **extensions** where are all the extensions for the *Transfer Protocol Client* .
 
 Here the visual schema for all the classes and his relations with others:
 
