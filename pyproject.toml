@@ -25,6 +25,8 @@ multipledispatch = "^0.6.0"
 [tool.poetry.dev-dependencies]
 pylint = "^2.14.4"
 pytest = "^7.1.2"
+coverage = "^6.4.1"
+black = "^22.6.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
