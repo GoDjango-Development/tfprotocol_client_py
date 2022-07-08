@@ -62,9 +62,6 @@ class StatusInfo:
             status, msg = StatusServerCode.UNKNOWN, message
         elif (status is not StatusServerCode.FAILED) or not parse_code:
             # ? <status> [<msg>]
-            # msg = msg.replace(
-            #     str.encode(status.name, encoding=STRING_ENCODING), b'', 1
-            # ).strip()
             code = status.value
         else:
             # ? FAILED <str_code> : <msg>

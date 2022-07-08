@@ -32,7 +32,7 @@ def separate_status_b(data: bytes) -> Tuple[StatusServerCode, bytes]:
 def separate_status_codenumber(string: str) -> Tuple[str, str]:
     res = re.split(r'([-+]?\d+\.\d+)|([-+]?\d+)', string.strip(), maxsplit=1)
     res_f = [r.strip() for r in res if r is not None and r.strip() != '']
-    if len(res_f) > 1 and res_f[0].isdecimal():
+    if len(res_f) > 1 and res_f[0].isdigit():
         return res_f[0], ''.join(res_f[1:])
     else:
         return '', ''.join(res_f)
@@ -42,15 +42,15 @@ def separate_status_codenumber_b(data: bytes):
     res = re.split(br'([-+]?\d+\.\d+)|([-+]?\d+)', data.strip(), maxsplit=1)
     res_f = [r.strip() for r in res if r is not None and r.strip() != b'']
     if len(res_f) > 1 and isnumber(res_f[0]):
-        return res[0], b''.join(res_f[1:])
+        return res_f[0], b''.join(res_f[1:])
     return b'', b''.join(res_f)
 
 
 def isnumber(data: bytes):
-    if data.isalnum():
+    if data.isdigit():
         return True
     numb = data.split(b'.', maxsplit=1)
-    return all(part.isalnum() for part in numb)
+    return all(part.isdigit() for part in numb)
 
 
 def tryparse_int(
