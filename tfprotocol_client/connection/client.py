@@ -68,8 +68,7 @@ class SocketClient:
         try:
             ip = timelimit(
                 dns_resolution_timeout,
-                (lambda self: socket.gethostbyname(self.address)),
-                args=(self,),
+                (lambda *_,**__: socket.gethostbyname(self.address)),
             )
             self._socket.settimeout(timeout)
             self._socket.connect((ip, self.port))
