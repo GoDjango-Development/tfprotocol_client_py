@@ -5,15 +5,17 @@ from threading import Thread
 
 
 class TimeLimitExpired(Exception):
-    pass
+    """This exception is raised when the operation is timed out."""
 
 
-def timelimit(timeout, func, args=(), kwargs={}):
+def timelimit(timeout, func, *args, **kwargs):
     """ Run func with the given timeout. If func didn't finish running
         within the timeout, raise TimeLimitExpired
     """
 
     class FuncThread(Thread):
+        """Class to run a function with a timeout."""
+
         def __init__(self):
             Thread.__init__(self)
             self.result = None
