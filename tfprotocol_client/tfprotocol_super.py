@@ -9,7 +9,7 @@ from tfprotocol_client.misc.constants import (
     EMPTY_HANDLER,
     KEY_LEN_INTERVAL,
 )
-from tfprotocol_client.misc.status_server_code import StatusServerCode
+from tfprotocol_client.models.status_server_code import StatusServerCode
 from tfprotocol_client.models.keepalive_options import KeepAliveOptions
 from tfprotocol_client.models.proxy_options import ProxyOptions
 from tfprotocol_client.models.status_info import StatusInfo

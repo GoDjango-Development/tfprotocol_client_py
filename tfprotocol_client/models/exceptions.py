@@ -4,7 +4,7 @@
 from enum import Enum
 from typing import Optional, Union
 from tfprotocol_client.misc.constants import STRING_ENCODING
-from tfprotocol_client.misc.status_server_code import StatusServerCode
+from tfprotocol_client.models.status_server_code import StatusServerCode
 from tfprotocol_client.models.status_info import StatusInfo
 
 

@@ -2,7 +2,7 @@
 # email: lagcleaner@gmail.com
 
 from tfprotocol_client.connection.protocol_client import ProtocolClient
-from tfprotocol_client.misc.status_server_code import StatusServerCode
+from tfprotocol_client.models.status_server_code import StatusServerCode
 from tfprotocol_client.models.message import TfProtocolMessage
 
 

@@ -8,7 +8,7 @@ from tfprotocol_client.misc.parse_utils import (
     tryparse_int,
 )
 from tfprotocol_client.misc.constants import STRING_ENCODING
-from tfprotocol_client.misc.status_server_code import StatusServerCode
+from tfprotocol_client.models.status_server_code import StatusServerCode
 
 
 class StatusInfo:

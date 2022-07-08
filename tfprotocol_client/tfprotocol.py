@@ -12,7 +12,6 @@ from typing import Callable, Union
 from multipledispatch import dispatch
 from tfprotocol_client.connection.protocol_client import ProtocolClient
 
-from tfprotocol_client.security.hash_utils import hexstr, sha256_for
 from tfprotocol_client.connection.codes_sender_recvr import CodesSenderRecvr
 from tfprotocol_client.misc.build_utils import MessageUtils
 from tfprotocol_client.misc.constants import (
@@ -23,8 +22,8 @@ from tfprotocol_client.misc.constants import (
     LONG_SIZE,
     EMPTY_HANDLER,
 )
-from tfprotocol_client.misc.file_stat import FileStat, FileStatTypeEnum
-from tfprotocol_client.misc.status_server_code import StatusServerCode
+from tfprotocol_client.models.file_stat import FileStat, FileStatTypeEnum
+from tfprotocol_client.models.status_server_code import StatusServerCode
 from tfprotocol_client.misc.thread import TfThread
 from tfprotocol_client.models.exceptions import ErrorCode, TfException
 from tfprotocol_client.models.message import TfProtocolMessage
