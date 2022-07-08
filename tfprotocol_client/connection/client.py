@@ -79,7 +79,7 @@ class SocketClient:
             return StatusInfo.parse("DISCONNECTED 0 null pointer exception")
         except TimeLimitExpired:
             return StatusInfo.parse("DISCONNECTED 0 time out dns")
-        except Exception:
+        except Exception:  # pylint: disable=broad-except
             return StatusInfo.parse("DISCONNECTED 0 connection time out")
 
     def stop_connection(self):

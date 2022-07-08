@@ -10,6 +10,7 @@ from tfprotocol_client.misc.constants import (
     EMPTY_HANDLER,
     KEY_LEN_INTERVAL,
 )
+from tfprotocol_client.misc.handlers_aliases import ResponseHandler
 from tfprotocol_client.models.exceptions import ErrorCode, TfException
 from tfprotocol_client.models.keepalive_options import KeepAliveOptions
 from tfprotocol_client.models.proxy_options import ProxyOptions
@@ -79,14 +80,14 @@ class TfProtocolSuper:
     def connect(
         self,
         keepalive_options: Optional[KeepAliveOptions] = None,
-        on_response: Callable[[StatusInfo], None] = EMPTY_HANDLER,
+        on_response: ResponseHandler = EMPTY_HANDLER,
         on_connect: Callable[['TfProtocolSuper'], None] = EMPTY_HANDLER,
     ):
         """Connect to the server with keep-alive mechanism enabled or disabled
 
         Args:
             `keepalive_options` (KeepAliveOptions): Keep alive options.
-            `on_response` ((StatusInfo) -> None): The callback for the server responses in the
+            `on_response` (ResponseHandler): The callback for the server responses in the
                 connection process.
             `on_connect` ((TfProtocolSuper) -> None): The callback to retrieve the connected
                 instance of tfprotocol after stablishing connection.
@@ -102,7 +103,6 @@ class TfProtocolSuper:
             on_connect(self)
             return True
         else:
-            # FIXME: WHY THIS METHOD RAISE AN EXCEPTION AND THE STANDARD 'connect()' do not
             on_response(final_status)
             try:
                 self._proto_client.stop_connection()
@@ -115,7 +115,7 @@ class TfProtocolSuper:
                 raise TfException(exception=ex)
 
     def _connect(
-        self, on_response: Callable[[StatusInfo], None] = EMPTY_HANDLER,
+        self, on_response: ResponseHandler = EMPTY_HANDLER,
     ) -> StatusInfo:
         self._tcp_timeout_options = TCPTimeoutOptions(
             status_server_callback=on_response,
