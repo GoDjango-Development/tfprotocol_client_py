@@ -11,10 +11,10 @@ from tfprotocol_client.models.status_server_code import StatusServerCode
 def separate_status(string: str):
     res = re.split(r'\s+', string, maxsplit=1)
     # res_f = [r.strip() for r in res if r is not None and r.strip() != '']
-    if len(res) > 1:
-        return res[0], ''.join(res[1:])
-    else:
-        return res[0], ''
+    status: StatusServerCode = StatusServerCode.from_str(res[0])
+    if status is not None:
+        return status, ''.join(res[1:]) if len(res) > 1 else ''
+    return None, string
 
 
 def separate_status_b(data: bytes) -> Tuple[StatusServerCode, bytes]:

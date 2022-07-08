@@ -12,10 +12,10 @@ from tfprotocol_client.models.status_server_code import StatusServerCode
 def test_parse_utils():
     """Test for parse_utils"""
     assert (separate_status('FAILED 5: a lot of info before')) == (
-        'FAILED',
+        StatusServerCode.FAILED,
         '5: a lot of info before',
     )
-    assert (separate_status('OK')) == ('OK', '')
+    assert (separate_status('OK')) == (StatusServerCode.OK, '')
 
     assert (separate_status_b(b'FAILED 5: a lot of info before')) == (
         StatusServerCode.FAILED,

@@ -3,7 +3,9 @@
 
 from typing import Optional
 from tfprotocol_client.misc.parse_utils import (
+    separate_status,
     separate_status_b,
+    separate_status_codenumber,
     separate_status_codenumber_b,
     tryparse_int,
 )
@@ -31,30 +33,51 @@ class StatusInfo:
         self.message: str = message
 
     @staticmethod
-    def parse(
-        rawmessage: Optional[str] = None, payload: Optional[bytes] = None
-    ) -> 'StatusInfo':
-        status_info = None
+    def parse(rawmessage: Optional[str]=None, payload: Optional[bytes] = None) -> 'StatusInfo':
+        """Parse raw string message to build an instance of StatusInfo.
+
+        Args:
+            `rawmessage`: raw string message from server.
+            `payload`: payload of the message.
+        """
         if rawmessage is not None:
-            values = rawmessage.split(' ')
-            if len(values) == 1:
-                status_info = StatusInfo(StatusServerCode.from_str(values[0]), 0, '')
-            else:
-                status_info = StatusInfo(
-                    StatusServerCode.from_str(values[0]),
-                    int(values[1]) if values[1].isdigit() else None,
-                    ' '.join(values[2:]),
+            try:
+                status, msg = separate_status(rawmessage)
+                code = len(rawmessage)
+                if status is None:
+                    # ? <msg>
+                    status, msg = StatusServerCode.UNKNOWN, rawmessage
+                elif status is not StatusServerCode.FAILED:
+                    # ? <status> [<msg>]
+                    code = status.value
+                else:
+                    # ? FAILED <str_code> : <msg>
+                    str_code, msg = separate_status_codenumber(msg)
+                    msg = msg.strip().replace(': ', '', 1)
+                    code = tryparse_int(str_code, dflt_value=status.value)
+
+                return StatusInfo(
+                    status,
+                    code=code,
+                    message=msg,
+                    payload=payload,
                 )
-        if payload is not None:
-            status_info.payload = payload
-        return status_info if status_info else StatusInfo()
+            except: # pylint: disable=bare-except
+                pass
+        return StatusInfo()
 
     @staticmethod
     def build_status(
         header: int, message: bytes, parse_code: bool = True
     ) -> 'StatusInfo':
+        """Build status from header and message received from the server.
+        
+        Args:
+            `header`: header of the message.
+            `message`: message received from the server.
+            `parse_code`: if True, parse the code from the message.
+        """
         code: int = header
-        # msg_str_full: str = str(message, encoding=STRING_ENCODING)
         status, msg = separate_status_b(message)
 
         if status is None:
