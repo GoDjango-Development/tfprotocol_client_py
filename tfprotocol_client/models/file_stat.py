@@ -72,5 +72,4 @@ class FileStat:
         code, _type, size, atime, mtime = struct.unpack(
             f'{ENDIANESS}bbQQQ', fstatstruct
         )
-        # TODO: _TYPE PENDING TO VERIFICATION
         return code, FileStat(_type, size, atime, mtime)

@@ -41,7 +41,7 @@ class KeepAliveThread(Thread):
         self._max_tries: int = options.max_tries
         self._counter: int = 0
         self._prockey: str = ''
-        self._on_connection_closed: Callable[[],None] = on_connection_closed
+        self._on_connection_closed: Callable[[], None] = on_connection_closed
 
         try:
             self._datagram_socket: Optional[socks.socksocket] = socks.socksocket(
@@ -205,7 +205,7 @@ def set_keepalive_linux(sock, after_idle_sec=3600, interval_sec=3, max_fails=5):
     sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPCNT, max_fails)
 
 
-def set_keepalive_windows(sock, after_idle_sec=3600, interval_sec=3, max_fails=5):
+def set_keepalive_windows(sock, after_idle_sec=3600, interval_sec=3, _=None):
     """Set TCP keepalive on an open socket.
 
     It activates after 3600 seconds (after_idle_sec) of idleness,

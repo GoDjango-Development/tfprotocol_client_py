@@ -1,6 +1,7 @@
 # coded by lagcleaner
 # email: lagcleaner@gmail.com
 
+# pylint: disable=too-many-lines
 """ Transfer Protocol API Base implementation. """
 
 import datetime as dt
@@ -747,7 +748,8 @@ class TfProtocol(TfProtocolSuper):
             `canpt` (int): Cancellation Points, determines the cancellation points where the
                 user, it will have to read from the server to know if it continues or not.
             `response_handler` (ResponseHandler): The function to handle the command response.
-            `transference_handler` (TransferenceHandler): The function to handle the transference cancelations.
+            `transference_handler` (TransferenceHandler): The function to handle the transference
+                cancelations.
         """
         offset, canpt = max(0, offset), max(0, canpt)
 
@@ -932,7 +934,7 @@ class TfProtocol(TfProtocolSuper):
         uses, but not the only one, is to test whether the server or even the socket communication
         line is still opened, in other words: the keepalive mechanism from the client side
         perspective.
-        
+
         Args:
             `response_handler` (ResponseHandler): The function to handle the command response.
         """
@@ -1267,7 +1269,7 @@ class TfProtocol(TfProtocolSuper):
         this command -in 'advisory' way- to retrieve other servers in order to balance the
         overall traffic. By 'advisory' we mean that it's up to the clients to agree in asking for
         a server from the pool before start any further interaction.
-        
+
         Args:
             `response_handler` (ResponseHandler): The function to handle the command response.
         """

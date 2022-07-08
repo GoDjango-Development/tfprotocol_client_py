@@ -27,8 +27,8 @@ class TfThread(Thread):
         Args:
             `target` (Callable[..., Any]): The method who is going to be used asynchronous.
             `quite_errors` (bool, optional): Raise silently exceptions.
-            `cond_lock` (Conditional, optional): The mutex that is going to be informed when the method
-                execution reach its end. Defaults to None.
+            `cond_lock` (Conditional, optional): The mutex that is going to be informed when the
+                method execution reach its end. Defaults to None.
             `name` (str, optional): Thread name. Defaults to ....
             `args` (Iterable[Any], optional): Postitional arguments to be passed to method
                 call, must be set at the exactly order required by the method.
@@ -71,10 +71,10 @@ class TfThread(Thread):
             finally:
                 self.conditional_lock.notify_all()
         # self._stop()
-        
+
     def interrupt(self):
         self._quite_errors = True
         # self._stop()
-    
+
     def set_handled_t(self):
         self.__class__.HANDLED_THREAD = self

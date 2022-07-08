@@ -12,14 +12,15 @@ class ProxyOptions:
 
         Args:
             `proxy_type` (proxy type): The type of the proxy to be used. Three types are
-            supported: PROXY_TYPE_SOCKS4 (including socks4a), PROXY_TYPE_SOCKS5 and PROXY_TYPE_HTTP
+                supported: PROXY_TYPE_SOCKS4 (including socks4a), PROXY_TYPE_SOCKS5 and
+                PROXY_TYPE_HTTP.
             `address` (str): The address of the server (IP or DNS).
             `port` (int): The port of the server. Defaults to 1080 for SOCKS servers and 8080 for
-            HTTP proxy servers.
+                HTTP proxy servers.
             `username` (str): Username to authenticate with to the server. The default is no
-            authentication. (Optional)
+                authentication. (Optional)
             `password` (str): Password to authenticate with to the server. Only relevant when
-            username is also provided. (Optional)
+                username is also provided. (Optional)
         """
         self.proxy_type = proxy_type
         self.port = port
