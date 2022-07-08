@@ -71,4 +71,3 @@ class MessageUtils:
     @staticmethod
     def decode_int(value: bytes, signed=False) -> int:
         return int.from_bytes(value, byteorder=ENDIANESS_NAME, signed=signed)
-

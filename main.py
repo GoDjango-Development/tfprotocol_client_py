@@ -10,14 +10,13 @@ from tfprotocol_client.misc.constants import (
     SECFS_ALL_PERMISSIONS,
 )
 
-from tfprotocol_client.misc.file_stat import FileStat
 from tfprotocol_client.models.keepalive_options import (
     KeepAliveMechanismType,
     KeepAliveOptions,
 )
 from tfprotocol_client.tfprotocol import TfProtocol
 from tfprotocol_client.models.status_info import StatusInfo
-from tfprotocol_client.misc.file_stat import FileStatTypeEnum
+from tfprotocol_client.models.file_stat import FileStat, FileStatTypeEnum
 from tfprotocol_client.connection.protocol_client import ProtocolClient
 from tfprotocol_client.models.putget_commands import PutGetCommandEnum
 from tfprotocol_client.models.transfer_state import TransferStatus

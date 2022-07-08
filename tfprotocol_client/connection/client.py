@@ -6,10 +6,6 @@ from typing import Any
 import socket
 import tfprotocol_client.connection.socks_prox as socks
 from tfprotocol_client.misc.constants import DFLT_HEADER_SIZE, DFLT_MAX_BUFFER_SIZE
-from tfprotocol_client.misc.guard_exception import (
-    on_except,
-    raise_from,
-)
 from tfprotocol_client.misc.timeout_func import TimeLimitExpired, timelimit
 from tfprotocol_client.models.exceptions import ErrorCode, TfException
 
@@ -59,17 +55,6 @@ class SocketClient:
     def set_socket(self, new_socket: socks.socksocket):
         self._socket = new_socket
 
-    @on_except(
-        dflt_handler=lambda _: StatusInfo.parse("DISCONNECTED 0 connection time out"),
-        **{
-            AttributeError.__name__: lambda _: StatusInfo.parse(
-                "DISCONNECTED 0 null pointer exception"
-            ),
-            TimeLimitExpired.__name__: lambda _: StatusInfo.parse(
-                "DISCONNECTED 0 time out dns"
-            ),
-        },
-    )
     def start_connection(self, dns_resolution_timeout: int, timeout: int) -> Any:
         """Method to initiate the connection with the server via socket.
 
@@ -80,17 +65,23 @@ class SocketClient:
         Returns:
             StatusInfo: status information resulting from connection attempt
         """
-        ip = timelimit(
-            dns_resolution_timeout,
-            (lambda self: socket.gethostbyname(self.address)),
-            args=(self,),
-        )
-        self._socket.settimeout(timeout)
-        self._socket.connect((ip, self.port))
-        self._is_connect = True
-        return StatusInfo.parse("OK")
+        try:
+            ip = timelimit(
+                dns_resolution_timeout,
+                (lambda self: socket.gethostbyname(self.address)),
+                args=(self,),
+            )
+            self._socket.settimeout(timeout)
+            self._socket.connect((ip, self.port))
+            self._is_connect = True
+            return StatusInfo.parse("OK")
+        except AttributeError:
+            return StatusInfo.parse("DISCONNECTED 0 null pointer exception")
+        except TimeLimitExpired:
+            return StatusInfo.parse("DISCONNECTED 0 time out dns")
+        except Exception:
+            return StatusInfo.parse("DISCONNECTED 0 connection time out")
 
-    @on_except(dflt_handler=raise_from)
     def stop_connection(self):
         """Close socket connection to the server"""
         if self._socket is not None:
