@@ -1,3 +1,6 @@
+# coded by lagcleaner
+# email: lagcleaner@gmail.com
+
 from tfprotocol_client.misc.constants import LONG_SIZE
 from tfprotocol_client.models.message import TfProtocolMessage
 

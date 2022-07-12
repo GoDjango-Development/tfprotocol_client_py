@@ -1,3 +1,6 @@
+# coded by lagcleaner
+# email: lagcleaner@gmail.com
+
 from tfprotocol_client.security.hash_utils import sha256_for
 
 

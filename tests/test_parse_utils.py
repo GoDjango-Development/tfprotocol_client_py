@@ -1,3 +1,6 @@
+# coded by lagcleaner
+# email: lagcleaner@gmail.com
+
 from tfprotocol_client.misc.parse_utils import (
     isnumber,
     separate_status,
