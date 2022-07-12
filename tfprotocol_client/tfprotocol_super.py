@@ -12,7 +12,10 @@ from tfprotocol_client.misc.constants import (
 )
 from tfprotocol_client.misc.handlers_aliases import ResponseHandler
 from tfprotocol_client.models.exceptions import ErrorCode, TfException
-from tfprotocol_client.models.keepalive_options import KeepAliveOptions
+from tfprotocol_client.models.keepalive_options import (
+    KeepAliveMechanismType,
+    KeepAliveOptions,
+)
 from tfprotocol_client.models.proxy_options import ProxyOptions
 from tfprotocol_client.models.status_info import StatusInfo
 from tfprotocol_client.models.status_server_code import StatusServerCode
@@ -40,7 +43,7 @@ class TfProtocolSuper:
         channel_len: int = DFLT_MAX_BUFFER_SIZE,
         verbosity_mode: bool = False,
     ) -> None:
-        """ Constructor for Transfer Protocol super class.
+        """Constructor for Transfer Protocol super class.
 
         Args:
             `protocol_version` (str): The desired version of the protocol.
@@ -115,7 +118,8 @@ class TfProtocolSuper:
                 raise TfException(exception=ex)
 
     def _connect(
-        self, on_response: ResponseHandler = EMPTY_HANDLER,
+        self,
+        on_response: ResponseHandler = EMPTY_HANDLER,
     ) -> StatusInfo:
         self._tcp_timeout_options = TCPTimeoutOptions(
             status_server_callback=on_response,
@@ -158,7 +162,7 @@ class TfProtocolSuper:
         return StatusInfo(StatusServerCode.OK)
 
     def disconnect(self):
-        """Disconect the protocol"""
+        """Disconect the protocol client from the server."""
         self.client.stop_connection()
 
     def get_len_channel(self) -> int:
@@ -176,7 +180,7 @@ class TfProtocolSuper:
 
     @property
     def tcp_timeout_options(self) -> TCPTimeoutOptions:
-        """ Gets options for connection attempts.
+        """Gets options for connection attempts.
 
         Returns:
             TCPTimeoutOptions: `tcp_timeout_options`
@@ -190,3 +194,14 @@ class TfProtocolSuper:
     @property
     def client(self) -> ProtocolClient:
         return self._proto_client
+
+    # sintax - with tfopen()
+    def __enter__(self):
+        self.connect(
+            keepalive_options=KeepAliveOptions(
+                KeepAliveMechanismType.TCP_NATIVE, 3, 6, 5
+            )
+        )
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.disconnect()
