@@ -14,7 +14,7 @@ from tfprotocol_client.models.status_info import StatusInfo
 
 
 class SocketClient:
-    """Socket Client, handles proxy and basic send and receive. """
+    """Socket Client, handles proxy and basic send and receive."""
 
     def __init__(
         self,
@@ -68,7 +68,7 @@ class SocketClient:
         try:
             ip = timelimit(
                 dns_resolution_timeout,
-                (lambda *_,**__: socket.gethostbyname(self.address)),
+                (lambda *_, **__: socket.gethostbyname(self.address)),
             )
             self._socket.settimeout(timeout)
             self._socket.connect((ip, self.port))
@@ -78,6 +78,10 @@ class SocketClient:
             return StatusInfo.parse("DISCONNECTED 0 null pointer exception")
         except TimeLimitExpired:
             return StatusInfo.parse("DISCONNECTED 0 time out dns")
+        except socks.GeneralProxyError:
+            return StatusInfo.parse(
+                "DISCONNECTED 0 cannot stablish connection with this parameters"
+            )
         except Exception:  # pylint: disable=broad-except
             return StatusInfo.parse("DISCONNECTED 0 connection time out")
 
