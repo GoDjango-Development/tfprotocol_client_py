@@ -78,6 +78,7 @@ class TfProtocolSuper:
         )
         self._address: Tuple[str, int] = address
         #
+        self.__call_kwargs = None 
         self._tcp_timeout_options: Optional[TCPTimeoutOptions] = None
 
     def connect(
@@ -196,11 +197,28 @@ class TfProtocolSuper:
         return self._proto_client
 
     # sintax - with tfopen()
+    def __call__(self, **kwargs):
+        """Connect to the server with keep-alive mechanism enabled or disabled
+
+        Args:
+            `keepalive_options` (KeepAliveOptions): Keep alive options.
+            `on_response` (ResponseHandler): The callback for the server responses in the
+                connection process.
+            `on_connect` ((TfProtocolSuper) -> None): The callback to retrieve the connected
+                instance of tfprotocol after stablishing connection.
+        """
+        self.__call_kwargs = kwargs
+        return self
+
     def __enter__(self):
+        if self.__call_kwargs is not None:
+            keepAlOpt: KeepAliveOptions = self.__call_kwargs.get('keepalive_options')
+            on_resp: ResponseHandler = self.__call_kwargs.get('on_response')
+            on_conct: Callable[[TfProtocolSuper], None] = self.__call_kwargs.get('on_connect')
         self.connect(
-            keepalive_options=KeepAliveOptions(
-                KeepAliveMechanismType.TCP_NATIVE, 3, 6, 5
-            )
+            keepalive_options=keepAlOpt,
+            on_response=on_resp if on_resp is not None else EMPTY_HANDLER,
+            on_connect=on_conct if on_conct is not None else EMPTY_HANDLER,
         )
 
     def __exit__(self, exc_type, exc_value, traceback):
