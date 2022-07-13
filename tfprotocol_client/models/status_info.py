@@ -104,5 +104,19 @@ class StatusInfo:
             payload=msg,
         )
 
+    def __eq__(self, __o: object) -> bool:
+        if not isinstance(__o, type(self)):
+            return False
+        __o: StatusInfo
+        if (
+            __o.message == self.message
+            and __o.code == self.code
+            and __o.status == self.status
+            and __o.sz == self.sz
+            and self.payload == __o.payload
+        ):
+            return True
+        return False
+
     def __str__(self):
         return f'StatusInfo[{self.status.name}]<{self.code}, "{self.message}">'
