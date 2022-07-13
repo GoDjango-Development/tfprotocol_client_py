@@ -33,7 +33,9 @@ class StatusInfo:
         self.message: str = message
 
     @staticmethod
-    def parse(rawmessage: Optional[str]=None, payload: Optional[bytes] = None) -> 'StatusInfo':
+    def parse(
+        rawmessage: Optional[str] = None, payload: Optional[bytes] = None
+    ) -> 'StatusInfo':
         """Parse raw string message to build an instance of StatusInfo.
 
         Args:
@@ -62,7 +64,7 @@ class StatusInfo:
                     message=msg,
                     payload=payload,
                 )
-            except: # pylint: disable=bare-except
+            except:  # pylint: disable=bare-except
                 pass
         return StatusInfo()
 
@@ -71,7 +73,7 @@ class StatusInfo:
         header: int, message: bytes, parse_code: bool = True
     ) -> 'StatusInfo':
         """Build status from header and message received from the server.
-        
+
         Args:
             `header`: header of the message.
             `message`: message received from the server.

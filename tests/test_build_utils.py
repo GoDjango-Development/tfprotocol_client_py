@@ -4,7 +4,7 @@
 import pytest
 from tfprotocol_client.misc.build_utils import MessageUtils
 
-
+@pytest.mark.run(order=3)
 def test_encode_value():
     """Test encode_value"""
     assert MessageUtils.encode_value(1) == b'\x00\x00\x00\x01'
@@ -23,6 +23,7 @@ def test_encode_value():
     assert MessageUtils.encode_value(None) is None
 
 
+@pytest.mark.run(order=4)
 def test_decode_value():
     """Test decode_value"""
     assert MessageUtils.decode_int(b'\x00\x00\x00\x01') == 1

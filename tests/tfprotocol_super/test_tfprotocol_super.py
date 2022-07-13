@@ -3,7 +3,7 @@
 
 
 import os
-
+import pytest
 from dotenv import load_dotenv
 from tfprotocol_client.models.exceptions import TfException
 from tfprotocol_client.models.status_info import StatusInfo
@@ -16,7 +16,7 @@ load_dotenv()
 def _assert_status_is_ok(status: StatusInfo):
     assert status.status is StatusServerCode.OK, status.message
 
-
+@pytest.mark.run(order=8)
 def test_tfprotocol_super_connection():
     """Test for tfprotocol_super"""
     PROTO_VERSION = os.environ.get('PROTO_VERSION', '0.0')

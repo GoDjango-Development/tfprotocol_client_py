@@ -1,10 +1,11 @@
 # coded by lagcleaner
 # email: lagcleaner@gmail.com
 
+import pytest
 from tfprotocol_client.misc.constants import LONG_SIZE
 from tfprotocol_client.models.message import TfProtocolMessage
 
-
+@pytest.mark.run(order=1)
 def test_message():
     """Test for message"""
     # test1

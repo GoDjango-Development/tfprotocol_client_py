@@ -1,9 +1,11 @@
 # coded by lagcleaner
 # email: lagcleaner@gmail.com
 
+import pytest
 from tfprotocol_client.security.hash_utils import sha256_for
 
 
+@pytest.mark.run(order=2)
 def test_hash():
     """Test the hash utils"""
     assert (

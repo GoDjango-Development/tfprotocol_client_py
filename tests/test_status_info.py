@@ -1,10 +1,11 @@
 # coded by lagcleaner
 # email: lagcleaner@gmail.com
-
+import pytest
 from tfprotocol_client.models.status_info import StatusInfo
 from tfprotocol_client.models.status_server_code import StatusServerCode
 
 
+@pytest.mark.run(order=5)
 def test_status_info_build():
     """Test for status_info builder function"""
     # test OK
@@ -28,6 +29,7 @@ def test_status_info_build():
     assert status.payload == b'A lot of info whitout header or status'
 
 
+@pytest.mark.run(order=6)
 def test_status_info_parse():
     """Test for status_info parse function"""
 

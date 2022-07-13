@@ -1,6 +1,7 @@
 # coded by lagcleaner
 # email: lagcleaner@gmail.com
 
+import pytest
 from tfprotocol_client.misc.parse_utils import (
     isnumber,
     separate_status,
@@ -12,6 +13,7 @@ from tfprotocol_client.misc.parse_utils import (
 from tfprotocol_client.models.status_server_code import StatusServerCode
 
 
+@pytest.mark.run(order=7)
 def test_parse_utils():
     """Test for parse_utils"""
     assert (separate_status('FAILED 5: a lot of info before')) == (
