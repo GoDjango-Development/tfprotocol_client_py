@@ -66,8 +66,8 @@ For Contributors :wrench:
 Development Environment Installation :computer:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-To set up the development environment, all you need as a prerequisite is to have python Python
-2.7  or 3.5+ and `poetry <https://python-poetry.org/>`_ installed. If you need to install poetry
+To set up the development environment, all you need as a prerequisite is to have Python 2.7
+or 3.5+ and `poetry <https://python-poetry.org/>`_ installed. If you need to install poetry
 follow `these steps <https://python-poetry.org/docs/#installation>`_ and come back. 
 
 With this in mind, to install the necessary dependencies and create a python environment for
