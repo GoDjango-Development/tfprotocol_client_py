@@ -812,75 +812,76 @@ def test_putget_files(proto: TfProtocol):
 
 def test_folders_commands(proto: TfProtocol):
     # DONE
-    proto.rmdir_command('leo_test')
+    proto.rmdir_command('py_test')
 
-    proto.mkdir_command('leo_test')
-    proto.mkdir_command('leo_test/pattern')
-    proto.mkdir_command('leo_test/214pattern')
-    proto.mkdir_command('leo_test/test1')
-    proto.mkdir_command('leo_test/test2')
-    proto.touch_command('leo_test/test2/test.java')
-    proto.mkdir_command('leo_test/test2/test21')
-    proto.mkdir_command('leo_test/test2/test22')
-    proto.mkdir_command('leo_test/test3')
+    proto.mkdir_command('py_test')
+    proto.mkdir_command('py_test/pattern')
+    proto.mkdir_command('py_test/214pattern')
+    proto.mkdir_command('py_test/test1')
+    proto.mkdir_command('py_test/test2')
+    proto.touch_command('py_test/test2/test.java')
+    proto.mkdir_command('py_test/test2/test21')
+    proto.mkdir_command('py_test/test2/test22')
+    proto.mkdir_command('py_test/test3')
 
-    proto.lsr_command('/leo_test')
+    proto.lsr_command('/py_test')
 
-    proto.renam_command('/leo_test/test3', '/leo_test/test3new')
-    proto.lsr_command('/leo_test')
+    proto.renam_command('/py_test/test3', '/py_test/test3new')
+    proto.lsr_command('/py_test')
 
-    proto.cpdir_command('/leo_test/test2', '/leo_test/test2cpdir')
-    proto.lsr_command('/leo_test')
+    proto.cpdir_command('/py_test/test2', '/py_test/test2cpdir')
+    proto.lsr_command('/py_test')
 
-    proto.xcpdir_command('testxcpdir', '/leo_test/test2', 'pattern')
-    proto.lsr_command('/leo_test')
+    proto.xcpdir_command('testxcpdir', '/py_test/test2', 'pattern')
+    proto.lsr_command('/py_test')
 
-    proto.mkdir_command('/leo_test/test2copy')
-    proto.copy_command('leo_test/test2/test.java', 'leo_test/test2copy/test.java')
-    proto.lsr_command('/leo_test')
+    proto.mkdir_command('/py_test/test2copy')
+    proto.copy_command('py_test/test2/test.java', 'py_test/test2copy/test.java')
+    proto.lsr_command('/py_test')
 
-    proto.mkdir_command('/leo_test/test2xcopy')
+    proto.mkdir_command('/py_test/test2xcopy')
     # how to use this command
     proto.xcopy_command(
         'test_xcopy.java',
-        '/leo_test/test2copy/test.java',
+        '/py_test/test2copy/test.java',
         'test21',
     )
-    proto.lsr_command('/leo_test')
+    proto.lsr_command('/py_test')
 
-    proto.xdel_command('/leo_test', 'test.java')
-    proto.lsr_command('/leo_test')
+    proto.xdel_command('/py_test', 'test.java')
+    proto.lsr_command('/py_test')
 
-    proto.xrmdir_command('/leo_test', 'test2')
-    proto.lsr_command('/leo_test')
+    proto.xrmdir_command('/py_test', 'test2')
+    proto.lsr_command('/py_test')
 
-    proto.touch_command('/leo_test/file_touch.txt')
-    proto.lsr_command('/leo_test')
+    proto.touch_command('/py_test/file_touch.txt')
+    proto.lsr_command('/py_test')
 
-    proto.lsrv2_command('/leo_test', '/leo_test/testrls.txt')
+    proto.lsrv2_command('/py_test', '/py_test/testrls.txt')
 
-    proto.lsv2_command('/leo_test', '/leo_test/testls.txt')
+    proto.lsv2_command('/py_test', '/py_test/testls.txt')
 
-    proto.fsize_command('/leo_test/testls.txt')
+    proto.fsize_command('/py_test/testls.txt')
 
-    proto.fsizels_command('/leo_test/testls.txt')
-
+    proto.fsizels_command('/py_test/testls.txt')
+    
+    proto.rmdir_command('py_test')
 
 def test_files_modification_commands(proto: TfProtocol):
-    proto.rmdir_command('/leo_test')
+    proto.rmdir_command('/py_test')
 
-    proto.mkdir_command('/leo_test')
-    proto.touch_command('/leo_test/file_touch.txt')
-    proto.fstat_command('/leo_test/file_touch.txt')
+    proto.mkdir_command('/py_test')
+    proto.touch_command('/py_test/file_touch.txt')
+    proto.fstat_command('/py_test/file_touch.txt')
 
-    proto.chmod_command('/leo_test/file_touch.txt', '600')
-    proto.fstat_command('/leo_test/file_touch.txt')
+    proto.chmod_command('/py_test/file_touch.txt', '600')
+    proto.fstat_command('/py_test/file_touch.txt')
 
-    # proto.chown_command('/leo_test/file_touch.txt', '', '')
-    # proto.fstat_command('/leo_test/file_touch.txt')
+    # proto.chown_command('/py_test/file_touch.txt', '', '')
+    # proto.fstat_command('/py_test/file_touch.txt')
 
-    proto.fupd_command('/leo_test/file_touch.txt')
-    proto.fstat_command('/leo_test/file_touch.txt')
+    proto.fupd_command('/py_test/file_touch.txt')
+    proto.fstat_command('/py_test/file_touch.txt')
 
 
 def test_notify_system_commands(proto: TfProtocol):
@@ -962,15 +963,15 @@ def test_netsecurity_commands(proto: TfProtocol):
     )
 
     proto.mkdir_command(
-        '/leo_test_sys',
+        '/py_test_sys',
         response_handler=myhandler.mkdir_callback,
     )
     proto.locksys_command(
-        '/leo_test_sys',
+        '/py_test_sys',
         response_handler=myhandler.locksystem_callback,
     )
     proto.touch_command(
-        '/leo_test_sys/file_touch.txt',
+        '/py_test_sys/file_touch.txt',
         response_handler=myhandler.touch_callback,
     )
 
@@ -1018,12 +1019,12 @@ def main():
     # test_supsdown_files(proto)
     # test_putget_files(proto)
     # test_putcangetcan_files(proto)
-    # test_folders_commands(proto)
+    test_folders_commands(proto)
     # test_files_modification_commands(proto)
     # test_regular_commands(proto)
     # test_notify_system_commands(proto)
     # test_integrity_rw_commands(proto)
-    test_netsecurity_commands(proto)
+    # test_netsecurity_commands(proto)
 
     # proto.rmdir_command('prueba.sd')
     # proto.tlb_command()
