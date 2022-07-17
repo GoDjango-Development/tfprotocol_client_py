@@ -30,7 +30,6 @@ class TfException(Exception):
         code: Union[int, ErrorCode, None] = None,
     ) -> None:
         super().__init__(*args, message)
-        self.message: str = message
         if status_info:
             self.status_info: StatusInfo = status_info
         else:
@@ -56,7 +55,6 @@ class TfException(Exception):
 
     def __str__(self) -> str:
         return f'''\n--------------------------------------------------
-{self.message}
 {self.status_info.status}
 {self.status_info.code}
 {self.status_info.message}
