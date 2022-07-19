@@ -39,7 +39,7 @@ def test_tfprotocol_super_connection():
         tfproto.connect(on_response=_assert_status_is_ok)
         assert tfproto.client.is_connect(), 'Connection to server failed'
     except TfException as e:
-        assert False, e.message
+        assert False, str(e)
 
     tfproto.disconnect()
     assert not tfproto.client.is_connect(), 'Connection with server stills open'
