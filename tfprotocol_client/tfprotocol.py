@@ -1490,13 +1490,13 @@ class TfProtocol(TfProtocolSuper):
             )
 
     def fstatls_command(
-        self, path: str, response_handler: ResponseHandler = EMPTY_HANDLER
+        self, path: str, response_handler: Callable[[FileStat], None] = EMPTY_HANDLER
     ):
         """Returns a special structure per each line in the file indicated by the first parameter.
 
         Args:
             `path` (str): Path to file containing the paths to files to get stats.
-            `response_handler` (ResponseHandler): The function to handle the command response.
+            `response_handler` (Callable[[FileStat], None]): The function to handle the command response.
         """
         self.client.send(TfProtocolMessage('FSTATLS', path))
         _code = 0
