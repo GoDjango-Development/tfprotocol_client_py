@@ -120,3 +120,5 @@ class StatusInfo:
 
     def __str__(self):
         return f'StatusInfo[{self.status.name}]<{self.code}, "{self.message}">'
+
+    __repr__ = __str__

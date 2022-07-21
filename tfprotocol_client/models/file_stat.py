@@ -63,6 +63,7 @@ class FileStat:
             f'last_access={self.last_access}, '
             f'last_mod={self.last_modification})'
         )
+    __repr__ = __str__
 
     @staticmethod
     def build_from_structure(fstatstruct: bytes) -> Tuple[int, 'FileStat']:
