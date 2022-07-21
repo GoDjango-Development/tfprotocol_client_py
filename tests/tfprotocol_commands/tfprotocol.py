@@ -1,13 +1,14 @@
 import os
 import pytest
+
+from dotenv import load_dotenv
 from tfprotocol_client.tfprotocol import TfProtocol
-COUNTER = 0
+
+load_dotenv()
+
 
 @pytest.fixture(scope='module')
 def tfprotocol_instance():
-    global COUNTER
-    COUNTER  = COUNTER + 1
-    assert COUNTER == 1, COUNTER
     PROTO_VERSION = os.environ.get('PROTO_VERSION', '0.0')
     PROTO_PUBLIC_KEY = os.environ.get('PROTO_PUBLIC_KEY')
     PROTO_CLIENT_HASH = os.environ.get('PROTO_CLIENT_HASH', 'testhash')
@@ -24,6 +25,8 @@ def tfprotocol_instance():
         PROTO_SERVER_PORT,
     )
     tfproto.connect()
+    tfproto.rmdir_command('/py_test')
+    tfproto.mkdir_command('/py_test')
     yield tfproto
+    tfproto.rmdir_command('/py_test')
     tfproto.disconnect()
-
