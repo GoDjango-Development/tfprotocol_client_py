@@ -353,3 +353,109 @@ def test_tfprotocol_fsize_command(tfprotocol_instance: TfProtocol):
     )
     resps.clear()
 
+
+@pytest.mark.run(order=23)
+def test_tfprotocol_fsizels_command(tfprotocol_instance: TfProtocol):
+    tfproto = tfprotocol_instance
+    resps: List[StatusInfo] = []
+    #
+    # FSIZELS -> OK
+    tfproto.fsizels_command(
+        '/py_test/testls.txt',
+        response_handler=resps.append,
+    )
+    assert resps[0] == StatusInfo(
+        StatusServerCode.CONT,
+        code=109,
+        payload=b'',
+        message='109',
+    )
+    assert resps[1] == StatusInfo(
+        StatusServerCode.CONT,
+        code=-2,
+        payload=b'',
+        message='-2',
+    )
+    assert resps[2] == StatusInfo(
+        StatusServerCode.CONT,
+        code=59,
+        payload=b'',
+        message='59',
+    )
+    assert resps[3] == StatusInfo(
+        StatusServerCode.CONT,
+        code=-3,
+        payload=b'',
+        message='-3',
+    )
+    resps.clear()
+
+
+@pytest.mark.run(order=23)
+def test_tfprotocol_fstatls_command(tfprotocol_instance: TfProtocol):
+    tfproto = tfprotocol_instance
+    resps: List[FileStat] = []
+    #
+    # FSTATLS -> OK
+    tfproto.fstatls_command('/py_test/testls.txt', response_handler=resps.append)
+    assert len(resps) == 4, resps
+    assert (
+        resps[0].type == 3
+        and resps[0].size == 109
+        and resps[0].last_access != 0
+        and resps[0].last_modification != 0
+    )
+    assert (
+        resps[1].type == 0
+        and resps[1].size == 4096
+        and resps[1].last_access != 0
+        and resps[1].last_modification != 0
+    )
+    assert (
+        resps[2].type == 3
+        and resps[2].size == 59
+        and resps[2].last_access != 0
+        and resps[2].last_modification != 0
+    )
+    assert (
+        resps[3].type == 0
+        and resps[3].size == 0
+        and resps[3].last_access == 0
+        and resps[3].last_modification == 0
+    )
+    resps.clear()
+
+
+@pytest.mark.run(order=23)
+def test_tfprotocol_ftypels_command(tfprotocol_instance: TfProtocol):
+    tfproto = tfprotocol_instance
+    resps: List[StatusInfo] = []
+    #
+    # FTYPELS -> OK
+    tfproto.ftypels_command('/py_test/testls.txt', response_handler=resps.append)
+    assert len(resps) == 4, resps
+    assert resps[0] == StatusInfo(
+        status=StatusServerCode.OK,
+        code=3,
+        payload=b'',
+        message='3',
+    )
+    assert resps[1] == StatusInfo(
+        status=StatusServerCode.OK,
+        code=0,
+        payload=b'',
+        message='0',
+    )
+    assert resps[2] == StatusInfo(
+        status=StatusServerCode.OK,
+        code=3,
+        payload=b'',
+        message='3',
+    )
+    assert resps[3] == StatusInfo(
+        status=StatusServerCode.OK,
+        code=-2,
+        payload=b'',
+        message='-2',
+    )
+    resps.clear()
