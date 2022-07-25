@@ -40,18 +40,14 @@ class MyHandler:
     def mkdir_callback(self, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
         )
 
     def ftod_callback(self, timestamp: int, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
             'timestamp:(',
             timestamp,
@@ -61,9 +57,7 @@ class MyHandler:
     def datef_callback(self, date: datetime, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
             'date:(',
             date,
@@ -73,27 +67,21 @@ class MyHandler:
     def del_callback(self, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
         )
 
     def rmdir_callback(self, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
         )
 
     def copy_callback(self, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
         )
 
@@ -107,9 +95,7 @@ class MyHandler:
     def fupd_callback(self, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
             status.payload,
         )
@@ -117,9 +103,7 @@ class MyHandler:
     def date_callback(self, timestamp: int, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
             'timestamp:(',
             timestamp,
@@ -130,18 +114,14 @@ class MyHandler:
     def dtof_callback(self, date: Date, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
         )
 
     def fstat_callback(self, filestat: FileStatTypeEnum, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
             status.payload,
         )
@@ -149,54 +129,42 @@ class MyHandler:
     def cpdir_callback(self, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
         )
 
     def xcopy_callback(self, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
         )
 
     def xdel_callback(self, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
         )
 
     def xrmdir_callback(self, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
         )
 
     def xcpdir_callback(self, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
         )
 
     def lock_callback(self, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
         )
 
@@ -209,9 +177,7 @@ class MyHandler:
     ):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
         )
 
@@ -220,9 +186,7 @@ class MyHandler:
     ):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
             len(status.payload),
             sep=' ',
@@ -248,18 +212,14 @@ class MyHandler:
     def ls_callback(self, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
         )
 
     def lsr_callback(self, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
             status.message,
         )
@@ -267,36 +227,28 @@ class MyHandler:
     def renam_callback(self, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
         )
 
     def keepalive_callback(self, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
         )
 
     def login_callback(self, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
         )
 
     def chmod_callback(self, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
             status.payload,
         )
@@ -304,9 +256,7 @@ class MyHandler:
     def chown_callback(self, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
         )
 
@@ -334,9 +284,7 @@ class MyHandler:
                 )
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' ')
             if status is not None
             else '-'.ljust(8, '-'),
@@ -351,9 +299,7 @@ class MyHandler:
     ):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' ')
             if status is not None
             else '-'.ljust(8, '-'),
@@ -363,9 +309,7 @@ class MyHandler:
     def sha256_callback(self, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
             status.payload,
         )
@@ -373,9 +317,7 @@ class MyHandler:
     def prockey_callback(self, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
             status.payload,
         )
@@ -383,36 +325,28 @@ class MyHandler:
     def freesp_callback(self, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
         )
 
     def udate_callback(self, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
         )
 
     def ndate_callback(self, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
         )
 
     def getstatus_callback(self, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
             status.code,
         )
@@ -420,9 +354,7 @@ class MyHandler:
     def get_callback(self, codes: CodesSenderRecvr):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             codes.last_header,
         )
         # sleep(0.3)
@@ -431,9 +363,7 @@ class MyHandler:
     def put_callback(self, codes: CodesSenderRecvr):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             '-'.ljust(8, '-'),
             codes.last_header,
         )
@@ -441,18 +371,14 @@ class MyHandler:
     def putstatus_callback(self, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
         )
 
     def nigma_callback(self, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
             'NewSessionKey:(',
             status.payload,
@@ -462,54 +388,42 @@ class MyHandler:
     def rmsecuredirectory_callback(self, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
         )
 
     def injail_callback(self, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
         )
 
     def tlb_callback(self, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
         )
 
     def sdown_callback(self, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
         )
 
     def sup_callback(self, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
         )
 
     def fsize_callback(self, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
             status.code,
         )
@@ -517,9 +431,7 @@ class MyHandler:
     def fsizels_callback(self, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
             status.code,
         )
@@ -527,27 +439,21 @@ class MyHandler:
     def lsv2_callback(self, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
         )
 
     def lsrv2_callback(self, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
         )
 
     def ftype_callback(self, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
             status.payload,
         )
@@ -555,19 +461,16 @@ class MyHandler:
     def ftypels_callback(self, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
+            status.code,
             status.payload,
         )
 
     def fstatls_callback(self, file_stat: FileStat):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             '-'.ljust(8, '-'),
             file_stat,
         )
@@ -575,9 +478,7 @@ class MyHandler:
     def addntfy_callback(self, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             '-'.ljust(8, '-'),
         )
 
@@ -589,9 +490,7 @@ class MyHandler:
     ):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             '-'.ljust(8, '-'),
         )
         # The handler always have to end with send_ok() or send_del() and should be
@@ -601,9 +500,7 @@ class MyHandler:
     def intread_callback(self, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
             status.code,
         )
@@ -611,9 +508,7 @@ class MyHandler:
     def intwrite_callback(self, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
             status.code,
         )
@@ -621,9 +516,7 @@ class MyHandler:
     def netlock_callback(self, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
             status.payload,
         )
@@ -631,9 +524,7 @@ class MyHandler:
     def netunlock_callback(self, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
             status.payload,
         )
@@ -641,9 +532,7 @@ class MyHandler:
     def netlocktry_callback(self, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
             status.payload,
         )
@@ -651,9 +540,7 @@ class MyHandler:
     def netmutacqtry_callback(self, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
             status.payload,
         )
@@ -661,9 +548,7 @@ class MyHandler:
     def netmutrel_callback(self, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
             status.payload,
         )
@@ -671,9 +556,7 @@ class MyHandler:
     def setfsid_callback(self, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
             status.payload,
         )
@@ -681,9 +564,7 @@ class MyHandler:
     def setfsperm_callback(self, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
             status.payload,
         )
@@ -691,9 +572,7 @@ class MyHandler:
     def remfsperm_callback(self, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
             status.payload,
         )
@@ -701,9 +580,7 @@ class MyHandler:
     def getfsperm_callback(self, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
             status.payload,
         )
@@ -711,9 +588,7 @@ class MyHandler:
     def issecfs_callback(self, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
             status.payload,
         )
@@ -721,9 +596,7 @@ class MyHandler:
     def locksystem_callback(self, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
             status.payload,
         )
@@ -731,9 +604,7 @@ class MyHandler:
     def echo_callback(self, value: str):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             '-'.ljust(8, ' '),
             'ServerSays:("',
             value,
@@ -744,18 +615,14 @@ class MyHandler:
     def status_server(self, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
         )
 
     def response_server_callback(self, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
-            sys._getframe()
-            .f_code.co_name.replace('_callback', '', 1)
-            .ljust(10, ' '),
+            sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
         )
 
@@ -815,38 +682,42 @@ def test_folders_commands(proto: TfProtocol):
     proto.rmdir_command('py_test')
 
     proto.mkdir_command('py_test')
-    proto.mkdir_command('py_test/pattern')
-    proto.mkdir_command('py_test/214pattern')
+    # proto.mkdir_command('py_test/pattern')
+    # proto.mkdir_command('py_test/214pattern')
     proto.mkdir_command('py_test/test1')
     proto.mkdir_command('py_test/test2')
-    proto.touch_command('py_test/test2/test.java')
     proto.mkdir_command('py_test/test2/test21')
-    proto.mkdir_command('py_test/test2/test22')
+    # proto.mkdir_command('py_test/test2/test22')
     proto.mkdir_command('py_test/test3')
 
+    proto.touch_command('py_test/test2/test.java')
+
     proto.lsr_command('/py_test')
+    proto.rmdir_command('/py_test/test1')
 
     proto.renam_command('/py_test/test3', '/py_test/test3new')
     proto.lsr_command('/py_test')
+    proto.rmdir_command('/py_test/test3new')
 
     proto.cpdir_command('/py_test/test2', '/py_test/test2cpdir')
     proto.lsr_command('/py_test')
 
+    proto.mkdir_command('py_test/pattern')
     proto.xcpdir_command('testxcpdir', '/py_test/test2', 'pattern')
     proto.lsr_command('/py_test')
 
     proto.mkdir_command('/py_test/test2copy')
     proto.copy_command('py_test/test2/test.java', 'py_test/test2copy/test.java')
     proto.lsr_command('/py_test')
+    proto.rmdir_command('/py_test/test2copy')
 
-    proto.mkdir_command('/py_test/test2xcopy')
-    # how to use this command
     proto.xcopy_command(
         'test_xcopy.java',
-        '/py_test/test2copy/test.java',
-        'test21',
+        '/py_test/test2/test.java',
+        '/test21',
     )
     proto.lsr_command('/py_test')
+    proto.rmdir_command('/py_test/pattern')
 
     proto.xdel_command('/py_test', 'test.java')
     proto.lsr_command('/py_test')
@@ -864,8 +735,17 @@ def test_folders_commands(proto: TfProtocol):
     proto.fsize_command('/py_test/testls.txt')
 
     proto.fsizels_command('/py_test/testls.txt')
+
+    proto.fstatls_command(
+        '/py_test/testls.txt', response_handler=MyHandler().fstatls_callback
+    )
+    
+    proto.ftypels_command(
+        '/py_test/testls.txt', response_handler=MyHandler().ftypels_callback
+    )
     
     proto.rmdir_command('py_test')
+
 
 def test_files_modification_commands(proto: TfProtocol):
     proto.rmdir_command('/py_test')
