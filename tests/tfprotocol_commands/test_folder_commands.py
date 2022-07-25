@@ -3,10 +3,10 @@
 
 # pylint: disable=redefined-outer-name
 
-from typing import List
+from typing import List, Tuple
 
 import pytest
-from tfprotocol_client.models.file_stat import FileStat
+from tfprotocol_client.models.file_stat import FileStat, FileStatTypeEnum
 from tfprotocol_client.models.status_info import StatusInfo
 from tfprotocol_client.models.status_server_code import StatusServerCode
 from tfprotocol_client.tfprotocol import TfProtocol
@@ -352,6 +352,22 @@ def test_tfprotocol_fsize_command(tfprotocol_instance: TfProtocol):
         message='59',
     )
     resps.clear()
+
+@pytest.mark.run(order=22)
+def test_fstat_command(tfprotocol_instance: TfProtocol):
+    """Test for fstat command."""
+    tfproto = tfprotocol_instance
+    resps: List[Tuple(FileStat, StatusInfo)] = []
+    # FSTAT command
+    tfproto.fstat_command(
+        '/py_test/testls.txt',
+        response_handler=lambda stat, resp: resps.append((stat, resp)),
+    )
+    assert len(resps) == 1
+    assert resps[0][1].status == StatusServerCode.OK
+    assert resps[0][1].payload != b'' # b"F xxx xxxxxxxxx xxxxxxxxx",
+    assert resps[0][0].type == FileStatTypeEnum.FILE
+    assert resps[0][0].size == 59, 'File size is not 59'
 
 
 @pytest.mark.run(order=23)
