@@ -74,7 +74,7 @@ class TfProtocolSuper:
         self._sleep_time_milisec = 3000
         self._len_channel = channel_len if channel_len is not None else 512 * 1024
         self._keybyteslen = (
-            keylen if KEY_LEN_INTERVAL[0] <= keylen <= KEY_LEN_INTERVAL[1] else 16
+            keylen if KEY_LEN_INTERVAL[0] <= keylen <= KEY_LEN_INTERVAL[1] else KEY_LEN_INTERVAL[0]
         )
         self._address: Tuple[str, int] = address
         #
@@ -214,7 +214,7 @@ class TfProtocolSuper:
         if self.__call_kwargs is not None:
             keepAlOpt: KeepAliveOptions = self.__call_kwargs.get('keepalive_options')
             on_resp: ResponseHandler = self.__call_kwargs.get('on_response')
-            on_conct: Callable[[TfProtocolSuper], None] = self.__call_kwargs.get('on_connect')
+            on_conct: Callable[['TfProtocolSuper'], None] = self.__call_kwargs.get('on_connect')
         self.connect(
             keepalive_options=keepAlOpt,
             on_response=on_resp if on_resp is not None else EMPTY_HANDLER,
