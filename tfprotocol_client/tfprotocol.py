@@ -914,6 +914,7 @@ class TfProtocol(TfProtocolSuper):
     def end_command(self):
         """Command is sent by the client to the server in order to terminate the TCP connection."""
         self.client.send('END')
+        self.disconnect()
 
     def sha256_command(
         self, path: str, response_handler: ResponseHandler = EMPTY_HANDLER
