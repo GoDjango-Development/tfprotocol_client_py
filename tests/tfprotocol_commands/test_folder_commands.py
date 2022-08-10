@@ -15,63 +15,55 @@ from .tfprotocol import tfprotocol_instance
 
 
 @pytest.mark.run(order=9)
-def test_tfprotocol_rmdir_command(tfprotocol_instance: TfProtocol):
+def test_rmdir_command(tfprotocol_instance: TfProtocol):
     tfproto = tfprotocol_instance
     #
     # RMDIR -> OK
     resps = []
     tfproto.rmdir_command(
-        'py_test',
-        response_handler=resps.append,
+        'py_test', response_handler=resps.append,
     )
     assert resps[0] == StatusInfo(StatusServerCode.OK)
     resps.clear()
 
 
 @pytest.mark.run(order=10)
-def test_tfprotocol_mkdir_command(tfprotocol_instance: TfProtocol):
+def test_mkdir_command(tfprotocol_instance: TfProtocol):
     tfproto = tfprotocol_instance
     resps = []
     # MKDIR -> OK
     tfproto.mkdir_command(
-        'py_test',
-        response_handler=resps.append,
+        'py_test', response_handler=resps.append,
     )
     tfproto.mkdir_command(
-        'py_test/test1',
-        response_handler=resps.append,
+        'py_test/test1', response_handler=resps.append,
     )
     tfproto.mkdir_command(
-        'py_test/test2',
-        response_handler=resps.append,
+        'py_test/test2', response_handler=resps.append,
     )
     tfproto.mkdir_command(
-        'py_test/test2/test21',
-        response_handler=resps.append,
+        'py_test/test2/test21', response_handler=resps.append,
     )
     tfproto.mkdir_command(
-        'py_test/test3',
-        response_handler=resps.append,
+        'py_test/test3', response_handler=resps.append,
     )
     assert all(r == StatusInfo(StatusServerCode.OK) for r in resps)
     resps.clear()
 
 
 @pytest.mark.run(order=11)
-def test_tfprotocol_touch_command(tfprotocol_instance: TfProtocol):
+def test_touch_command(tfprotocol_instance: TfProtocol):
     tfproto = tfprotocol_instance
     resps = []
     # TOUCH -> OK
     tfproto.touch_command(
-        'py_test/test2/test.java',
-        response_handler=resps.append,
+        'py_test/test2/test.java', response_handler=resps.append,
     )
     assert resps[0] == StatusInfo(StatusServerCode.OK)
     resps.clear()
     # TOUCH -> FAILED 12
     tfproto.touch_command(
-        'py_test/test2/test.java',
-        response_handler=resps.append,
+        'py_test/test2/test.java', response_handler=resps.append,
     )
     assert resps[0] == StatusInfo(
         StatusServerCode.FAILED,
@@ -83,13 +75,12 @@ def test_tfprotocol_touch_command(tfprotocol_instance: TfProtocol):
 
 
 @pytest.mark.run(order=12)
-def test_tfprotocol_lsr_command(tfprotocol_instance: TfProtocol):
+def test_lsr_command(tfprotocol_instance: TfProtocol):
     tfproto = tfprotocol_instance
     resps = []
     # LSR -> OK
     tfproto.lsr_command(
-        '/py_test',
-        response_handler=resps.append,
+        '/py_test', response_handler=resps.append,
     )
     assert resps[0] == StatusInfo(
         StatusServerCode.CONT,
@@ -104,21 +95,18 @@ def test_tfprotocol_lsr_command(tfprotocol_instance: TfProtocol):
 
 
 @pytest.mark.run(order=13)
-def test_tfprotocol_rename_command(tfprotocol_instance: TfProtocol):
+def test_rename_command(tfprotocol_instance: TfProtocol):
     tfproto = tfprotocol_instance
     resps = []
     # RENAM -> OK
     tfproto.renam_command(
-        '/py_test/test3',
-        '/py_test/test3new',
-        response_handler=resps.append,
+        '/py_test/test3', '/py_test/test3new', response_handler=resps.append,
     )
     assert resps[0] == StatusInfo(StatusServerCode.OK)
     resps.clear()
 
     tfproto.lsr_command(
-        '/py_test',
-        response_handler=resps.append,
+        '/py_test', response_handler=resps.append,
     )
     assert resps[0] == StatusInfo(
         StatusServerCode.CONT,
@@ -133,21 +121,18 @@ def test_tfprotocol_rename_command(tfprotocol_instance: TfProtocol):
 
 
 @pytest.mark.run(order=14)
-def test_tfprotocol_cpdir_command(tfprotocol_instance: TfProtocol):
+def test_cpdir_command(tfprotocol_instance: TfProtocol):
     tfproto = tfprotocol_instance
     resps = []
     # CPDIR -> OK
     tfproto.cpdir_command(
-        '/py_test/test2',
-        '/py_test/test2cpdir',
-        response_handler=resps.append,
+        '/py_test/test2', '/py_test/test2cpdir', response_handler=resps.append,
     )
     assert resps[0] == StatusInfo(StatusServerCode.OK)
     resps.clear()
 
     tfproto.lsr_command(
-        '/py_test',
-        response_handler=resps.append,
+        '/py_test', response_handler=resps.append,
     )
     assert resps[0] == StatusInfo(
         StatusServerCode.CONT,
@@ -160,24 +145,20 @@ def test_tfprotocol_cpdir_command(tfprotocol_instance: TfProtocol):
 
 
 @pytest.mark.run(order=15)
-def test_tfprotocol_xcpdir_command(tfprotocol_instance: TfProtocol):
+def test_xcpdir_command(tfprotocol_instance: TfProtocol):
     tfproto = tfprotocol_instance
     resps = []
     #
     tfproto.mkdir_command('py_test/pattern')
     # XCPDIR -> OK
     tfproto.xcpdir_command(
-        'testxcpdir',
-        '/py_test/test2',
-        'pattern',
-        response_handler=resps.append,
+        'testxcpdir', '/py_test/test2', 'pattern', response_handler=resps.append,
     )
     assert resps[0] == StatusInfo(StatusServerCode.OK), resps[0]
     resps.clear()
 
     tfproto.lsr_command(
-        '/py_test',
-        response_handler=resps.append,
+        '/py_test', response_handler=resps.append,
     )
     assert resps[0] == StatusInfo(
         StatusServerCode.CONT,
@@ -190,7 +171,7 @@ def test_tfprotocol_xcpdir_command(tfprotocol_instance: TfProtocol):
 
 
 @pytest.mark.run(order=16)
-def test_tfprotocol_copy_command(tfprotocol_instance: TfProtocol):
+def test_copy_command(tfprotocol_instance: TfProtocol):
     tfproto = tfprotocol_instance
     resps = []
     tfproto.mkdir_command('/py_test/test2copy')
@@ -205,8 +186,7 @@ def test_tfprotocol_copy_command(tfprotocol_instance: TfProtocol):
     resps.clear()
 
     tfproto.lsr_command(
-        '/py_test/test2copy/',
-        response_handler=resps.append,
+        '/py_test/test2copy/', response_handler=resps.append,
     )
     assert resps[0] == StatusInfo(
         StatusServerCode.CONT,
@@ -221,7 +201,7 @@ def test_tfprotocol_copy_command(tfprotocol_instance: TfProtocol):
 
 
 @pytest.mark.run(order=17)
-def test_tfprotocol_xcopy_command(tfprotocol_instance: TfProtocol):
+def test_xcopy_command(tfprotocol_instance: TfProtocol):
     tfproto = tfprotocol_instance
     resps = []
     #
@@ -236,8 +216,7 @@ def test_tfprotocol_xcopy_command(tfprotocol_instance: TfProtocol):
     resps.clear()
 
     tfproto.lsr_command(
-        '/py_test',
-        response_handler=resps.append,
+        '/py_test', response_handler=resps.append,
     )
     assert resps[0] == StatusInfo(
         StatusServerCode.CONT,
@@ -249,23 +228,20 @@ def test_tfprotocol_xcopy_command(tfprotocol_instance: TfProtocol):
 
 
 @pytest.mark.run(order=18)
-def test_tfprotocol_xdel_command(tfprotocol_instance: TfProtocol):
+def test_xdel_command(tfprotocol_instance: TfProtocol):
     tfproto = tfprotocol_instance
     resps = []
     #
     tfproto.rmdir_command('/py_test/pattern')
     # XDEL -> OK
     tfproto.xdel_command(
-        '/py_test',
-        'test.java',
-        response_handler=resps.append,
+        '/py_test', 'test.java', response_handler=resps.append,
     )
     assert resps[0] == StatusInfo(StatusServerCode.OK)
     resps.clear()
 
     tfproto.lsr_command(
-        '/py_test',
-        response_handler=resps.append,
+        '/py_test', response_handler=resps.append,
     )
     assert resps[0] == StatusInfo(
         StatusServerCode.CONT,
@@ -278,22 +254,19 @@ def test_tfprotocol_xdel_command(tfprotocol_instance: TfProtocol):
 
 
 @pytest.mark.run(order=19)
-def test_tfprotocol_xrmdir_command(tfprotocol_instance: TfProtocol):
+def test_xrmdir_command(tfprotocol_instance: TfProtocol):
     tfproto = tfprotocol_instance
     resps = []
     #
     # XRMDIR -> OK
     tfproto.xrmdir_command(
-        '/py_test',
-        'test2',
-        response_handler=resps.append,
+        '/py_test', 'test2', response_handler=resps.append,
     )
     assert resps[0] == StatusInfo(StatusServerCode.OK)
     resps.clear()
 
     tfproto.lsr_command(
-        '/py_test',
-        response_handler=resps.append,
+        '/py_test', response_handler=resps.append,
     )
     assert resps[0] == StatusInfo(
         StatusServerCode.CONT,
@@ -306,52 +279,45 @@ def test_tfprotocol_xrmdir_command(tfprotocol_instance: TfProtocol):
 
 
 @pytest.mark.run(order=20)
-def test_tfprotocol_lsrv2_command(tfprotocol_instance: TfProtocol):
+def test_lsrv2_command(tfprotocol_instance: TfProtocol):
     tfproto = tfprotocol_instance
     resps = []
     #
     # LSRV2 -> OK
     tfproto.lsrv2_command(
-        '/py_test',
-        '/py_test/testrls.txt',
-        response_handler=resps.append,
+        '/py_test', '/py_test/testrls.txt', response_handler=resps.append,
     )
     assert resps[0] == StatusInfo(StatusServerCode.OK)
     resps.clear()
 
 
 @pytest.mark.run(order=21)
-def test_tfprotocol_lsv2_command(tfprotocol_instance: TfProtocol):
+def test_lsv2_command(tfprotocol_instance: TfProtocol):
     tfproto = tfprotocol_instance
     resps = []
     #
     # LSV2 -> OK
     tfproto.lsv2_command(
-        '/py_test',
-        '/py_test/testls.txt',
-        response_handler=resps.append,
+        '/py_test', '/py_test/testls.txt', response_handler=resps.append,
     )
     assert resps[0] == StatusInfo(StatusServerCode.OK)
     resps.clear()
 
 
 @pytest.mark.run(order=22)
-def test_tfprotocol_fsize_command(tfprotocol_instance: TfProtocol):
+def test_fsize_command(tfprotocol_instance: TfProtocol):
     tfproto = tfprotocol_instance
     resps: List[StatusInfo] = []
     #
     # FSIZE -> OK
     tfproto.fsize_command(
-        '/py_test/testls.txt',
-        response_handler=resps.append,
+        '/py_test/testls.txt', response_handler=resps.append,
     )
     assert resps[0] == StatusInfo(
-        StatusServerCode.OK,
-        code=59,
-        payload=b'',
-        message='59',
+        StatusServerCode.OK, code=59, payload=b'', message='59',
     )
     resps.clear()
+
 
 @pytest.mark.run(order=22)
 def test_fstat_command(tfprotocol_instance: TfProtocol):
@@ -365,50 +331,37 @@ def test_fstat_command(tfprotocol_instance: TfProtocol):
     )
     assert len(resps) == 1
     assert resps[0][1].status == StatusServerCode.OK
-    assert resps[0][1].payload != b'' # b"F xxx xxxxxxxxx xxxxxxxxx",
+    assert resps[0][1].payload != b''  # b"F xxx xxxxxxxxx xxxxxxxxx",
     assert resps[0][0].type == FileStatTypeEnum.FILE
     assert resps[0][0].size == 59, 'File size is not 59'
 
 
 @pytest.mark.run(order=23)
-def test_tfprotocol_fsizels_command(tfprotocol_instance: TfProtocol):
+def test_fsizels_command(tfprotocol_instance: TfProtocol):
     tfproto = tfprotocol_instance
     resps: List[StatusInfo] = []
     #
     # FSIZELS -> OK
     tfproto.fsizels_command(
-        '/py_test/testls.txt',
-        response_handler=resps.append,
+        '/py_test/testls.txt', response_handler=resps.append,
     )
     assert resps[0] == StatusInfo(
-        StatusServerCode.CONT,
-        code=109,
-        payload=b'',
-        message='109',
+        StatusServerCode.CONT, code=109, payload=b'', message='109',
     )
     assert resps[1] == StatusInfo(
-        StatusServerCode.CONT,
-        code=-2,
-        payload=b'',
-        message='-2',
+        StatusServerCode.CONT, code=-2, payload=b'', message='-2',
     )
     assert resps[2] == StatusInfo(
-        StatusServerCode.CONT,
-        code=59,
-        payload=b'',
-        message='59',
+        StatusServerCode.CONT, code=59, payload=b'', message='59',
     )
     assert resps[3] == StatusInfo(
-        StatusServerCode.CONT,
-        code=-3,
-        payload=b'',
-        message='-3',
+        StatusServerCode.CONT, code=-3, payload=b'', message='-3',
     )
     resps.clear()
 
 
 @pytest.mark.run(order=23)
-def test_tfprotocol_fstatls_command(tfprotocol_instance: TfProtocol):
+def test_fstatls_command(tfprotocol_instance: TfProtocol):
     tfproto = tfprotocol_instance
     resps: List[FileStat] = []
     #
@@ -443,7 +396,7 @@ def test_tfprotocol_fstatls_command(tfprotocol_instance: TfProtocol):
 
 
 @pytest.mark.run(order=23)
-def test_tfprotocol_ftypels_command(tfprotocol_instance: TfProtocol):
+def test_ftypels_command(tfprotocol_instance: TfProtocol):
     tfproto = tfprotocol_instance
     resps: List[StatusInfo] = []
     #
@@ -451,27 +404,16 @@ def test_tfprotocol_ftypels_command(tfprotocol_instance: TfProtocol):
     tfproto.ftypels_command('/py_test/testls.txt', response_handler=resps.append)
     assert len(resps) == 4, resps
     assert resps[0] == StatusInfo(
-        status=StatusServerCode.OK,
-        code=3,
-        payload=b'',
-        message='3',
+        status=StatusServerCode.OK, code=3, payload=b'', message='3',
     )
     assert resps[1] == StatusInfo(
-        status=StatusServerCode.OK,
-        code=0,
-        payload=b'',
-        message='0',
+        status=StatusServerCode.OK, code=0, payload=b'', message='0',
     )
     assert resps[2] == StatusInfo(
-        status=StatusServerCode.OK,
-        code=3,
-        payload=b'',
-        message='3',
+        status=StatusServerCode.OK, code=3, payload=b'', message='3',
     )
     assert resps[3] == StatusInfo(
-        status=StatusServerCode.OK,
-        code=-2,
-        payload=b'',
-        message='-2',
+        status=StatusServerCode.OK, code=-2, payload=b'', message='-2',
     )
     resps.clear()
+
