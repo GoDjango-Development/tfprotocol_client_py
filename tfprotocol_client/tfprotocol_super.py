@@ -65,20 +65,24 @@ class TfProtocolSuper:
         self._protocol_version = protocol_version
         self._public_key = public_key
         self._client_hash = client_hash
-        self._proto_client = ProtocolClient(
-            address=address,
-            port=port,
-            proxy_options=proxy,
-            verbosity_mode=verbosity_mode,
-        )
+        self._proto_client: ProtocolClient = None
+        self.__proto_client_args = {
+            'address': address,
+            'port': port,
+            'proxy_options': proxy,
+            'max_buffer_size': channel_len,
+            'verbosity_mode': verbosity_mode,
+        }
         self._sleep_time_milisec = 3000
         self._len_channel = channel_len if channel_len is not None else 512 * 1024
         self._keybyteslen = (
-            keylen if KEY_LEN_INTERVAL[0] <= keylen <= KEY_LEN_INTERVAL[1] else KEY_LEN_INTERVAL[0]
+            keylen
+            if KEY_LEN_INTERVAL[0] <= keylen <= KEY_LEN_INTERVAL[1]
+            else KEY_LEN_INTERVAL[0]
         )
         self._address: Tuple[str, int] = address
         #
-        self.__call_kwargs = None 
+        self.__call_kwargs = None
         self._tcp_timeout_options: Optional[TCPTimeoutOptions] = None
 
     def connect(
@@ -122,6 +126,7 @@ class TfProtocolSuper:
         self,
         on_response: ResponseHandler = EMPTY_HANDLER,
     ) -> StatusInfo:
+        self._proto_client = ProtocolClient(**self.__proto_client_args)
         self._tcp_timeout_options = TCPTimeoutOptions(
             status_server_callback=on_response,
         )
@@ -214,7 +219,9 @@ class TfProtocolSuper:
         if self.__call_kwargs is not None:
             keepAlOpt: KeepAliveOptions = self.__call_kwargs.get('keepalive_options')
             on_resp: ResponseHandler = self.__call_kwargs.get('on_response')
-            on_conct: Callable[['TfProtocolSuper'], None] = self.__call_kwargs.get('on_connect')
+            on_conct: Callable[['TfProtocolSuper'], None] = self.__call_kwargs.get(
+                'on_connect'
+            )
         self.connect(
             keepalive_options=keepAlOpt,
             on_response=on_resp if on_resp is not None else EMPTY_HANDLER,
