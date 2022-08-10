@@ -66,6 +66,35 @@ def test_dtof_command(tfprotocol_instance: TfProtocol):
     assert resps[0][0] is not None, resps[0]
     assert resps[0][1].status == StatusServerCode.OK, resps[0]
     assert resps[0][1].message is not None and len(resps[0][1].message) > 0, resps[0]
+
+
+@pytest.mark.run(order=38)
+def test_ftod_command(tfprotocol_instance: TfProtocol):
+    """Test for ftod command."""
+    tfproto = tfprotocol_instance
+    resps: List[Tuple(int, StatusInfo)] = []
+    tfproto.ftod_command(
+        '1999-12-10 12:12:0',
+        response_handler=lambda i, s: resps.append((i, s)),
+    )
+    # FTOD command
+    assert len(resps) == 1, resps[0]
+    assert resps[0][0] > 1659536725466, resps[0]
+    assert resps[0][1].status == StatusServerCode.OK, resps[0]
+    assert resps[0][1].message == '944827920', resps[0]
+
+
+@pytest.mark.run(order=38)
+def test_udate_command(tfprotocol_instance: TfProtocol):
+    """Test for udate command."""
+    tfproto = tfprotocol_instance
+    resps: List[StatusInfo] = []
+    tfproto.udate_command(response_handler=resps.append)
+    # UDATE command
+    assert len(resps) == 1, resps
+    assert resps[0].status == StatusServerCode.OK, resps[0]
+    assert resps[0].message is not None and resps[0].message != '', resps[0]
+
 @pytest.mark.run(order=39)
 def test_fpub_command(tfprotocol_instance: TfProtocol):
     """Test for fpub command."""
