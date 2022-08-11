@@ -268,10 +268,10 @@ class MyHandler:
         transfer_status: TransferStatus,
     ):
         if transfer_status is not None:
-            if transfer_status.dummy_state:
+            if transfer_status.handling_canpt:
                 # transfer_status.dummy = PutGetCommandEnum.HPFCANCEL.value
                 pass
-            elif transfer_status.dummy in (
+            elif transfer_status.client_command in (
                 PutGetCommandEnum.HPFCANCEL.value,
                 PutGetCommandEnum.HPFEND.value,
             ):
@@ -637,7 +637,7 @@ class MyHandler:
 def test_updown_tinyfiles(proto: TfProtocol):
     # DONE
     with open('test2.java', 'rb') as f:
-        proto.sendfile_command(True, 'test2.java', f)
+        proto.sndfile_command(True, 'test2.java', f)
 
     with open('test2-rec.java', 'wb') as f:
         proto.rcvfile_command(False, 'test2.java', f)
