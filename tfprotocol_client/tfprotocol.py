@@ -773,7 +773,6 @@ class TfProtocol(TfProtocolSuper):
             .add(buffer_size, size=LONG_SIZE, signed=True)
             .add(canpt, size=LONG_SIZE, signed=False)
         )
-        response_handler(response)
 
         # INITIALIZE TRANSFER VARIABLES
         transfer_status = TransferStatus()
@@ -783,6 +782,9 @@ class TfProtocol(TfProtocolSuper):
         if response is None or response.code != 0:
             return
         server_buffer_size = MessageUtils.decode_int(response.payload, signed=True)
+
+        response.code = server_buffer_size
+        response_handler(response)
         i = 0
         while True:
             if canpt > 0 and i == canpt:
@@ -836,7 +838,9 @@ class TfProtocol(TfProtocolSuper):
                     or transfer_status.client_command == PutGetCommandEnum.HPFEND.value
                 ):
                     self.client.just_send(
-                        PutGetCommandEnum.HPFEND.value, size=header_size, signed=True,
+                        PutGetCommandEnum.HPFEND.value,
+                        size=header_size,
+                        signed=True,
                     )
                     transfer_status.client_command = PutGetCommandEnum.HPFEND.value
                     transfer_handler(self.client, transfer_status)
@@ -878,14 +882,15 @@ class TfProtocol(TfProtocolSuper):
             .add(buffer_size, size=LONG_SIZE, signed=True)
             .add(canpt, size=LONG_SIZE, signed=False)
         )
-        response_handler(response)
 
         # INITIALIZE TRANSFER VARIABLES
         transfer_status = TransferStatus()
         header_size = LONG_SIZE
         if response is None or response.code != 0:
             return
-        _ = MessageUtils.decode_int(response.payload, signed=True)
+        response.code = MessageUtils.decode_int(response.payload, signed=True)
+
+        response_handler(response)
         i = 0
         while True:
             if canpt > 0 and i == canpt:
@@ -917,10 +922,9 @@ class TfProtocol(TfProtocolSuper):
                 transfer_status.server_command = cur_header
 
                 # handle hpffin command exchange at the end of getcan command
-                transfer_handler(
-                    self.client, transfer_status,
-                )
+                transfer_handler(self.client, transfer_status)
                 break
+
             pyld = self.client.just_recv(size=cur_header)
             try:
                 data_sink.write(pyld)
@@ -1034,7 +1038,9 @@ class TfProtocol(TfProtocolSuper):
         t_command: TfThread
         try:
             t_handler = TfThread(
-                transfer_handler, cond_lock=Condition(), args=(code_sr,),
+                transfer_handler,
+                cond_lock=Condition(),
+                args=(code_sr,),
             )
             t_command = TfThread(
                 self.__get_command_t,
@@ -1159,7 +1165,13 @@ class TfProtocol(TfProtocolSuper):
             t_command = TfThread(
                 self.__put_command_t,
                 cond_lock=cond_lock,
-                args=(data_stream, response.code, code_sr),
+                args=(
+                    data_stream,
+                    response.code,
+                    code_sr,
+                    response_handler,
+                    transfer_handler,
+                ),
             )
         except Exception as e:
             raise TfException(
