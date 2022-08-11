@@ -520,7 +520,10 @@ class TfProtocol(TfProtocolSuper):
             TfProtocolMessage('SNDFILE', '1' if (is_overriten) else '0', path),
         )
         handler(
-            is_overriten, path, response, stream,
+            is_overriten,
+            path,
+            response,
+            stream,
         )
         while True:
             payload = stream.read(
@@ -547,7 +550,7 @@ class TfProtocol(TfProtocolSuper):
             # BREAK IF BAD RESPONSE RECEIVED
             if response.status != StatusServerCode.CONT:
                 break
-        handler(is_overriten, path, self.client.translate('OK'), payload)
+        handler(is_overriten, path, self.client.translate('OK'), stream)
 
     def rcvfile_command(
         self,
@@ -563,7 +566,7 @@ class TfProtocol(TfProtocolSuper):
                 true and tells the server whether the file must be deleted after successfully
                 received by the client.
             `path` (str): The path to the file in the server to be retrieved.
-            `sink` (BytesIO): The sink to send data in byte mode.
+            `sink` (BytesIO): The sink to receive data in byte mode.
             `handler` (SendRecvFileHandler): The function to handle receiving states.
         """
         response = self.client.translate(
