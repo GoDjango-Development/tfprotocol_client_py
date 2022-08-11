@@ -4,7 +4,7 @@
 # pylint: disable=redefined-outer-name
 
 import io
-from typing import List, Tuple
+from typing import List
 
 import pytest
 from tfprotocol_client.models.putget_commands import PutGetCommandEnum
@@ -13,6 +13,7 @@ from tfprotocol_client.models.status_server_code import StatusServerCode
 from tfprotocol_client.models.transfer_state import TransferStatus
 from tfprotocol_client.tfprotocol import TfProtocol
 
+# pylint: disable=unused-import
 from .tfprotocol import tfprotocol_instance
 
 
@@ -55,7 +56,7 @@ def __rcvfile_handler(
     resps.append(status)
 
 
-@pytest.mark.run(order=50)
+@pytest.mark.run(order=51)
 def test_snd_rcv_commands(tfprotocol_instance: TfProtocol):
     """Test for sndfile and rcvfile commands."""
     tfproto = tfprotocol_instance
@@ -86,7 +87,7 @@ def test_snd_rcv_commands(tfprotocol_instance: TfProtocol):
     #
 
 
-@pytest.mark.run(order=50)
+@pytest.mark.run(order=52)
 def test_put_get_commands(tfprotocol_instance: TfProtocol):
     """Test for put and get commands."""
     tfproto = tfprotocol_instance
@@ -135,7 +136,7 @@ def test_put_get_commands(tfprotocol_instance: TfProtocol):
     tfproto.del_command('py_test/test_putget.txt')
 
 
-@pytest.mark.run(order=50)
+@pytest.mark.run(order=53)
 def test_putcan_getcan_commands(tfprotocol_instance: TfProtocol):
     """Test for putcan and getcan commands."""
     tfproto = tfprotocol_instance

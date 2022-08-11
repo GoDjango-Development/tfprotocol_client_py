@@ -12,6 +12,7 @@ from tfprotocol_client.models.status_info import StatusInfo
 from tfprotocol_client.models.status_server_code import StatusServerCode
 from tfprotocol_client.tfprotocol import TfProtocol
 
+# pylint: disable=unused-import
 from .tfprotocol import tfprotocol_instance
 
 
@@ -27,12 +28,13 @@ def test_chmod_command(tfprotocol_instance: TfProtocol):
     #
     tfproto.del_command('/py_test/file.txt')
 
+
 @pytest.mark.run(order=30)
 def test_chown_command(tfprotocol_instance: TfProtocol):
     """Test for chown command."""
     tfproto = tfprotocol_instance
     resps: List = []
-    tfproto.touch_command('/py_test/file.txt',response_handler=resps.append)
+    tfproto.touch_command('/py_test/file.txt', response_handler=resps.append)
     # CHOWN command
     # tfproto.chown_command('/py_test/file.txt', 'user', 'group', response_handler=resps.append)
     # assert resps[-1] == StatusInfo(status=StatusServerCode.OK), resps[-1]
@@ -44,16 +46,17 @@ def test_chown_command(tfprotocol_instance: TfProtocol):
 def test_fpub_command(tfprotocol_instance: TfProtocol):
     """Test for fpub command."""
     tfproto = tfprotocol_instance
-    resps: List[Tuple(FileStat,StatusInfo)] = []
+    resps: List[Tuple(FileStat, StatusInfo)] = []
     tfproto.touch_command('/py_test/file.txt')
     # CHOWN command
     sleep(3)
-    tfproto.fupd_command('/py_test/file.txt',response_handler=resps.append)
+    tfproto.fupd_command('/py_test/file.txt', response_handler=resps.append)
     assert resps[-1] == StatusInfo(status=StatusServerCode.OK), resps[-1]
 
-    tfproto.fstat_command('/py_test/file.txt',response_handler=lambda s,r: resps.append((s,r)))
+    tfproto.fstat_command(
+        '/py_test/file.txt', response_handler=lambda s, r: resps.append((s, r))
+    )
     assert resps[-1][1].status == StatusServerCode.OK
     # assert resps[-1][0].last_modification > resps[-1][0].last_access, resps[-1]
     #
     tfproto.del_command('/py_test/file.txt')
-

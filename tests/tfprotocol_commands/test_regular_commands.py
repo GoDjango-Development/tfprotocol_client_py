@@ -8,13 +8,13 @@ from time import sleep
 from typing import List, Tuple
 
 import pytest
-from tfprotocol_client.misc.constants import KEY_LEN_INTERVAL
 from tfprotocol_client.models.exceptions import TfException
 from tfprotocol_client.models.file_stat import FileStat
 from tfprotocol_client.models.status_info import StatusInfo
 from tfprotocol_client.models.status_server_code import StatusServerCode
 from tfprotocol_client.tfprotocol import Date, TfProtocol
 
+# pylint: disable=unused-import
 from .tfprotocol import tfprotocol_instance
 
 
@@ -165,7 +165,7 @@ def test_sha256_command(tfprotocol_instance: TfProtocol):
     # SHA256 command
     tfproto.sha256_command('/py_test/file.txt', response_handler=resps.append)
     assert resps[-1].status == StatusServerCode.OK, resps[-1]
-    assert resps[-1].message == "0xe3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", resps[-1]
+    assert resps[-1].message == "0xe3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", resps[-1] # pylint: disable=line-too-long
     #
     tfproto.del_command('/py_test/file.txt')
 

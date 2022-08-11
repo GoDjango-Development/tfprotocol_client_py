@@ -5,12 +5,14 @@ from io import BytesIO
 import sys
 from typing import Callable, Union
 from datetime import datetime, date as Date
+# pylint: disable=unused-import
 from tfprotocol_client.misc.constants import (
     KEY_LEN_INTERVAL,
     RESPONSE_LOGGER,
     SECFS_ALL_PERMISSIONS,
 )
 
+# pylint: disable=unused-import
 from tfprotocol_client.models.keepalive_options import (
     KeepAliveMechanismType,
     KeepAliveOptions,
@@ -112,14 +114,14 @@ class MyHandler:
             status.status.name.ljust(8, ' '),
         )
 
-    def dtof_callback(self, date: Date, status: StatusInfo):
+    def dtof_callback(self, _: Date, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
             sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
             status.status.name.ljust(8, ' '),
         )
 
-    def fstat_callback(self, filestat: FileStatTypeEnum, status: StatusInfo):
+    def fstat_callback(self, _: FileStatTypeEnum, status: StatusInfo):
         print(
             "CLIENT-HANDLER: ",
             sys._getframe().f_code.co_name.replace('_callback', '', 1).ljust(10, ' '),
@@ -264,7 +266,7 @@ class MyHandler:
     def getcan_callback(
         self,
         status: StatusInfo,
-        client: ProtocolClient,
+        _: ProtocolClient,
         transfer_status: TransferStatus,
     ):
         if transfer_status is not None:
@@ -295,7 +297,7 @@ class MyHandler:
     def putcan_callback(
         self,
         status: StatusInfo,
-        client: ProtocolClient,
+        _: ProtocolClient,
         transfer_status: TransferStatus,
     ):
         print(
