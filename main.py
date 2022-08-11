@@ -6,6 +6,7 @@ import sys
 from typing import Callable, Union
 from datetime import datetime, date as Date
 from tfprotocol_client.misc.constants import (
+    KEY_LEN_INTERVAL,
     RESPONSE_LOGGER,
     SECFS_ALL_PERMISSIONS,
 )
@@ -739,11 +740,11 @@ def test_folders_commands(proto: TfProtocol):
     proto.fstatls_command(
         '/py_test/testls.txt', response_handler=MyHandler().fstatls_callback
     )
-    
+
     proto.ftypels_command(
         '/py_test/testls.txt', response_handler=MyHandler().ftypels_callback
     )
-    
+
     proto.rmdir_command('py_test')
 
 
@@ -859,11 +860,11 @@ def test_netsecurity_commands(proto: TfProtocol):
 def test_regular_commands(proto: TfProtocol):
     proto.echo_command('Hola mundo')
 
-    # proto.nigma_command(KEY_LEN_INTERVAL[1])
     proto.echo_command(
         'Hola despues de cambiar el cerrojo', response_handler=RESPONSE_LOGGER
     )
     proto.date_command(response_handler=MyHandler().date_callback)
+    proto.nigma_command(16, response_handler=MyHandler().nigma_callback)
     proto.datef_command()
     proto.dtof_command(datetime.timestamp(datetime.now()))
     proto.ftod_command('1999-12-10 12:12:0')
@@ -899,9 +900,9 @@ def main():
     # test_supsdown_files(proto)
     # test_putget_files(proto)
     # test_putcangetcan_files(proto)
-    test_folders_commands(proto)
+    # test_folders_commands(proto)
     # test_files_modification_commands(proto)
-    # test_regular_commands(proto)
+    test_regular_commands(proto)
     # test_notify_system_commands(proto)
     # test_integrity_rw_commands(proto)
     # test_netsecurity_commands(proto)

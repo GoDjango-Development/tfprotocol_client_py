@@ -43,16 +43,19 @@ Date = dt.date
 
 
 class TfProtocol(TfProtocolSuper):
-    """ Tranference Protocol API easy to use.
-        `TfProtocolSuper`: The Abstract mother class of Tranference Protocol API.
+    """Tranference Protocol API easy to use.
+    `TfProtocolSuper`: The Abstract mother class of Tranference Protocol API.
     """
 
     # pylint: disable=super-init-not-called
     @dispatch(TfProtocolSuper, verbosity_mode=False)
     def __init__(
-        self, tfprotocol: TfProtocolSuper, verbosity_mode: bool = False, **_,
+        self,
+        tfprotocol: TfProtocolSuper,
+        verbosity_mode: bool = False,
+        **_,
     ) -> None:
-        """ Constructor for Transfer Protocol class.
+        """Constructor for Transfer Protocol class.
 
         Args:
             `tfprotocol` (TfProtocolSuper): A created transfer protocol instance.
@@ -86,7 +89,7 @@ class TfProtocol(TfProtocolSuper):
         verbosity_mode=False,
         **_,
     ) -> None:
-        """ Constructor for Transfer Protocol class.
+        """Constructor for Transfer Protocol class.
 
         Args:
             `protocol_version` (str, optional): The desired version of the protocol.
@@ -303,7 +306,8 @@ class TfProtocol(TfProtocolSuper):
         timestamp = int(get_time_value.total_seconds() * 1000)
 
         response_handler(
-            timestamp, self.client.translate(TfProtocolMessage('FTOD', formatted_date)),
+            timestamp,
+            self.client.translate(TfProtocolMessage('FTOD', formatted_date)),
         )
 
     def fstat_command(
@@ -327,7 +331,8 @@ class TfProtocol(TfProtocolSuper):
             response_handler(
                 FileStat(
                     FileStatTypeEnum.from_char(
-                        raw_filestat[0][0], dflt=FileStatTypeEnum.UNKNOWN,
+                        raw_filestat[0][0],
+                        dflt=FileStatTypeEnum.UNKNOWN,
                     ),
                     int(raw_filestat[1]),
                     int(raw_filestat[2]),
@@ -339,7 +344,8 @@ class TfProtocol(TfProtocolSuper):
             )
         else:
             response_handler(
-                FileStat(FileStatTypeEnum.UNKNOWN, 0, 0, 0), response,
+                FileStat(FileStatTypeEnum.UNKNOWN, 0, 0, 0),
+                response,
             )
 
     def fupd_command(
@@ -465,13 +471,19 @@ class TfProtocol(TfProtocolSuper):
         response_handler(
             self.client.translate(
                 TfProtocolMessage(
-                    'XCPDIR', new_directory, path, '|', destination_pattern,
+                    'XCPDIR',
+                    new_directory,
+                    path,
+                    '|',
+                    destination_pattern,
                 )
             )
         )
 
     def lock_command(
-        self, lock_filename: str, response_handler: ResponseHandler = EMPTY_HANDLER,
+        self,
+        lock_filename: str,
+        response_handler: ResponseHandler = EMPTY_HANDLER,
     ):
         """Specifies a filename that when it exists in a directory no operation can be done on it,
         except to delete the lock file. This allows a temporary blocking of a directory for any
