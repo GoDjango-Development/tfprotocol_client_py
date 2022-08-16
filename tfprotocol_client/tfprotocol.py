@@ -1568,7 +1568,7 @@ class TfProtocol(TfProtocolSuper):
     def startnfy_command(
         self,
         interval: Union[float, str, int],
-        response_handler: Callable[[StatusInfo, Callable, Callable]] = EMPTY_HANDLER,
+        response_handler: Callable[[StatusInfo, Callable, Callable], None] = EMPTY_HANDLER,
     ):
         """Starts the notification system. Starts the watchdog to the list of directory specified
         by the ADDNTFY command. Once STARTNTFY is issued there is no way back to the standard mode.
