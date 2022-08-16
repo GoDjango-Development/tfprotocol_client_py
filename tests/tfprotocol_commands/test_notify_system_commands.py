@@ -33,6 +33,7 @@ def test_ntfy_system_commands(tfprotocol_instance: TfProtocol):
     tfproto = tfprotocol_instance
     resps: List[StatusInfo] = []
     #
+    tfproto.touch_command('/py_test/test_ntfy.txt')
     # ADDNTFY
     tfproto.addntfy_command(
         'test',
