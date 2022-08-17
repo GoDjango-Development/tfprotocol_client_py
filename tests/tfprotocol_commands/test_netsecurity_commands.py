@@ -100,3 +100,49 @@ def test_netmut_command(tfprotocol_instance: TfProtocol):
     #
     # tfproto.del_command('/py_test/test.mut')
 
+
+@pytest.mark.run(order=74)
+def test_sec_file_system_commands(tfprotocol_instance: TfProtocol):
+    """Test for security file system commands."""
+    # pylint: disable=global-statement
+    tfproto = tfprotocol_instance
+    resps: List[StatusInfo] = []
+    tfproto.mkdir_command('/py_test/test_secfsys/')
+    # SETFSID command
+    tfproto.setfsid_command(
+        'secid',
+        response_handler=resps.append,
+    )
+    assert resps[0].status == StatusServerCode.OK, resps[0]
+    # SETFSPERM command
+    tfproto.setfsperm_command(
+        'secid',
+        SECFS_ALL_PERMISSIONS,
+        '/py_test/test_secfsys/',
+        response_handler=resps.append,
+    )
+    assert resps[-1].status == StatusServerCode.OK, resps[-1]
+    # ISSECFS command
+    tfproto.issecfs_command(
+        '/py_test/test_secfsys/',
+        response_handler=resps.append,
+    )
+    assert resps[-1].status == StatusServerCode.OK, resps[-1]
+    # GETFSPERM command
+    tfproto.getfsperm_command(
+        'secid',
+        '/py_test/test_secfsys/',
+        response_handler=resps.append,
+    )
+    assert resps[-1].status == StatusServerCode.OK, resps[-1]
+    assert resps[-1].message is not None and resps[-1].message != '', resps[-1]
+    # REMFSPERM command
+    tfproto.remfsperm_command(
+        'secid',
+        '/py_test/test_secfsys/',
+        response_handler=resps.append,
+    )
+    assert resps[-1].status == StatusServerCode.OK, resps[-1]
+    #
+    # tfproto.del_command('/py_test/test.mut')
+
