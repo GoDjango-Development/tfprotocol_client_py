@@ -146,3 +146,25 @@ def test_sec_file_system_commands(tfprotocol_instance: TfProtocol):
     #
     # tfproto.del_command('/py_test/test.mut')
 
+
+@pytest.mark.run(order=75)
+def test_locksys_command(tfprotocol_instance: TfProtocol):
+    """Test for locksys command."""
+    # pylint: disable=global-statement
+    tfproto = tfprotocol_instance
+    resps: List[StatusInfo] = []
+    tfproto.mkdir_command('/py_test/test_locksys/')
+    # LOCKSYS command (NOT WORKING PROPERLY YET)
+    tfproto.locksys_command(
+        'secid',
+        response_handler=resps.append,
+    )
+    # assert resps[0].status == StatusServerCode.OK, resps[0]
+    assert resps[0].status == StatusServerCode.UNKNOWN, resps[0]
+
+    tfproto.touch_command(
+        '/py_test/test_locksys/testfile',
+        response_handler=resps.append,
+    )
+    # assert resps[-1].status == StatusServerCode.FAILED, resps[-1]
+    assert resps[-1].status == StatusServerCode.OK, resps[-1]
