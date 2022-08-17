@@ -1530,7 +1530,8 @@ class TfProtocol(TfProtocolSuper):
 
         Args:
             `path` (str): Path to file containing the paths to files to get stats.
-            `response_handler` (Callable[[FileStat], None]): The function to handle the command response.
+            `response_handler` (Callable[[FileStat], None]): The function to handle the command
+                response.
         """
         self.client.send(TfProtocolMessage('FSTATLS', path))
         _code = 0

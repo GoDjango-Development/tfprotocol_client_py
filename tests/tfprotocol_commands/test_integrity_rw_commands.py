@@ -43,7 +43,11 @@ def test_integrity_rw_commands(tfprotocol_instance: TfProtocol):
         'py_test/test_integrity.txt', sink, response_handler=resps.append
     )
     assert sink.getvalue() == b'Some random text'
-    assert resps[-1].status == StatusServerCode.OK and resps[-1].code == 16 and resps[-1].message != '',resps[-1]
+    assert (
+        resps[-1].status == StatusServerCode.OK
+        and resps[-1].code == 16
+        and resps[-1].message != ''
+    ), resps[-1]
 
     #
     # INTWRITE
@@ -54,7 +58,7 @@ def test_integrity_rw_commands(tfprotocol_instance: TfProtocol):
         response_handler=resps.append,
     )
 
-    assert resps[-1].status == StatusServerCode.OK and resps[-1].code == 0 ,resps[-1]
+    assert resps[-1].status == StatusServerCode.OK and resps[-1].code == 0, resps[-1]
     resps.clear()
     #
     tfproto.del_command('py_test/test_integrity.txt')

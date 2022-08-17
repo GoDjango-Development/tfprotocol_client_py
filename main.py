@@ -5,6 +5,7 @@ from io import BytesIO
 import sys
 from typing import Callable, Union
 from datetime import datetime, date as Date
+
 # pylint: disable=unused-import
 from tfprotocol_client.misc.constants import (
     KEY_LEN_INTERVAL,
@@ -808,17 +809,23 @@ def test_netsecurity_commands(proto: TfProtocol):
     proto.touch_command('testlaglock', response_handler=myhandler.touch_callback)
     proto.netlock_command(5, 'testlaglock', response_handler=_handler_callback)
     proto.netlocktry_command(
-        5, 'testlaglock', response_handler=myhandler.netlocktry_callback
+        5,
+        'testlaglock',
+        response_handler=myhandler.netlocktry_callback,
     )
 
     proto.netunlock_command(lock_id)
 
     proto.touch_command('test.mut')
     proto.netmutacqtry_command(
-        'test.mut', 'testtoken', response_handler=myhandler.netmutacqtry_callback
+        'test.mut',
+        'testtoken',
+        response_handler=myhandler.netmutacqtry_callback,
     )
     proto.netmutrel_command(
-        'test.mut', 'testtoken', response_handler=myhandler.netmutrel_callback
+        'test.mut',
+        'testtoken',
+        response_handler=myhandler.netmutrel_callback,
     )
 
     proto.setfsid_command('secid', response_handler=myhandler.setfsid_callback)
