@@ -75,3 +75,28 @@ def test_netunlock_command(tfprotocol_instance: TfProtocol):
     #
     tfproto.del_command('/py_test/test.lock')
 
+
+@pytest.mark.run(order=73)
+def test_netmut_command(tfprotocol_instance: TfProtocol):
+    """Test for netmutacqtry and netmutrel command."""
+    # pylint: disable=global-statement
+    tfproto = tfprotocol_instance
+    resps: List[StatusInfo] = []
+    tfproto.touch_command('/py_test/test.mut')
+    # NETMUTACQTRY command
+    tfproto.netmutacqtry_command(
+        '/py_test/test.mut',
+        'testtoken',
+        response_handler=resps.append,
+    )
+    assert resps[-1].status == StatusServerCode.OK, resps[-1]
+    # NETMUTREL command
+    tfproto.netmutrel_command(
+        '/py_test/test.mut',
+        'testtoken',
+        response_handler=resps.append,
+    )
+    assert resps[-1].status == StatusServerCode.OK, resps[-1]
+    #
+    # tfproto.del_command('/py_test/test.mut')
+
