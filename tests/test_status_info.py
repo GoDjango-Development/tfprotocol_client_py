@@ -14,12 +14,35 @@ def test_status_info_build():
     assert status.code == 0
     assert status.payload == b''
     assert status.message == ''
+
+    # test OK (with initial parse code)
+    status = StatusInfo.build_status(
+        29,
+        b'1 BD OPENED OK WITH ID "2341"',
+        parse_code=True,
+    )
+    assert status.status == StatusServerCode.OK
+    assert status.code == 1
+    assert status.payload == b'BD OPENED  WITH ID "2341"'
+    assert status.message == 'BD OPENED  WITH ID "2341"'
+
     # test FAILED
     status = StatusInfo.build_status(30, b'FAILED 5: a lot of info before')
     assert status.status == StatusServerCode.FAILED
     assert status.message == 'a lot of info before'
     assert status.code == 5
     assert status.payload == b'a lot of info before'
+
+    # test FAILED (with initial parse code)
+    status = StatusInfo.build_status(
+        33,
+        b'4 FAILED CLOSE BD DOES NOT EXISTS',
+        parse_code=True,
+    )
+    assert status.status == StatusServerCode.FAILED
+    assert status.message == 'CLOSE BD DOES NOT EXISTS'
+    assert status.code == 4
+    assert status.payload == b'CLOSE BD DOES NOT EXISTS'
 
     # test RAW MESSAGE
     status = StatusInfo.build_status(38, b'A lot of info whitout header or status')
