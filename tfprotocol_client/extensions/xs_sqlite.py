@@ -1,6 +1,14 @@
 from typing import Union
 from multipledispatch import dispatch
 from tfprotocol_client.tfprotocol_super import TfProtocolSuper
+from tfprotocol_client.models.status_info import StatusInfo
+from tfprotocol_client.models.message import TfProtocolMessage
+from tfprotocol_client.misc.handlers_aliases import (
+    ResponseHandler,
+    SendRecvFileHandler,
+    TransferAsyncHandler,
+    TransferHandler,
+)
 from tfprotocol_client.misc.constants import (
     BYTE_SIZE,
     DFLT_MAX_BUFFER_SIZE,
@@ -10,6 +18,7 @@ from tfprotocol_client.misc.constants import (
     LONG_SIZE,
 )
 from tfprotocol_client.models.proxy_options import ProxyOptions
+from tfprotocol_client.models.status_server_code import StatusServerCode
 
 
 class XSSQLite(TfProtocolSuper):
@@ -88,3 +97,15 @@ class XSSQLite(TfProtocolSuper):
             channel_len,
             verbosity_mode=verbosity_mode,
         )
+
+    def xssqlite_command(self, response_handler: ResponseHandler = EMPTY_HANDLER):
+        """Makes the server enter the subsystem. Once inside the subsystem, the server remains
+        there until the client explicitly exits the module with the proper commands. If this
+        module is not implemented by the server, it will return UNKNOWN. Otherwise the eXtended
+        Subsystem SQLITE will start listening for commands.
+
+        Args:
+            `response_handler` (ResponseHandler): The function to handle the command response.
+        """
+        #FIXME: HEADER_SIZE NOT SPECIFIED IN DOCUMENTATION
+        response_handler(self.client.translate('XS_SQLITE'))
