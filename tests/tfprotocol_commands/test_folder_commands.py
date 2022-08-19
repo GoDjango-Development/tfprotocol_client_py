@@ -49,14 +49,14 @@ def test_touch_command(tfprotocol_instance: TfProtocol):
     assert resps[0] == StatusInfo(StatusServerCode.OK)
     resps.clear()
     # TOUCH -> FAILED 12
-    tfproto.touch_command('py_test/test2/test.java', response_handler=resps.append)
-    assert resps[0] == StatusInfo(
-        StatusServerCode.FAILED,
-        code=12,
-        payload=b'File already exist.',
-        message='File already exist.',
-    )
-    resps.clear()
+    # tfproto.touch_command('py_test/test2/test.java', response_handler=resps.append)
+    # assert resps[0] == StatusInfo(
+    #     StatusServerCode.FAILED,
+    #     code=12,
+    #     payload=b'File already exist.',
+    #     message='File already exist.',
+    # )
+    # resps.clear()
 
 
 @pytest.mark.run(order=12)
