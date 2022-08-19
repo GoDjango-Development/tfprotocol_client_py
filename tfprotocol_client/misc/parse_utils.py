@@ -39,10 +39,10 @@ def separate_status_codenumber(string: str) -> Tuple[str, str]:
 
 
 def separate_status_codenumber_b(data: bytes):
-    res = re.split(br'([-+]?\d+\.\d+)|([-+]?\d+)', data.strip(), maxsplit=1)
-    res_f = [r.strip() for r in res if r is not None and r.strip() != b'']
+    res = re.split(br'([-+]?\d+\.\d+)|([-+]?\d+)', data.lstrip(), maxsplit=1)
+    res_f = [r for r in res if r is not None and r.strip() != b'']
     if len(res_f) > 1 and isnumber(res_f[0]):
-        return res_f[0], b''.join(res_f[1:])
+        return res_f[0], b''.join(res_f[1:]).lstrip()
     return b'', b''.join(res_f)
 
 
