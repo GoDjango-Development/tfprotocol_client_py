@@ -70,7 +70,9 @@ class StatusInfo:
 
     @staticmethod
     def build_status(
-        header: int, message: bytes, parse_code: bool = True
+        header: int,
+        message: bytes,
+        parse_code: bool = False,
     ) -> 'StatusInfo':
         """Build status from header and message received from the server.
 
@@ -80,19 +82,35 @@ class StatusInfo:
             `parse_code`: if True, parse the code from the message.
         """
         code: int = header
-        status, msg = separate_status_b(message)
+        status: StatusServerCode = StatusServerCode.UNKNOWN
+        msg: bytes = message
 
-        if status is None:
-            # ? <msg>
-            status, msg = StatusServerCode.UNKNOWN, message
-        elif (status is not StatusServerCode.FAILED) or not parse_code:
-            # ? <status> [<msg>]
-            code = status.value
+        if parse_code:
+            str_code, msg = separate_status_codenumber_b(message)
+            code = tryparse_int(str_code, dflt_value=code)
+
+            min_index = len(msg)
+            for sc in StatusServerCode:
+                index = msg.find(sc.name.encode(STRING_ENCODING))
+                if index >= 0 and index < min_index:
+                    status = sc
+                    if index == 0:
+                        break
+            msg = msg.replace(status.name.encode(STRING_ENCODING), b'', 1).lstrip()
         else:
-            # ? FAILED <str_code> : <msg>
-            str_code, msg = separate_status_codenumber_b(msg)
-            msg = msg.strip().replace(b': ', b'', 1)
-            code = tryparse_int(str_code, dflt_value=status.value)
+            status, msg = separate_status_b(message)
+
+            if status is None:
+                # ? <msg>
+                status, msg = StatusServerCode.UNKNOWN, message
+            elif status is not StatusServerCode.FAILED:
+                # ? <status> [<msg>]
+                code = status.value
+            else:
+                # ? FAILED <str_code> : <msg>
+                str_code, msg = separate_status_codenumber_b(msg)
+                msg = msg.strip().replace(b': ', b'', 1)
+                code = tryparse_int(str_code, dflt_value=status.value)
 
         return StatusInfo(
             status,
