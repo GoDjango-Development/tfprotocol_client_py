@@ -96,7 +96,11 @@ class StatusInfo:
                     status = sc
                     if index == 0:
                         break
-            msg = msg.replace(status.name.encode(STRING_ENCODING), b'', 1).lstrip()
+            status_name = status.name.encode(STRING_ENCODING)
+            if index == 0:
+                msg = msg.replace(status_name + b' ', b'', 1).lstrip()
+            else:
+                msg = msg.replace(b' ' + status_name + b' ', b' ', 1).lstrip()
         else:
             status, msg = separate_status_b(message)
 
