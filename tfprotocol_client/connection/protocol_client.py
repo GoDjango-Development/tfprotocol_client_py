@@ -18,7 +18,7 @@ from tfprotocol_client.security.cryptography import Xor
 
 
 class ProtocolClient(SocketClient):
-    """ Protocol Client to handle, connections and make the interface
+    """Protocol Client to handle, connections and make the interface
     easy to use.
 
     SocketClient: Super class
@@ -29,7 +29,7 @@ class ProtocolClient(SocketClient):
         address: str = 'localhost',
         port: int = 1234,
         proxy_options: Optional[ProxyOptions] = None,
-        max_buffer_size = DFLT_MAX_BUFFER_SIZE,
+        max_buffer_size=DFLT_MAX_BUFFER_SIZE,
         verbosity_mode: bool = False,
     ) -> None:
         super().__init__(
@@ -139,12 +139,19 @@ class ProtocolClient(SocketClient):
     ):
         self.send(
             TfProtocolMessage(
-                message, custom_header=custom_header, header_size=header_size,
+                message,
+                custom_header=custom_header,
+                header_size=header_size,
             )
         )
 
     @dispatch()
-    def recv(self, header_size=None, header_signed=True) -> StatusInfo:
+    def recv(
+        self,
+        header_size=None,
+        header_signed=True,
+        parse_front_code_response=False,
+    ) -> StatusInfo:
         self.exception_guard()
         header_size = header_size if header_size > 0 else self.header_size
         # RECEIVE, DECRYPT AND DECODE HEADER
@@ -156,19 +163,29 @@ class ProtocolClient(SocketClient):
         # RECEIVE AND DECRYPT BODY
         received_body = self._recv(decoded_header)
         decrypted_body = self._decrypt(received_body)
-        status = StatusInfo.build_status(decoded_header, decrypted_body)
+        status = StatusInfo.build_status(
+            decoded_header,
+            decrypted_body,
+            parse_code=parse_front_code_response,
+        )
         if self.verbosity_mode:
             print(f'SERVER: {decoded_header} {status}')
         return status
 
     @dispatch(TfProtocolMessage)
     def translate(
-        self, message: TfProtocolMessage, recv_header_signed=True, **_
+        self,
+        message: TfProtocolMessage,
+        recv_header_signed=True,
+        parse_front_code_response=False,
+        **_,
     ) -> StatusInfo:
         self.exception_guard()
         self.send(message)
         return self.recv(
-            header_size=message.header_size, header_signed=recv_header_signed
+            header_size=message.header_size,
+            header_signed=recv_header_signed,
+            parse_front_code_response=parse_front_code_response,
         )
 
     # pylint: disable=function-redefined
@@ -179,6 +196,7 @@ class ProtocolClient(SocketClient):
         custom_header: Union[str, bytes, int, bool, None] = None,
         header_size: int = None,
         recv_header_signed=True,
+        parse_front_code_response=False,
         **_,
     ) -> StatusInfo:
         return self.translate(
@@ -186,4 +204,5 @@ class ProtocolClient(SocketClient):
                 message, custom_header=custom_header, header_size=header_size
             ),
             recv_header_signed=recv_header_signed,
+            parse_front_code_response=parse_front_code_response,
         )

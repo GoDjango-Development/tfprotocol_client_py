@@ -23,8 +23,8 @@ def test_status_info_build():
     )
     assert status.status == StatusServerCode.OK
     assert status.code == 1
-    assert status.payload == b'BD OPENED  WITH ID "2341"'
-    assert status.message == 'BD OPENED  WITH ID "2341"'
+    assert status.payload == b'BD OPENED WITH ID "2341"'
+    assert status.message == 'BD OPENED WITH ID "2341"'
 
     # test FAILED
     status = StatusInfo.build_status(30, b'FAILED 5: a lot of info before')
