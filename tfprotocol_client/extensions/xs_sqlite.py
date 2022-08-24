@@ -141,7 +141,7 @@ class XSSQLite(TfProtocolSuper):
         db_id: int,
         response_handler: ResponseHandler = EMPTY_HANDLER,
     ):
-        """Ocloses the database represented by the handle “DB-ID”. This frees that handle to be
+        """Closes the database represented by the handle “DB-ID”. This frees that handle to be
         reused in next openings.
 
         Args:
