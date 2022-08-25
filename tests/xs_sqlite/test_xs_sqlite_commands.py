@@ -24,14 +24,24 @@ def test_xssqlite_command(xssqlite_instance: XSSQLite):
     resps: List[StatusInfo] = []
     # XS_SQLITE command
     tfproto.xssqlite_command(response_handler=resps.append)
-    assert resps[0].status in (StatusServerCode.OK, StatusServerCode.UNKNOWN), resps[0]
+    assert resps[0].status == StatusServerCode.OK, resps[0]
+    # assert resps[0].status in (StatusServerCode.OK, StatusServerCode.UNKNOWN), resps[0]
 
 
-def test_xssqlite_open_command(xssqlite_instance: XSSQLite):
-    """Test for open command."""
+@pytest.mark.depends(on=['test_xssqlite_command'])
+def test_xssqlite_open_close_commands(xssqlite_instance: XSSQLite):
+    """Test for open and close commands."""
     tfproto = xssqlite_instance
     resps: List[StatusInfo] = []
     # OPEN command
-    tfproto.open_command('py_test/db.db', response_handler=resps.append)
+    tfproto.open_command('py_test.db', response_handler=resps.append)
+    assert resps[-1].status == StatusServerCode.OK, resps[-1]
+    assert resps[-1].message not in (None, ''), resps[-1]
+    db_id = resps[-1].message.split()[-1]
+    # CLOSE command
+    tfproto.close_command(db_id, response_handler=resps.append)
+    assert resps[-1].status == StatusServerCode.OK, resps[-1]
+    assert resps[-1].message not in (None, ''), resps[-1]
+    
     assert resps[0].status == StatusServerCode.OK, resps[0]
     assert resps[0].message not in (None, ''), resps[0]
