@@ -1,24 +1,17 @@
-from typing import Callable, Tuple, Union
+from typing import Callable, Union
 from multipledispatch import dispatch
 from tfprotocol_client.tfprotocol_super import TfProtocolSuper
-from tfprotocol_client.models.status_info import StatusInfo
 from tfprotocol_client.models.message import TfProtocolMessage
 from tfprotocol_client.misc.handlers_aliases import (
     ResponseHandler,
-    SendRecvFileHandler,
-    TransferAsyncHandler,
-    TransferHandler,
 )
 from tfprotocol_client.misc.constants import (
-    BYTE_SIZE,
     DFLT_MAX_BUFFER_SIZE,
     EMPTY_HANDLER,
-    INT_SIZE,
     KEY_LEN_INTERVAL,
     LONG_SIZE,
 )
 from tfprotocol_client.models.proxy_options import ProxyOptions
-from tfprotocol_client.models.status_server_code import StatusServerCode
 
 
 class XSSQLite(TfProtocolSuper):
@@ -138,14 +131,14 @@ class XSSQLite(TfProtocolSuper):
 
     def close_command(
         self,
-        db_id: int,
+        db_id: Union[int, str],
         response_handler: ResponseHandler = EMPTY_HANDLER,
     ):
         """Closes the database represented by the handle “DB-ID”. This frees that handle to be
         reused in next openings.
 
         Args:
-            `db_id` (int): The ID of the database to be closed.
+            `db_id` (int,str): The ID of the database to be closed.
             `response_handler` (ResponseHandler): The function to handle the command response.
         """
         response_handler(
@@ -157,7 +150,7 @@ class XSSQLite(TfProtocolSuper):
 
     def exec_command(
         self,
-        db_id: int,
+        db_id: Union[int, str],
         sql_query: str,
         response_handler: ResponseHandler = EMPTY_HANDLER,
         rows_handler: Callable[[list], None] = EMPTY_HANDLER,
@@ -165,7 +158,7 @@ class XSSQLite(TfProtocolSuper):
         """Executes an SQL-Query in the database represented by the specified handle in “DB-ID”.
 
         Args:
-            `db_id` (int): The ID of the database to execute the query.
+            `db_id` (int, str): The ID of the database to execute the query.
             `sql_query` (str): The SQL query to be executed.
             `response_handler` (ResponseHandler): The function to handle the command response.
         """
@@ -186,7 +179,7 @@ class XSSQLite(TfProtocolSuper):
     def execof_command(
         self,
         path_to_file: str,
-        db_id: int,
+        db_id: Union[int, str],
         sql_query: str,
         response_handler: ResponseHandler = EMPTY_HANDLER,
     ):
@@ -195,7 +188,7 @@ class XSSQLite(TfProtocolSuper):
 
         Args:
             `path_to_file` (str): The file where result of query is stored.
-            `db_id` (int): The ID of the database to execute the query.
+            `db_id` (int, str): The ID of the database to execute the query.
             `sql_query` (str): The SQL query to be executed.
             `response_handler` (ResponseHandler): The function to handle the command response.
         """
@@ -209,12 +202,15 @@ class XSSQLite(TfProtocolSuper):
         )
 
     def lastrowid_command(
-        self, db_id: int, response_handler: ResponseHandler = EMPTY_HANDLER
+        self,
+        db_id: Union[int, str],
+        response_handler: ResponseHandler = EMPTY_HANDLER,
     ):
-        """Returns the last row id of the actual queried table in the database represented by the handle “DB-ID”.
+        """Returns the last row id of the actual queried table in the database represented by the
+        handle “DB-ID”.
 
         Args:
-            `db_id` (int): The ID of the database to execute the query.
+            `db_id` (int, str): The ID of the database to execute the query.
             `response_handler` (ResponseHandler): The function to handle the command response.
         """
         response_handler(
@@ -256,11 +252,14 @@ class XSSQLite(TfProtocolSuper):
             )
         )
 
-    def blobin_command(self, db_id: int, bd_table: str, filename: str, filepath: str):
-        """Stores in the database represented by the handle “BD-ID” a file read from “FILEPATH” which name will be “FILENAME” the table “DB-TABLE”.
+    def blobin_command(
+        self, db_id: Union[int, str], bd_table: str, filename: str, filepath: str
+    ):
+        """Stores in the database represented by the handle “BD-ID” a file read from “FILEPATH”
+        which name will be “FILENAME” the table “DB-TABLE”.
 
         Args:
-            `db_id` (int): The ID of the database to execute the command.
+            `db_id` (int, str): The ID of the database to execute the command.
             `bd_table` (str): The database table to store the file.
             `filename` (str): The name of the file to store.
             `filepath` (str): The path to the file to store.
@@ -277,12 +276,14 @@ class XSSQLite(TfProtocolSuper):
             parse_front_code_response=True,
         )
 
-    def blobout_command(self, db_id: int, bd_table: str, filename: str, filepath: str):
+    def blobout_command(
+        self, db_id: Union[int, str], bd_table: str, filename: str, filepath: str
+    ):
         """Extracts from the database represented by the handle “BD-ID” a file which name is
         “FILENAME” from the table “DB-TABLE” to a file written to “FILEPATH”.
 
         Args:
-            `db_id` (int): The ID of the database to execute the command.
+            `db_id` (int, str): The ID of the database to execute the command.
             `bd_table` (str): The database table to extract the file.
             `filename` (str): The name of the file to extract.
             `filepath` (str): The path to the file to extract.
