@@ -174,7 +174,7 @@ class XSSQLite(TfProtocolSuper):
             if header <= 0:
                 break
             data = self.client.just_recv(size=header)
-            rows_handler(data.split('@@'))
+            rows_handler(data.split(b'@@'))
 
     def execof_command(
         self,
