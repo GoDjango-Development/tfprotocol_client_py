@@ -99,6 +99,8 @@ class StatusInfo:
             status_name = status.name.encode(STRING_ENCODING)
             if index == 0:
                 msg = msg.replace(status_name + b' ', b'', 1).lstrip()
+            elif msg[-len(status_name):] == status_name:
+                msg = msg.replace(b' ' + status_name, b'', 1).rstrip()
             else:
                 msg = msg.replace(b' ' + status_name + b' ', b' ', 1).lstrip()
         else:
