@@ -1,4 +1,4 @@
-from typing import Callable, Union
+from typing import Callable, Optional, Union
 from multipledispatch import dispatch
 from tfprotocol_client.models.status_server_code import StatusServerCode
 from tfprotocol_client.tfprotocol_super import TfProtocolSuper
@@ -102,16 +102,14 @@ class XSSQLite(TfProtocolSuper):
         Args:
             `response_handler` (ResponseHandler): The function to handle the command response.
         """
-        # FIXME: HEADER_SIZE NOT SPECIFIED IN DOCUMENTATION
         response_handler(self.client.translate('XS_SQLITE'))
 
-    # TODO: implements `with tf.open_command():` sintax
     def open_command(
         self,
         path_to_db: str,
         response_handler: ResponseHandler = EMPTY_HANDLER,
-    ):
-        """Opens a database in the path indicated by the first parameter. If the database
+    ) -> Optional[str]:
+        """iOpens a database in the path indicated by the first parameter. If the database
         already exist, then OPEN will open it. If the database does not exist, OPEN will
         create it. Note that there is a whitespace between OPEN and the first parameter.
         If the command succeeds the ID returned in “ID” will represent that particular
@@ -123,13 +121,17 @@ class XSSQLite(TfProtocolSuper):
         Args:
             `path_to_db` (str): Path to the database.
             `response_handler` (ResponseHandler): The function to handle the command response.
+
+        Returns:
+            Optional[str]: The ID of the opened database.
         """
-        response_handler(
-            self.client.translate(
-                TfProtocolMessage('OPEN', path_to_db, header_size=LONG_SIZE),
-                parse_front_code_response=True,
-            )
+        resp: StatusInfo = self.client.translate(
+            TfProtocolMessage('OPEN', path_to_db, header_size=LONG_SIZE),
+            parse_front_code_response=True,
         )
+        response_handler(resp)
+        if resp.status_code == StatusServerCode.OK:
+            return resp.message.split()[-1]
 
     def close_command(
         self,
