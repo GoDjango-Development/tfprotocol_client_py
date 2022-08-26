@@ -26,4 +26,8 @@ def xssqlite_instance():
     )
     tfproto.connect()
     yield tfproto
+    try:
+        tfproto.terminate_command()
+    except: # pylint: disable=bare-except
+        pass
     tfproto.disconnect()
