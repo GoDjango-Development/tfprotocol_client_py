@@ -1,5 +1,6 @@
 from typing import Callable, Union
 from multipledispatch import dispatch
+from tfprotocol_client.models.status_server_code import StatusServerCode
 from tfprotocol_client.tfprotocol_super import TfProtocolSuper
 from tfprotocol_client.models.message import TfProtocolMessage
 from tfprotocol_client.misc.handlers_aliases import (
@@ -12,6 +13,7 @@ from tfprotocol_client.misc.constants import (
     LONG_SIZE,
 )
 from tfprotocol_client.models.proxy_options import ProxyOptions
+from tfprotocol_client.models.status_info import StatusInfo
 
 
 class XSSQLite(TfProtocolSuper):
@@ -162,12 +164,13 @@ class XSSQLite(TfProtocolSuper):
             `sql_query` (str): The SQL query to be executed.
             `response_handler` (ResponseHandler): The function to handle the command response.
         """
-        response_handler(
-            self.client.translate(
-                TfProtocolMessage('EXEC', str(db_id), sql_query, header_size=LONG_SIZE),
-                parse_front_code_response=True,
-            )
+        resp: StatusInfo = self.client.translate(
+            TfProtocolMessage('EXEC', str(db_id), sql_query, header_size=LONG_SIZE),
+            parse_front_code_response=True,
         )
+        response_handler(resp)
+        if resp.status != StatusServerCode.OK:
+            return
         header = -1
         while True:
             header = self.client.just_recv_int(size=LONG_SIZE)
