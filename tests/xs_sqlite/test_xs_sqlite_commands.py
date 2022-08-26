@@ -4,15 +4,12 @@
 # pylint: disable=redefined-outer-name
 
 
-from typing import List, Tuple
+from typing import List
 
 import pytest
 from tfprotocol_client.extensions.xs_sqlite import XSSQLite
-from tfprotocol_client.models.exceptions import TfException
-from tfprotocol_client.models.file_stat import FileStat
 from tfprotocol_client.models.status_info import StatusInfo
 from tfprotocol_client.models.status_server_code import StatusServerCode
-from tfprotocol_client.tfprotocol import Date, TfProtocol
 
 # pylint: disable=unused-import
 from .xs_sqlite import xssqlite_instance
@@ -266,3 +263,25 @@ def test_xssqlite_blob_commands(xssqlite_instance: XSSQLite):
     #
     tfproto.exec_command(db_id, '''DROP TABLE TEST;''')
     tfproto.close_command(db_id)
+
+
+@pytest.mark.depends(on=['xssqlite'])
+def test_xssqlite_exit_command(xssqlite_instance: XSSQLite):
+    """Test for exit command."""
+    tfproto = xssqlite_instance
+    resps: List[StatusInfo] = []
+    # EXIT command
+    tfproto.exit_command()
+    tfproto.xssqlite_command(response_handler=resps.append)
+    assert resps[0].status == StatusServerCode.OK, resps[0]
+
+
+@pytest.mark.depends(on=['xssqlite'])
+def test_xssqlite_terminate_command(xssqlite_instance: XSSQLite):
+    """Test for terminate command."""
+    tfproto = xssqlite_instance
+    resps: List[StatusInfo] = []
+    # TERMINATE command
+    tfproto.terminate_command()
+    tfproto.xssqlite_command(response_handler=resps.append)
+    assert resps[0].status == StatusServerCode.OK, resps[0]
