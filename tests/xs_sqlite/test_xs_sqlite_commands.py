@@ -98,3 +98,120 @@ def test_xssqlite_exec_command(xssqlite_instance: XSSQLite):
     #
     tfproto.exec_command(db_id, '''DROP TABLE COMPANY;''')
     tfproto.close_command(db_id)
+
+
+@pytest.mark.depends(name='sqlite_execof', on=['sqlite-exec'])
+def test_xssqlite_execof_command(xssqlite_instance: XSSQLite):
+    """Test for execof command."""
+    tfproto = xssqlite_instance
+    resps: List[StatusInfo] = []
+    tfproto.open_command('py_test.db', response_handler=resps.append)
+    db_id = resps[-1].message.split()[-1]
+    # EXECOF command (With no data)
+    tfproto.execof_command(
+        'py_test_execof.output',
+        db_id,
+        '''
+        DROP TABLE IF EXISTS COMPANY;
+        CREATE TABLE COMPANY(
+            ID INT PRIMARY KEY     NOT NULL,
+            NAME           TEXT    NOT NULL,
+            AGE            INT     NOT NULL,
+            ADDRESS        CHAR(50),
+            SALARY         REAL
+        );
+        ''',
+        response_handler=resps.append,
+    )
+    assert resps[-1].status == StatusServerCode.OK, resps[-1]
+    assert resps[-1].message not in (None, ''), resps[-1]
+    tfproto.execof_command(
+        'py_test_execof.output',
+        db_id,
+        '''
+        INSERT INTO COMPANY (ID,NAME,AGE,ADDRESS,SALARY)
+        VALUES (1, 'Paul', 32, 'California', 20000.00 );
+
+        INSERT INTO COMPANY (ID,NAME,AGE,ADDRESS,SALARY)
+        VALUES (2, 'Allen', 25, 'Texas', 15000.00 );
+
+        INSERT INTO COMPANY (ID,NAME,AGE,ADDRESS,SALARY)
+        VALUES (3, 'Teddy', 23, 'Norway', 20000.00 );
+        ''',
+    )
+    # EXECOF command (With data)
+    tfproto.execof_command(
+        'py_test_execof.output',
+        db_id,
+        '''SELECT * FROM COMPANY;''',
+        response_handler=resps.append,
+    )
+    assert resps[-1].status == StatusServerCode.OK, resps[-1]
+    assert resps[-1].message not in (None, ''), resps[-1]
+    #
+    tfproto.exec_command(db_id, '''DROP TABLE COMPANY;''')
+    tfproto.close_command(db_id)
+
+
+@pytest.mark.depends(on=['sqlite-exec'])
+def test_xssqlite_lastrowid_command(xssqlite_instance: XSSQLite):
+    """Test for lastrowid command."""
+    tfproto = xssqlite_instance
+    resps: List[StatusInfo] = []
+    tfproto.open_command('py_test.db', response_handler=resps.append)
+    db_id = resps[-1].message.split()[-1]
+    # LAST_ROWID command "Failed"
+    tfproto.lastrowid_command(db_id, response_handler=resps.append)
+    assert resps[-1].status == StatusServerCode.FAILED, resps[-1]
+    assert resps[-1].message not in (None, ''), resps[-1]
+    # LAST_ROWID command "OK"
+    tfproto.exec_command(
+        db_id,
+        '''
+        DROP TABLE IF EXISTS COMPANY;
+        CREATE TABLE COMPANY(
+            ID INT PRIMARY KEY     NOT NULL,
+            NAME           TEXT    NOT NULL,
+            AGE            INT     NOT NULL,
+            ADDRESS        CHAR(50),
+            SALARY         REAL
+        );
+        ''',
+    )
+    tfproto.exec_command(
+        db_id,
+        '''
+        INSERT INTO COMPANY (ID,NAME,AGE,ADDRESS,SALARY)
+        VALUES (1, 'Paul', 32, 'California', 20000.00 );
+
+        INSERT INTO COMPANY (ID,NAME,AGE,ADDRESS,SALARY)
+        VALUES (2, 'Allen', 25, 'Texas', 15000.00 );
+
+        INSERT INTO COMPANY (ID,NAME,AGE,ADDRESS,SALARY)
+        VALUES (3, 'Teddy', 23, 'Norway', 20000.00 );
+        ''',
+    )
+    tfproto.exec_command(db_id, '''SELECT * FROM COMPANY;''')
+    tfproto.lastrowid_command(db_id, response_handler=resps.append)
+    assert resps[-1].status == StatusServerCode.OK, resps[-1]
+    assert resps[-1].message not in (None, ''), resps[-1]
+    lastrow_id = resps[-1].message.split()[-1]
+    assert lastrow_id == '3', f'lastrowid: {lastrow_id} expected: 3'
+    #
+    tfproto.exec_command(db_id, '''DROP TABLE COMPANY;''')
+    tfproto.close_command(db_id)
+
+
+@pytest.mark.depends(on=['xssqlite'])
+def test_xssqlite_heapsize_commands(xssqlite_instance: XSSQLite):
+    """Test for softheap and hardheap commands."""
+    tfproto = xssqlite_instance
+    resps: List[StatusInfo] = []
+    # SOFT_HEAP command
+    tfproto.softheap_command(70368744177664, response_handler=resps.append)
+    assert resps[-1].status == StatusServerCode.OK, resps[-1]
+    assert resps[-1].message not in (None, ''), resps[-1]
+    # HARD_HEAP command
+    tfproto.hardheap_command(1844674407370955161, response_handler=resps.append)
+    assert resps[-1].status == StatusServerCode.OK, resps[-1]
+    assert resps[-1].message not in (None, ''), resps[-1]
