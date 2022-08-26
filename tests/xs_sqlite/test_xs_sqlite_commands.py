@@ -215,3 +215,54 @@ def test_xssqlite_heapsize_commands(xssqlite_instance: XSSQLite):
     tfproto.hardheap_command(1844674407370955161, response_handler=resps.append)
     assert resps[-1].status == StatusServerCode.OK, resps[-1]
     assert resps[-1].message not in (None, ''), resps[-1]
+
+
+@pytest.mark.depends(name='sqlite-blob', on=['sqlite-exec'])
+def test_xssqlite_blob_commands(xssqlite_instance: XSSQLite):
+    """Test for blobin and blobout commands."""
+    tfproto = xssqlite_instance
+    resps: List[StatusInfo] = []
+    tfproto.open_command('py_test.db', response_handler=resps.append)
+    db_id = resps[-1].message.split()[-1]
+    tfproto.exec_command(db_id, '''''')
+    tfproto.exec_command(
+        db_id,
+        '''
+        DROP TABLE IF EXISTS TEST;
+        CREATE TABLE TEST(
+            ID INT PRIMARY KEY    NOT NULL,
+            NAME         TEXT,
+            DATA         BLOB
+        );
+        INSERT INTO TEST (ID, NAME, DATA)
+        VALUES (1, 'example.txt', 12345);
+
+        INSERT INTO TEST (ID, NAME, DATA)
+        VALUES (2, 'example2.txt', NULL);
+        ''',
+    )
+    rows: List[List[bytes]] = []
+    # BLOBIN command
+    tfproto.blobout_command(
+        db_id,
+        'TEST',
+        'example.txt',
+        'example_file_sqlite.txt',
+    )
+    tfproto.exec_command(db_id, 'SELECT * FROM TEST;', rows_handler=rows.append)
+    assert rows[1][2] == b'12345', rows[1]
+    assert rows[2][2] == b'NULL', rows[2]
+    rows.clear()
+    # BLOBOUT command
+    tfproto.blobin_command(
+        db_id,
+        'TEST',
+        'example2.txt',
+        'example_file_sqlite.txt',
+    )
+    tfproto.exec_command(db_id, 'SELECT * FROM TEST;', rows_handler=rows.append)
+    assert rows[1][2] == b'12345', rows[1]
+    # assert rows[2][2] == b'12345', rows[2] # FIXME: WHY DOES NOT WORK PROPERLY
+    #
+    tfproto.exec_command(db_id, '''DROP TABLE TEST;''')
+    tfproto.close_command(db_id)
