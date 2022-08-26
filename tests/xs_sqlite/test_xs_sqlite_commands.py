@@ -18,6 +18,7 @@ from tfprotocol_client.tfprotocol import Date, TfProtocol
 from .xs_sqlite import xssqlite_instance
 
 
+@pytest.mark.depends(name='xssqlite')
 def test_xssqlite_command(xssqlite_instance: XSSQLite):
     """Test for xs_sqlite command."""
     tfproto = xssqlite_instance
@@ -28,7 +29,7 @@ def test_xssqlite_command(xssqlite_instance: XSSQLite):
     # assert resps[0].status in (StatusServerCode.OK, StatusServerCode.UNKNOWN), resps[0]
 
 
-@pytest.mark.depends(on=['test_xssqlite_command'])
+@pytest.mark.depends(name='sqlite-open-close', on=['xssqlite'])
 def test_xssqlite_open_close_commands(xssqlite_instance: XSSQLite):
     """Test for open and close commands."""
     tfproto = xssqlite_instance
@@ -44,7 +45,7 @@ def test_xssqlite_open_close_commands(xssqlite_instance: XSSQLite):
     assert resps[-1].message not in (None, ''), resps[-1]
 
 
-@pytest.mark.depends(on=['test_xssqlite_command', 'test_xssqlite_open_close_commands'])
+@pytest.mark.depends(name='sqlite-exec', on=['xssqlite', 'sqlite-open-close'])
 def test_xssqlite_exec_command(xssqlite_instance: XSSQLite):
     """Test for exec command."""
     tfproto = xssqlite_instance
@@ -81,7 +82,7 @@ def test_xssqlite_exec_command(xssqlite_instance: XSSQLite):
         VALUES (3, 'Teddy', 23, 'Norway', 20000.00 );
         ''',
     )
-    rows : List[list] = []
+    rows: List[list] = []
     # EXEC command (With data)
     tfproto.exec_command(
         db_id,
