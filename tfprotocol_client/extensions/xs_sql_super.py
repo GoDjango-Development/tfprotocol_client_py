@@ -63,7 +63,6 @@ class XSSQLSuper(TfProtocolSuper):
             verbosity_mode=verbosity_mode,
         )
 
-    
     def close_command(
         self,
         db_id: Union[int, str],

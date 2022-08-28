@@ -1,4 +1,4 @@
-from typing import Callable, Optional, Union
+from typing import Optional, Union
 from multipledispatch import dispatch
 from tfprotocol_client.models.status_server_code import StatusServerCode
 from tfprotocol_client.tfprotocol_super import TfProtocolSuper
@@ -15,6 +15,7 @@ from tfprotocol_client.misc.constants import (
 from tfprotocol_client.extensions.xs_sql_super import XSSQLSuper
 from tfprotocol_client.models.proxy_options import ProxyOptions
 from tfprotocol_client.models.status_info import StatusInfo
+
 
 class XSSQLite(XSSQLSuper):
     """Tranference Protocol API extension for SQLite.
@@ -185,7 +186,11 @@ class XSSQLite(XSSQLSuper):
         )
 
     def blobin_command(
-        self, db_id: Union[int, str], bd_table: str, filename: str, filepath: str
+        self,
+        db_id: Union[int, str],
+        bd_table: str,
+        filename: str,
+        filepath: str,
     ):
         """Stores in the database represented by the handle “BD-ID” a file read from “FILEPATH”
         which name will be “FILENAME” the table “DB-TABLE”.
@@ -209,7 +214,11 @@ class XSSQLite(XSSQLSuper):
         )
 
     def blobout_command(
-        self, db_id: Union[int, str], bd_table: str, filename: str, filepath: str
+        self,
+        db_id: Union[int, str],
+        bd_table: str,
+        filename: str,
+        filepath: str,
     ):
         """Extracts from the database represented by the handle “BD-ID” a file which name is
         “FILENAME” from the table “DB-TABLE” to a file written to “FILEPATH”.
