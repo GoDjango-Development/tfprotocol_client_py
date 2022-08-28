@@ -1,6 +1,7 @@
 # coded by lagcleaner
 # email: lagcleaner@gmail.com
 
+from abc import ABC
 from typing import Callable, Optional, Tuple, Union
 
 from tfprotocol_client.connection.keep_alive_thread import KeepAliveThread
@@ -13,7 +14,6 @@ from tfprotocol_client.misc.constants import (
 from tfprotocol_client.misc.handlers_aliases import ResponseHandler
 from tfprotocol_client.models.exceptions import ErrorCode, TfException
 from tfprotocol_client.models.keepalive_options import (
-    KeepAliveMechanismType,
     KeepAliveOptions,
 )
 from tfprotocol_client.models.proxy_options import ProxyOptions
@@ -23,7 +23,7 @@ from tfprotocol_client.models.tcptimeout_options import TCPTimeoutOptions
 from tfprotocol_client.security.cryptography import CryptographyUtils
 
 
-class TfProtocolSuper:
+class TfProtocolSuper(ABC):
     """The top tfprotocol class, all other classes of tfprotocol extends
     from this one, callbacks extends from ISuperCallback, all classes
     which extends from this one must have in order to be used another
