@@ -1,5 +1,4 @@
 from typing import Callable, Union
-from multipledispatch import dispatch
 from tfprotocol_client.models.status_server_code import StatusServerCode
 from tfprotocol_client.tfprotocol_super import TfProtocolSuper
 from tfprotocol_client.models.message import TfProtocolMessage
