@@ -12,13 +12,13 @@ from tfprotocol_client.misc.constants import (
     KEY_LEN_INTERVAL,
     LONG_SIZE,
 )
+from tfprotocol_client.extensions.xs_sql_super import XSSQLSuper
 from tfprotocol_client.models.proxy_options import ProxyOptions
 from tfprotocol_client.models.status_info import StatusInfo
 
-
-class XSSQLite(TfProtocolSuper):
+class XSSQLite(XSSQLSuper):
     """Tranference Protocol API extension for SQLite.
-    `TfProtocolSuper`: The Abstract mother class of Tranference Protocol API.
+    `XSSQLSuper`: The Abstract mother class of XS SQL like modules.
     """
 
     # pylint: disable=super-init-not-called
@@ -90,7 +90,7 @@ class XSSQLite(TfProtocolSuper):
             proxy,
             keylen,
             channel_len,
-            verbosity_mode=verbosity_mode,
+            verbosity_mode,
         )
 
     def xssqlite_command(self, response_handler: ResponseHandler = EMPTY_HANDLER):
@@ -130,81 +130,8 @@ class XSSQLite(TfProtocolSuper):
             parse_front_code_response=True,
         )
         response_handler(resp)
-        if resp.status_code == StatusServerCode.OK:
+        if resp.status == StatusServerCode.OK:
             return resp.message.split()[-1]
-
-    def close_command(
-        self,
-        db_id: Union[int, str],
-        response_handler: ResponseHandler = EMPTY_HANDLER,
-    ):
-        """Closes the database represented by the handle “DB-ID”. This frees that handle to be
-        reused in next openings.
-
-        Args:
-            `db_id` (int,str): The ID of the database to be closed.
-            `response_handler` (ResponseHandler): The function to handle the command response.
-        """
-        response_handler(
-            self.client.translate(
-                TfProtocolMessage('CLOSE', str(db_id), header_size=LONG_SIZE),
-                parse_front_code_response=True,
-            )
-        )
-
-    def exec_command(
-        self,
-        db_id: Union[int, str],
-        sql_query: str,
-        response_handler: ResponseHandler = EMPTY_HANDLER,
-        rows_handler: Callable[[list], None] = EMPTY_HANDLER,
-    ):
-        """Executes an SQL-Query in the database represented by the specified handle in “DB-ID”.
-
-        Args:
-            `db_id` (int, str): The ID of the database to execute the query.
-            `sql_query` (str): The SQL query to be executed.
-            `response_handler` (ResponseHandler): The function to handle the command response.
-        """
-        resp: StatusInfo = self.client.translate(
-            TfProtocolMessage('EXEC', str(db_id), sql_query, header_size=LONG_SIZE),
-            parse_front_code_response=True,
-        )
-        response_handler(resp)
-        if resp.status != StatusServerCode.OK:
-            return
-        header = -1
-        while True:
-            header = self.client.just_recv_int(size=LONG_SIZE)
-            if header <= 0:
-                break
-            data = self.client.just_recv(size=header)
-            rows_handler(data.split(b'@@'))
-
-    def execof_command(
-        self,
-        path_to_file: str,
-        db_id: Union[int, str],
-        sql_query: str,
-        response_handler: ResponseHandler = EMPTY_HANDLER,
-    ):
-        """Executes an SQL-Query in the database represented by the specified handle in “DB-ID”.
-        The result of the query is stored in the file indicated in the first parameter.
-
-        Args:
-            `path_to_file` (str): The file where result of query is stored.
-            `db_id` (int, str): The ID of the database to execute the query.
-            `sql_query` (str): The SQL query to be executed.
-            `response_handler` (ResponseHandler): The function to handle the command response.
-        """
-        response_handler(
-            self.client.translate(
-                TfProtocolMessage(
-                    'EXECOF', path_to_file, str(db_id), sql_query, header_size=LONG_SIZE
-                ),
-                parse_front_code_response=True,
-            )
-        )
 
     def lastrowid_command(
         self,
@@ -304,23 +231,3 @@ class XSSQLite(TfProtocolSuper):
             ),
             parse_front_code_response=True,
         )
-
-    def exit_command(self):
-        """Exits the XS_SQLITE module without freeing the previously allocated resources. This is,
-        every opened database will remain as such and the returned handles, valid. However, you are
-        now at the main command interface of the TF PROTOCOL.
-
-        If you want enter again the SQLITE subsystem, you can use the XS_SQLITE command again.
-        """
-        self.client.send(
-            TfProtocolMessage('EXIT', header_size=LONG_SIZE),
-        )
-
-    def terminate_command(self):
-        """Exits the XS_SQLITE module, unlike EXIT command, freeing the previously allocated
-        resources. This is, every opened database will be closed and every handle unallocated.
-
-        Now you are in the main command interface of the TF PROTOCOL. You may enter the subsystem
-        again by using the XS_SQLITE command.
-        """
-        self.client.send('TERMINATE', header_size=LONG_SIZE)
