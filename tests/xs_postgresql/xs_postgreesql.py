@@ -12,7 +12,7 @@ load_dotenv()
 def postgresql_ip_port() -> Tuple[str, int]:
     PROTO_SERVER_ADDRESS = os.environ.get(
         'PROTO_SERVER_ADDRESS',
-        ' tfproto.expresscuba.com',
+        'tfproto.expresscuba.com',
     )
     PROTO_SERVER_ADDRESS_POSTGRESQL = os.getenv(
         'PROTO_SERVER_ADDRESS_POSTGRESQL',
