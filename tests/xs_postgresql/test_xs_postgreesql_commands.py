@@ -13,7 +13,7 @@ from tfprotocol_client.models.status_info import StatusInfo
 from tfprotocol_client.models.status_server_code import StatusServerCode
 
 # pylint: disable=unused-import
-from .xs_postgreesql import xspostgresql_instance, postgresql_ip_port
+from .xs_postgreesql import postgresql_ip_port, xspostgresql_instance
 
 
 @pytest.mark.depends(name='xspostgresql')
@@ -49,16 +49,22 @@ def test_xspostgresql_open_close_commands(
             ),
         )
     except TimeLimitExpired:
-        assert False, 'open_command timeout, try with another (address, port) configuration.'
+        assert (
+            False
+        ), 'open_command timeout, try with another (address, port) configuration.'
 
     assert resps[-1].status == StatusServerCode.OK, resps[-1]
     assert resps[-1].message not in (None, ''), resps[-1]
     db_id = resps[-1].message.split()[-1]
     # CLOSE command
-    tfproto.close_command(db_id, response_handler=resps.append)
-    assert resps[-1].status == StatusServerCode.OK, resps[-1]
-    assert resps[-1].message not in (None, ''), resps[-1]
-
+    try:
+        timelimit(6, lambda *_, **__: tfproto.close_command(db_id, response_handler=resps.append))
+        assert resps[-1].status == StatusServerCode.OK, resps[-1]
+        assert resps[-1].message not in (None, ''), resps[-1]
+    except TimeLimitExpired:
+        assert(
+            False,
+        ), 'close_command timeout, try with another (address, port) configuration.'
 
 @pytest.mark.depends(
     name='postgresql-exec', on=['xspostgresql', 'postgresql-open-close']
@@ -196,9 +202,27 @@ def test_xspostgresql_exit_command(xspostgresql_instance: XSPostgreSQL):
     tfproto = xspostgresql_instance
     resps: List[StatusInfo] = []
     # EXIT command
-    tfproto.exit_command()
-    tfproto.xspostgresql_command(response_handler=resps.append)
-    assert resps[0].status == StatusServerCode.OK, resps[0]
+    try:
+        timelimit(
+            6,
+            lambda *_, **__: tfproto.exit_command(),
+        )
+    except TimeLimitExpired:
+        assert (
+            False
+        ), 'exit_command timeout, probably cause has nothing to exit from here and no response is given.'
+
+    # ..
+    try:
+        timelimit(
+            6,
+            lambda *_, **__: tfproto.xspostgresql_command(
+                response_handler=resps.append
+            ),
+        )
+        assert resps[0].status == StatusServerCode.OK, resps[0]
+    except TimeLimitExpired:
+        pass
 
 
 @pytest.mark.depends(on=['xspostgresql'])
@@ -207,6 +231,20 @@ def test_xspostgresql_terminate_command(xspostgresql_instance: XSPostgreSQL):
     tfproto = xspostgresql_instance
     resps: List[StatusInfo] = []
     # TERMINATE command
-    tfproto.terminate_command()
-    tfproto.xspostgresql_command(response_handler=resps.append)
-    assert resps[0].status == StatusServerCode.OK, resps[0]
+    try:
+        timelimit(6, lambda *_, **__: tfproto.terminate_command())
+    except TimeLimitExpired:
+        assert (
+            False
+        ), 'terminate_command timeout, probably cause has nothing to terminate here and no response is given.'
+    # ..
+    try:
+        timelimit(
+            6,
+            lambda *_, **__: tfproto.xspostgresql_command(
+                response_handler=resps.append
+            ),
+        )
+        assert resps[0].status == StatusServerCode.OK, resps[0]
+    except TimeLimitExpired:
+        pass
