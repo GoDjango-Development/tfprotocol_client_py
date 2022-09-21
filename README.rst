@@ -1,7 +1,7 @@
 ================================================
 TFProtocol Client Implemented in Python :snake:
 ================================================
-.. image:: https://img.shields.io/github/workflow/status/GoDjango-Development/tfprotocol_client_py/publish-to-pypi-and-testpypi?label=build
+.. image:: https://github.com/GoDjango-Development/tfprotocol_client_py/actions/workflows/publish-to-pypi-and-testpypi.yml/badge.svg?branch=master
     :target: https://github.com/GoDjango-Development/tfprotocol_client_py/actions/workflows/publish-to-pypi-and-testpypi.yml
 
 .. image:: https://github.com/GoDjango-Development/tfprotocol_client_py/actions/workflows/test-package-code.yml/badge.svg
