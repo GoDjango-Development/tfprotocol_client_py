@@ -21,7 +21,6 @@ jobs:
       PROTO_SERVER_PORT_POSTGRE: ${{ secrets.PROTO_SERVER_PORT_POSTGRE }}
     runs-on: ubuntu-latest
     steps:
-      - run: echo ${{ secrets.PROTO_VERSION }} | sed 's/./& /g'
       - name: Set up environment
         uses: actions/checkout@master
       - name: Set up Python
