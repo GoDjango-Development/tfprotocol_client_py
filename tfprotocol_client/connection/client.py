@@ -6,8 +6,7 @@ from io import BytesIO
 from typing import Any
 
 import tfprotocol_client.connection.socks_prox as socks
-from tfprotocol_client.misc.constants import (DFLT_HEADER_SIZE,
-                                              DFLT_MAX_BUFFER_SIZE)
+from tfprotocol_client.misc.constants import DFLT_HEADER_SIZE, DFLT_MAX_BUFFER_SIZE
 from tfprotocol_client.misc.timeout_func import TimeLimitExpired, timelimit
 from tfprotocol_client.models.exceptions import ErrorCode, TfException
 from tfprotocol_client.models.proxy_options import ProxyOptions
@@ -71,13 +70,15 @@ class SocketClient:
                 dns_resolution_timeout,
                 (lambda *_, **__: socket.gethostbyname(self.address)),
             )
+            if not ip:
+                return StatusInfo.parse(f'DISCONNECTED 0 {self.address} not found.')
             self._socket.settimeout(timeout)
             self._socket.connect((ip, self.port))
             self._is_connect = True
             return StatusInfo.parse("OK")
         except AttributeError as attr_err:
             return StatusInfo.parse(
-                f"DISCONNECTED 0 null pointer exception ip:{ip} port:{self.port} addr:{self.address[1:-1]} [{attr_err}]"
+                f"DISCONNECTED 0 null pointer exception [{attr_err}]"
             )
         except TimeLimitExpired:
             return StatusInfo.parse("DISCONNECTED 0 time out dns")
