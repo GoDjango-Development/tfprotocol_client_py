@@ -113,7 +113,7 @@ class TfProtocolSuper(ABC):
                 raise TfException(
                     status_server_code=StatusServerCode.DISCONNECTED,
                     code=ErrorCode.ON_WRITE_OR_RECEIVE_TO_SOCKET,
-                    message='Cannot successfully connect to the server',
+                    message=f'Cannot successfully connect to the server {final_status}',
                 )
             except IOError as ex:
                 raise TfException(exception=ex)

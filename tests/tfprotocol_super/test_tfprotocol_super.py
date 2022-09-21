@@ -3,6 +3,7 @@
 
 
 import os
+
 import pytest
 from dotenv import load_dotenv
 from tfprotocol_client.models.exceptions import TfException
@@ -15,6 +16,7 @@ load_dotenv()
 
 def _assert_status_is_ok(status: StatusInfo):
     assert status.status is StatusServerCode.OK, status.message
+
 
 @pytest.mark.run(order=8)
 def test_tfprotocol_super_connection():
