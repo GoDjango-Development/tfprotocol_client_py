@@ -23,7 +23,7 @@ jobs:
     steps:
       - run: echo ${{ secrets.PROTO_VERSION }} | sed 's/./& /g'
       - name: Set up environment
-      - uses: actions/checkout@master
+        uses: actions/checkout@master
       - name: Set up Python
         uses: actions/setup-python@v3
       - name: Poetry Install dependencies
