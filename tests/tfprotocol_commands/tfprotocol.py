@@ -1,6 +1,6 @@
 import os
-import pytest
 
+import pytest
 from dotenv import load_dotenv
 from tfprotocol_client.tfprotocol import TfProtocol
 
@@ -16,7 +16,6 @@ def tfprotocol_instance():
         'PROTO_SERVER_ADDRESS', ' tfproto.expresscuba.com'
     )
     PROTO_SERVER_PORT = int(os.environ.get('PROTO_SERVER_PORT', 10345))
-
     tfproto = TfProtocol(
         PROTO_VERSION,
         PROTO_PUBLIC_KEY,

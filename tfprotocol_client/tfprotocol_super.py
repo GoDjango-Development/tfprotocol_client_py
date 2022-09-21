@@ -6,16 +6,11 @@ from typing import Callable, Optional, Tuple, Union
 
 from tfprotocol_client.connection.keep_alive_thread import KeepAliveThread
 from tfprotocol_client.connection.protocol_client import ProtocolClient
-from tfprotocol_client.misc.constants import (
-    DFLT_MAX_BUFFER_SIZE,
-    EMPTY_HANDLER,
-    KEY_LEN_INTERVAL,
-)
+from tfprotocol_client.misc.constants import (DFLT_MAX_BUFFER_SIZE,
+                                              EMPTY_HANDLER, KEY_LEN_INTERVAL)
 from tfprotocol_client.misc.handlers_aliases import ResponseHandler
 from tfprotocol_client.models.exceptions import ErrorCode, TfException
-from tfprotocol_client.models.keepalive_options import (
-    KeepAliveOptions,
-)
+from tfprotocol_client.models.keepalive_options import KeepAliveOptions
 from tfprotocol_client.models.proxy_options import ProxyOptions
 from tfprotocol_client.models.status_info import StatusInfo
 from tfprotocol_client.models.status_server_code import StatusServerCode
@@ -61,6 +56,7 @@ class TfProtocolSuper(ABC):
                 Defaults to DFLT_MAX_BUFFER_SIZE.
             `verbosity_mode` (bool): Debug mode enabled for verbosity.
         """
+        assert isinstance(port,int), f'Port argument must be an integer: {port} given'
         self.verbosity_mode = verbosity_mode
         self._protocol_version = protocol_version
         self._public_key = public_key
