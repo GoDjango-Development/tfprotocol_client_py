@@ -16,7 +16,7 @@ from tfprotocol_client.models.status_server_code import StatusServerCode
 from .xs_postgreesql import postgresql_ip_port, xspostgresql_instance
 
 
-@pytest.mark.depends(name='xspostgresql')
+@pytest.mark.run(order=90)
 def test_xspostgresql_command(xspostgresql_instance: XSPostgreSQL):
     """Test for xs_sqlite command."""
     tfproto = xspostgresql_instance
@@ -27,7 +27,8 @@ def test_xspostgresql_command(xspostgresql_instance: XSPostgreSQL):
     # assert resps[0].status in (StatusServerCode.OK, StatusServerCode.UNKNOWN), resps[0]
 
 
-@pytest.mark.depends(name='postgresql-open-close', on=['xspostgresql'])
+@pytest.mark.run(order=91)
+@pytest.mark.depends(on=['test_xspostgresql_command'])
 def test_xspostgresql_open_close_commands(
     xspostgresql_instance: XSPostgreSQL,
     postgresql_ip_port: Tuple[str, int],
@@ -58,17 +59,22 @@ def test_xspostgresql_open_close_commands(
     db_id = resps[-1].message.split()[-1]
     # CLOSE command
     try:
-        timelimit(6, lambda *_, **__: tfproto.close_command(db_id, response_handler=resps.append))
+        timelimit(
+            6,
+            lambda *_, **__: tfproto.close_command(
+                db_id, response_handler=resps.append
+            ),
+        )
         assert resps[-1].status == StatusServerCode.OK, resps[-1]
         assert resps[-1].message not in (None, ''), resps[-1]
     except TimeLimitExpired:
-        assert(
+        assert (
             False,
         ), 'close_command timeout, try with another (address, port) configuration.'
 
-@pytest.mark.depends(
-    name='postgresql-exec', on=['xspostgresql', 'postgresql-open-close']
-)
+
+@pytest.mark.run(order=92)
+@pytest.mark.depends(on=['test_xspostgresql_open_close_commands'])
 def test_xspostgresql_exec_command(
     xspostgresql_instance: XSPostgreSQL,
     postgresql_ip_port: Tuple[str, int],
@@ -133,7 +139,8 @@ def test_xspostgresql_exec_command(
     tfproto.close_command(db_id)
 
 
-@pytest.mark.depends(name='postgresql_execof', on=['postgresql-exec'])
+@pytest.mark.run(order=93)
+@pytest.mark.depends(on=['test_xspostgresql_open_close_commands'])
 def test_xspostgresql_execof_command(
     xspostgresql_instance: XSPostgreSQL,
     postgresql_ip_port: Tuple[str, int],
@@ -196,7 +203,8 @@ def test_xspostgresql_execof_command(
     tfproto.close_command(db_id)
 
 
-@pytest.mark.depends(on=['xspostgresql'])
+@pytest.mark.run(order=94)
+@pytest.mark.depends(on=['test_xspostgresql_command'])
 def test_xspostgresql_exit_command(xspostgresql_instance: XSPostgreSQL):
     """Test for exit command."""
     tfproto = xspostgresql_instance
@@ -225,7 +233,8 @@ def test_xspostgresql_exit_command(xspostgresql_instance: XSPostgreSQL):
         pass
 
 
-@pytest.mark.depends(on=['xspostgresql'])
+@pytest.mark.run(order=95)
+@pytest.mark.depends(on=['test_xspostgresql_command'])
 def test_xspostgresql_terminate_command(xspostgresql_instance: XSPostgreSQL):
     """Test for terminate command."""
     tfproto = xspostgresql_instance

@@ -15,7 +15,7 @@ from tfprotocol_client.models.status_server_code import StatusServerCode
 from .xs_sqlite import xssqlite_instance
 
 
-@pytest.mark.depends(name='xssqlite')
+@pytest.mark.run(order=80)
 def test_xssqlite_command(xssqlite_instance: XSSQLite):
     """Test for xs_sqlite command."""
     tfproto = xssqlite_instance
@@ -26,7 +26,7 @@ def test_xssqlite_command(xssqlite_instance: XSSQLite):
     # assert resps[0].status in (StatusServerCode.OK, StatusServerCode.UNKNOWN), resps[0]
 
 
-@pytest.mark.depends(name='sqlite-open-close', on=['xssqlite'])
+@pytest.mark.run(order=81)
 def test_xssqlite_open_close_commands(xssqlite_instance: XSSQLite):
     """Test for open and close commands."""
     tfproto = xssqlite_instance
@@ -42,7 +42,7 @@ def test_xssqlite_open_close_commands(xssqlite_instance: XSSQLite):
     assert resps[-1].message not in (None, ''), resps[-1]
 
 
-@pytest.mark.depends(name='sqlite-exec', on=['xssqlite', 'sqlite-open-close'])
+@pytest.mark.run(order=82)
 def test_xssqlite_exec_command(xssqlite_instance: XSSQLite):
     """Test for exec command."""
     tfproto = xssqlite_instance
@@ -97,7 +97,7 @@ def test_xssqlite_exec_command(xssqlite_instance: XSSQLite):
     tfproto.close_command(db_id)
 
 
-@pytest.mark.depends(name='sqlite_execof', on=['sqlite-exec'])
+@pytest.mark.run(order=83)
 def test_xssqlite_execof_command(xssqlite_instance: XSSQLite):
     """Test for execof command."""
     tfproto = xssqlite_instance
@@ -150,6 +150,7 @@ def test_xssqlite_execof_command(xssqlite_instance: XSSQLite):
     tfproto.close_command(db_id)
 
 
+@pytest.mark.run(order=84)
 @pytest.mark.depends(on=['sqlite-exec'])
 def test_xssqlite_lastrowid_command(xssqlite_instance: XSSQLite):
     """Test for lastrowid command."""
@@ -199,7 +200,7 @@ def test_xssqlite_lastrowid_command(xssqlite_instance: XSSQLite):
     tfproto.close_command(db_id)
 
 
-@pytest.mark.depends(on=['xssqlite'])
+@pytest.mark.run(order=84)
 def test_xssqlite_heapsize_commands(xssqlite_instance: XSSQLite):
     """Test for softheap and hardheap commands."""
     tfproto = xssqlite_instance
@@ -214,7 +215,7 @@ def test_xssqlite_heapsize_commands(xssqlite_instance: XSSQLite):
     assert resps[-1].message not in (None, ''), resps[-1]
 
 
-@pytest.mark.depends(name='sqlite-blob', on=['sqlite-exec'])
+@pytest.mark.run(order=85)
 def test_xssqlite_blob_commands(xssqlite_instance: XSSQLite):
     """Test for blobin and blobout commands."""
     tfproto = xssqlite_instance
@@ -265,7 +266,7 @@ def test_xssqlite_blob_commands(xssqlite_instance: XSSQLite):
     tfproto.close_command(db_id)
 
 
-@pytest.mark.depends(on=['xssqlite'])
+@pytest.mark.run(order=86)
 def test_xssqlite_exit_command(xssqlite_instance: XSSQLite):
     """Test for exit command."""
     tfproto = xssqlite_instance
@@ -276,7 +277,7 @@ def test_xssqlite_exit_command(xssqlite_instance: XSSQLite):
     assert resps[0].status == StatusServerCode.OK, resps[0]
 
 
-@pytest.mark.depends(on=['xssqlite'])
+@pytest.mark.run(order=87)
 def test_xssqlite_terminate_command(xssqlite_instance: XSSQLite):
     """Test for terminate command."""
     tfproto = xssqlite_instance
