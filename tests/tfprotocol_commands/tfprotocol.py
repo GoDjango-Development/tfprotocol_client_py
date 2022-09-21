@@ -13,7 +13,7 @@ def tfprotocol_instance():
     PROTO_PUBLIC_KEY = os.environ.get('PROTO_PUBLIC_KEY')
     PROTO_CLIENT_HASH = os.environ.get('PROTO_CLIENT_HASH', 'testhash')
     PROTO_SERVER_ADDRESS = os.environ.get(
-        'PROTO_SERVER_ADDRESS', ' tfproto.expresscuba.com'
+        'PROTO_SERVER_ADDRESS', 'tfproto.expresscuba.com'
     )
     PROTO_SERVER_PORT = int(os.environ.get('PROTO_SERVER_PORT', 10345))
     tfproto = TfProtocol(
