@@ -1,14 +1,15 @@
 # coded by lagcleaner
 # email: lagcleaner@gmail.com
 
+import socket
 from io import BytesIO
 from typing import Any
-import socket
+
 import tfprotocol_client.connection.socks_prox as socks
-from tfprotocol_client.misc.constants import DFLT_HEADER_SIZE, DFLT_MAX_BUFFER_SIZE
+from tfprotocol_client.misc.constants import (DFLT_HEADER_SIZE,
+                                              DFLT_MAX_BUFFER_SIZE)
 from tfprotocol_client.misc.timeout_func import TimeLimitExpired, timelimit
 from tfprotocol_client.models.exceptions import ErrorCode, TfException
-
 from tfprotocol_client.models.proxy_options import ProxyOptions
 from tfprotocol_client.models.status_info import StatusInfo
 
@@ -74,8 +75,10 @@ class SocketClient:
             self._socket.connect((ip, self.port))
             self._is_connect = True
             return StatusInfo.parse("OK")
-        except AttributeError:
-            return StatusInfo.parse("DISCONNECTED 0 null pointer exception")
+        except AttributeError as attr_err:
+            return StatusInfo.parse(
+                f"DISCONNECTED 0 null pointer exception ip:{ip} port:{self.port} addr:{self.address[1:-1]} [{attr_err}]"
+            )
         except TimeLimitExpired:
             return StatusInfo.parse("DISCONNECTED 0 time out dns")
         except socks.GeneralProxyError:
