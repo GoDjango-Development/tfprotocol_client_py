@@ -1,13 +1,14 @@
 # coded by lagcleaner
 # email: lagcleaner@gmail.com
 
-from io import BytesIO
-import sys
-from platform import system as current_operating_system
-import time
 import socket
+import sys
+import time
+from io import BytesIO
+from platform import system as current_operating_system
 from threading import Thread
 from typing import Callable, Optional
+
 import tfprotocol_client.connection.socks_prox as socks
 from tfprotocol_client.connection.protocol_client import ProtocolClient
 from tfprotocol_client.misc.build_utils import MessageUtils
@@ -134,7 +135,7 @@ class KeepAliveThread(Thread):
                 self._counter = 0
         except IOError as e:
             print('UDP_SOCKET-IOError: ', e.strerror, e.args)
-        except e:
+        except Exception as e:  # pylint: disable=broad-except
             print('UDP_SOCKET-Error: ', e)
         finally:
             if self._counter == self._max_tries:
@@ -213,7 +214,8 @@ def set_keepalive_windows(sock, after_idle_sec=3600, interval_sec=3, _=None):
     and closes the connection after 5 failed ping (max_fails), or 15 seconds
     """
     sock.ioctl(
-        socket.SIO_KEEPALIVE_VALS, (1, after_idle_sec * 1000, interval_sec * 1000),
+        socket.SIO_KEEPALIVE_VALS,
+        (1, after_idle_sec * 1000, interval_sec * 1000),
     )
 
 
