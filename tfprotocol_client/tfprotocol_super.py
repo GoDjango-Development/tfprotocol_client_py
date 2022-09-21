@@ -6,8 +6,11 @@ from typing import Callable, Optional, Tuple, Union
 
 from tfprotocol_client.connection.keep_alive_thread import KeepAliveThread
 from tfprotocol_client.connection.protocol_client import ProtocolClient
-from tfprotocol_client.misc.constants import (DFLT_MAX_BUFFER_SIZE,
-                                              EMPTY_HANDLER, KEY_LEN_INTERVAL)
+from tfprotocol_client.misc.constants import (
+    DFLT_MAX_BUFFER_SIZE,
+    EMPTY_HANDLER,
+    KEY_LEN_INTERVAL,
+)
 from tfprotocol_client.misc.handlers_aliases import ResponseHandler
 from tfprotocol_client.models.exceptions import ErrorCode, TfException
 from tfprotocol_client.models.keepalive_options import KeepAliveOptions
@@ -59,7 +62,7 @@ class TfProtocolSuper(ABC):
         assert isinstance(port, int), f'Port argument must be an integer: {port} given'
         assert isinstance(
             protocol_version, str
-        )and protocol_version == '0.0', f'Protocol Version argument must be an float as string: {protocol_version} given'
+        ), f'Protocol Version argument must be an float as string: {protocol_version} given'
         self.verbosity_mode = verbosity_mode
         self._protocol_version = protocol_version
         self._public_key = public_key

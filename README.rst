@@ -1,15 +1,18 @@
 ================================================
 TFProtocol Client Implemented in Python :snake:
 ================================================
+.. image:: https://img.shields.io/github/workflow/status/GoDjango-Development/tfprotocol_client_py/publish-to-pypi-and-testpypi?label=build
+    :target: https://github.com/GoDjango-Development/tfprotocol_client_py/actions/workflows/publish-to-pypi-and-testpypi.yml
 
-.. image:: https://github.com/GoDjango-Development/tfprotocol_client_py/actions/workflows/python-package.yml/badge.svg
-    :target: https://github.com/GoDjango-Development/tfprotocol_client_py/actions/workflows/python-package.yml
+.. image:: https://github.com/GoDjango-Development/tfprotocol_client_py/actions/workflows/test-package-code.yml/badge.svg
+    :target: https://github.com/GoDjango-Development/tfprotocol_client_py/actions/workflows/test-package-code.yml
 
 .. image:: https://img.shields.io/badge/Maintained%3F-yes-green.svg
     :target: https://GitHub.com/lagcleaner/tfprotocol_client_py/graphs/commit-activity
 
 .. image:: https://img.shields.io/github/issues/lagcleaner/tfprotocol_client_py.svg
     :target: https://GitHub.com/lagcleaner/tfprotocol_client_py/issues/
+
 .. image:: https://img.shields.io/github/issues-closed/lagcleaner/tfprotocol_client_py.svg
     :target: https://GitHub.com/lagcleaner/tfprotocol_client_py/issues?q=is%3Aissue+is%3Aclosed
 
