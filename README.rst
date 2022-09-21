@@ -2,6 +2,9 @@
 TFProtocol Client Implemented in Python :snake:
 ================================================
 
+.. image:: https://github.com/GoDjango-Development/tfprotocol_client_py/actions/workflows/python-package.yml/badge.svg
+    :target: https://github.com/GoDjango-Development/tfprotocol_client_py/actions/workflows/python-package.yml
+
 .. image:: https://img.shields.io/badge/Maintained%3F-yes-green.svg
     :target: https://GitHub.com/lagcleaner/tfprotocol_client_py/graphs/commit-activity
 
