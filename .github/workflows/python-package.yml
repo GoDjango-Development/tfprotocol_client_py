@@ -10,7 +10,8 @@ on:
     branches: [ "master" ]
 
 jobs:
-  build:
+  test:
+    environment: TESTING_ENVIRONMENT
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
