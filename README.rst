@@ -1,11 +1,11 @@
 ================================================
 TFProtocol Client Implemented in Python :snake:
 ================================================
-.. image:: https://github.com/GoDjango-Development/tfprotocol_client_py/actions/workflows/publish-to-pypi-and-testpypi.yml/badge.svg?branch=master
-    :target: https://github.com/GoDjango-Development/tfprotocol_client_py/actions/workflows/publish-to-pypi-and-testpypi.yml
+.. image:: https://github.com/GoDjango-Development/tfprotocol_client_py/actions/workflows/push-master.yml/badge.svg?branch=master
+    :target: https://github.com/GoDjango-Development/tfprotocol_client_py/actions/workflows/push-master.yml
 
-.. image:: https://github.com/GoDjango-Development/tfprotocol_client_py/actions/workflows/test-package-code.yml/badge.svg
-    :target: https://github.com/GoDjango-Development/tfprotocol_client_py/actions/workflows/test-package-code.yml
+.. image:: https://github.com/GoDjango-Development/tfprotocol_client_py/actions/workflows/push-pull.yml/badge.svg
+    :target: https://github.com/GoDjango-Development/tfprotocol_client_py/actions/workflows/push-pull.yml
 
 .. image:: https://img.shields.io/badge/Maintained%3F-yes-green.svg
     :target: https://GitHub.com/lagcleaner/tfprotocol_client_py/graphs/commit-activity
