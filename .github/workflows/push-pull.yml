@@ -5,10 +5,14 @@ name: tests
 
 on:
   push:
-    branches: [ "master" ]
+    branches:
+      - develop 
+      - master
   pull_request:
-    branches: [ "master" ]
-
+    branches:
+      - develop 
+      - master
+  
 jobs:
   test:
     env:
