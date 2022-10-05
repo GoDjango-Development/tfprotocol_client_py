@@ -1,28 +1,26 @@
 import os
+from collections import namedtuple
 from typing import Tuple
-import pytest
 
+import pytest
 from dotenv import load_dotenv
 from tfprotocol_client.extensions.xs_mysql import XSMySQL
 
 load_dotenv()
 
 
+MySQLData = namedtuple('MySQLData', 'host port user password database')
+
+
 @pytest.fixture(scope='module')
-def mysql_ip_port() -> Tuple[str, int]:
-    PROTO_SERVER_ADDRESS = os.environ.get(
-        'PROTO_SERVER_ADDRESS',
-        'tfproto.expresscuba.com',
-    )
-    PROTO_SERVER_ADDRESS_MYSQL = os.getenv(
-        'PROTO_SERVER_ADDRESS_MYSQL',
-        PROTO_SERVER_ADDRESS,
-    )
-    PROTO_SERVER_PORT_MYSQL = int(
-        os.getenv('PROTO_SERVER_PORT_MYSQL', '5432')
-    )
+def mysql_info() -> MySQLData:
+    addr = os.getenv('MYSQL_HOST', 'localhost')
+    port = int(os.getenv('MYSQL_PORT', '3306'))
+    database = os.getenv('MYSQL_DATABASE', 'test')
+    user = os.getenv('MYSQL_USER', 'test')
+    password = os.getenv('MYSQL_PASSWORD', 'test')
     #
-    return PROTO_SERVER_ADDRESS_MYSQL, PROTO_SERVER_PORT_MYSQL
+    return MySQLData(addr, port, user, password, database)
 
 
 @pytest.fixture(scope='module')
