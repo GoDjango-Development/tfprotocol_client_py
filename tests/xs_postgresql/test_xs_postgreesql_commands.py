@@ -51,7 +51,9 @@ def test_xspostgresql_open_close_commands(
             ),
         )
     except TimeLimitExpired:
-        raise AssertionError('Timeout expired: open_command timeout, try with another (address, port) configuration.')
+        raise AssertionError(
+            'Timeout expired: open_command timeout, try with another (address, port) configuration.'
+        )
 
     assert resps[-1].status == StatusServerCode.OK, resps[-1]
     assert resps[-1].message not in (None, ''), resps[-1]
@@ -67,7 +69,9 @@ def test_xspostgresql_open_close_commands(
         assert resps[-1].status == StatusServerCode.OK, resps[-1]
         assert resps[-1].message not in (None, ''), resps[-1]
     except TimeLimitExpired:
-        raise AssertionError('Timeout expired: close_command timeout, try with another (address, port) configuration.')
+        raise AssertionError(
+            'Timeout expired: close_command timeout, try with another (address, port) configuration.'
+        )
 
 
 @pytest.mark.run(order=92)
@@ -129,7 +133,7 @@ def test_xspostgresql_exec_command(
     assert resps[-1].status == StatusServerCode.OK, resps[-1]
     assert resps[-1].message not in (None, ''), resps[-1]
     assert len(rows) == 4, rows
-    assert rows[0][0] == b'ID', rows[0]
+    assert rows[0][0] in (b'ID', b'id'), rows[0]
     assert rows[1][0] == b'1', rows[1]
     #
     tfproto.exec_command(db_id, '''DROP TABLE COMPANY;''')
@@ -213,7 +217,9 @@ def test_xspostgresql_exit_command(xspostgresql_instance: XSPostgreSQL):
             lambda *_, **__: tfproto.exit_command(),
         )
     except TimeLimitExpired:
-        raise AssertionError('Timeout expired: exit_command timeout, probably cause has nothing to exit from here and no response is given.')
+        raise AssertionError(
+            'Timeout expired: exit_command timeout, probably cause has nothing to exit from here and no response is given.'
+        )
 
     # ..
     try:
@@ -238,7 +244,9 @@ def test_xspostgresql_terminate_command(xspostgresql_instance: XSPostgreSQL):
     try:
         timelimit(6, lambda *_, **__: tfproto.terminate_command())
     except TimeLimitExpired:
-        raise AssertionError('Timeout expired: terminate_command timeout, probably cause has nothing to terminate here and no response is given.')
+        raise AssertionError(
+            'Timeout expired: terminate_command timeout, probably cause has nothing to terminate here and no response is given.'
+        )
     # ..
     try:
         timelimit(
