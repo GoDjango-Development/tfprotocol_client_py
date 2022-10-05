@@ -133,7 +133,7 @@ def test_prockey_command(tfprotocol_instance: TfProtocol):
     # PROCKEY command
     assert len(resps) == 1, resps
     assert resps[0].status == StatusServerCode.OK, resps[0]
-    assert resps[0].message is not None and len(resps[0].message) == 16, resps[0]
+    assert resps[0].message is not None, resps[0]
 
 
 @pytest.mark.run(order=40)
