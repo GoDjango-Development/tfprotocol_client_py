@@ -13,7 +13,8 @@ from tfprotocol_client.models.status_info import StatusInfo
 from tfprotocol_client.models.status_server_code import StatusServerCode
 
 # pylint: disable=unused-import
-from .xs_postgreesql import postgresql_ip_port, xspostgresql_instance
+from .xs_postgreesql import (PostgreeSQLData, postgresql_info,
+                             xspostgresql_instance)
 
 
 @pytest.mark.run(order=90)
@@ -31,7 +32,7 @@ def test_xspostgresql_command(xspostgresql_instance: XSPostgreSQL):
 @pytest.mark.depends(on=['test_xspostgresql_command'])
 def test_xspostgresql_open_close_commands(
     xspostgresql_instance: XSPostgreSQL,
-    postgresql_ip_port: Tuple[str, int],
+    postgresql_info: PostgreeSQLData,
 ):
     """Test for open and close commands."""
     tfproto = xspostgresql_instance
@@ -41,11 +42,11 @@ def test_xspostgresql_open_close_commands(
         timelimit(
             6,
             lambda *_, **__: tfproto.open_command(
-                postgresql_ip_port[0],
-                postgresql_ip_port[1],
-                'user-pytest',
-                'password-pytest',
-                'pytest-db',
+                postgresql_info.host,
+                postgresql_info.port,
+                postgresql_info.user,
+                postgresql_info.password,
+                postgresql_info.database,
                 response_handler=resps.append,
             ),
         )
@@ -73,17 +74,17 @@ def test_xspostgresql_open_close_commands(
 @pytest.mark.depends(on=['test_xspostgresql_open_close_commands'])
 def test_xspostgresql_exec_command(
     xspostgresql_instance: XSPostgreSQL,
-    postgresql_ip_port: Tuple[str, int],
+    postgresql_info: PostgreeSQLData,
 ):
     """Test for exec command."""
     tfproto = xspostgresql_instance
     resps: List[StatusInfo] = []
     tfproto.open_command(
-        postgresql_ip_port[0],
-        postgresql_ip_port[1],
-        'user-pytest',
-        'password-pytest',
-        'pytest-db',
+        postgresql_info.host,
+        postgresql_info.port,
+        postgresql_info.user,
+        postgresql_info.password,
+        postgresql_info.database,
         response_handler=resps.append,
     )
     db_id = resps[-1].message.split()[-1]
@@ -139,17 +140,17 @@ def test_xspostgresql_exec_command(
 @pytest.mark.depends(on=['test_xspostgresql_open_close_commands'])
 def test_xspostgresql_execof_command(
     xspostgresql_instance: XSPostgreSQL,
-    postgresql_ip_port: Tuple[str, int],
+    postgresql_info: PostgreeSQLData,
 ):
     """Test for execof command."""
     tfproto = xspostgresql_instance
     resps: List[StatusInfo] = []
     tfproto.open_command(
-        postgresql_ip_port[0],
-        postgresql_ip_port[1],
-        'user-pytest',
-        'password-pytest',
-        'pytest-db',
+        postgresql_info.host,
+        postgresql_info.port,
+        postgresql_info.user,
+        postgresql_info.password,
+        postgresql_info.database,
         response_handler=resps.append,
     )
     db_id = resps[-1].message.split()[-1]

@@ -1,28 +1,24 @@
 import os
-from typing import Tuple
-import pytest
+from collections import namedtuple
 
+import pytest
 from dotenv import load_dotenv
 from tfprotocol_client.extensions.xs_postgresql import XSPostgreSQL
 
 load_dotenv()
 
+PostgreeSQLData = namedtuple('PostgreSQLData', 'host port user password database')
+
 
 @pytest.fixture(scope='module')
-def postgresql_ip_port() -> Tuple[str, int]:
-    PROTO_SERVER_ADDRESS = os.environ.get(
-        'PROTO_SERVER_ADDRESS',
-        'tfproto.expresscuba.com',
-    )
-    PROTO_SERVER_ADDRESS_POSTGRESQL = os.getenv(
-        'PROTO_SERVER_ADDRESS_POSTGRESQL',
-        PROTO_SERVER_ADDRESS,
-    )
-    PROTO_SERVER_PORT_POSTGRESQL = int(
-        os.getenv('PROTO_SERVER_PORT_POSTGRESQL', '5432')
-    )
+def postgresql_info() -> PostgreeSQLData:
+    addr = os.getenv('POSTGRE_HOST', 'localhost')
+    port = int(os.getenv('POSTGRE_PORT', '5432'))
+    database = os.getenv('POSTGRE_DATABASE', 'test')
+    user = os.getenv('POSTGRE_USER', 'test')
+    password = os.getenv('POSTGRE_PASSWORD', 'test')
     #
-    return PROTO_SERVER_ADDRESS_POSTGRESQL, PROTO_SERVER_PORT_POSTGRESQL
+    return PostgreeSQLData(addr, port, user, password, database)
 
 
 @pytest.fixture(scope='module')
