@@ -21,8 +21,18 @@ jobs:
       PROTO_CLIENT_HASH: ${{ secrets.PROTO_CLIENT_HASH }}
       PROTO_SERVER_ADDRESS: ${{ secrets.PROTO_SERVER_ADDRESS }}
       PROTO_SERVER_PORT: ${{ secrets.PROTO_SERVER_PORT }}
-      PROTO_SERVER_ADDRESS_POSTGRE: ${{ secrets.PROTO_SERVER_ADDRESS_POSTGRE }}
-      PROTO_SERVER_PORT_POSTGRE: ${{ secrets.PROTO_SERVER_PORT_POSTGRE }}
+      # MYSQL
+      MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
+      MYSQL_HOST: ${{ secrets.MYSQL_HOST }}
+      MYSQL_PORT: ${{ secrets.MYSQL_PORT }}
+      MYSQL_USER: ${{ secrets.MYSQL_USER }}
+      MYSQL_PASS: ${{ secrets.MYSQL_PASS }}
+      # POSTGRES
+      POSTGRE_DATABASE: ${{ secrets.POSTGRE_DATABASE }}
+      POSTGRE_HOST: ${{ secrets.POSTGRE_HOST }}
+      POSTGRE_PORT: ${{ secrets.POSTGRE_PORT }}
+      POSTGRE_USER: ${{ secrets.POSTGRE_USER }}
+      POSTGRE_PASSWORD: ${{ secrets.POSTGRE_PASSWORD }}
     runs-on: ubuntu-latest
     steps:
       - name: Set up environment
