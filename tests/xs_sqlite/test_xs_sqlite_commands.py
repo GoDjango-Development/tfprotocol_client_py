@@ -43,7 +43,6 @@ def test_xssqlite_open_close_commands(xssqlite_instance: XSSQLite):
 
 
 @pytest.mark.run(order=82)
-@pytest.mark.depends(on=['test_xssqlite_open_close_commands'])
 def test_xssqlite_exec_command(xssqlite_instance: XSSQLite):
     """Test for exec command."""
     tfproto = xssqlite_instance
@@ -99,7 +98,6 @@ def test_xssqlite_exec_command(xssqlite_instance: XSSQLite):
 
 
 @pytest.mark.run(order=83)
-@pytest.mark.depends(on=['test_xssqlite_exec_command'])
 def test_xssqlite_execof_command(xssqlite_instance: XSSQLite):
     """Test for execof command."""
     tfproto = xssqlite_instance
@@ -153,7 +151,6 @@ def test_xssqlite_execof_command(xssqlite_instance: XSSQLite):
 
 
 @pytest.mark.run(order=84)
-@pytest.mark.depends(on=['test_xssqlite_execof_command'])
 def test_xssqlite_lastrowid_command(xssqlite_instance: XSSQLite):
     """Test for lastrowid command."""
     tfproto = xssqlite_instance

@@ -29,7 +29,6 @@ def test_xspostgresql_command(xspostgresql_instance: XSPostgreSQL):
 
 
 @pytest.mark.run(order=91)
-@pytest.mark.depends(on=['test_xspostgresql_command'])
 def test_xspostgresql_open_close_commands(
     xspostgresql_instance: XSPostgreSQL,
     postgresql_info: PostgreeSQLData,
@@ -75,7 +74,6 @@ def test_xspostgresql_open_close_commands(
 
 
 @pytest.mark.run(order=92)
-@pytest.mark.depends(on=['test_xspostgresql_open_close_commands'])
 def test_xspostgresql_exec_command(
     xspostgresql_instance: XSPostgreSQL,
     postgresql_info: PostgreeSQLData,
@@ -141,7 +139,6 @@ def test_xspostgresql_exec_command(
 
 
 @pytest.mark.run(order=93)
-@pytest.mark.depends(on=['test_xspostgresql_open_close_commands'])
 def test_xspostgresql_execof_command(
     xspostgresql_instance: XSPostgreSQL,
     postgresql_info: PostgreeSQLData,
@@ -205,7 +202,6 @@ def test_xspostgresql_execof_command(
 
 
 @pytest.mark.run(order=94)
-@pytest.mark.depends(on=['test_xspostgresql_command'])
 def test_xspostgresql_exit_command(xspostgresql_instance: XSPostgreSQL):
     """Test for exit command."""
     tfproto = xspostgresql_instance
@@ -235,7 +231,6 @@ def test_xspostgresql_exit_command(xspostgresql_instance: XSPostgreSQL):
 
 
 @pytest.mark.run(order=95)
-@pytest.mark.depends(on=['test_xspostgresql_command'])
 def test_xspostgresql_terminate_command(xspostgresql_instance: XSPostgreSQL):
     """Test for terminate command."""
     tfproto = xspostgresql_instance
